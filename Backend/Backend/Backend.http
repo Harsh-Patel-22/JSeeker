@@ -4,3 +4,12 @@ GET {{Backend_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+POST {{Backend_HostAddress}}/api/joblocation
+Content-Type: application/json
+
+{
+  "latitude": 51.505,
+  "longitude": 100.00,
+  "searchdistance": 10
+}

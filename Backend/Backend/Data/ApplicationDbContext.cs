@@ -8,7 +8,7 @@ public class ApplicationDbContext : DbContext {
         
     }
     
-    DbSet<Location> Locations { get; set; }
+    public DbSet<Location> Locations { get; set; }
 
     /*protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
