@@ -38,12 +38,12 @@ const Map = () => {
       center={position} 
       zoom={5} // TODO - set the zoom level dynamically based on the search distance
       scrollWheelZoom={false} 
-      style={{ height: "100vh", width: "100%" }}
+      style={{ height: "100vh", width: "100vh" }}
     >
             <TileLayer url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-            <MapCard position={position} message={"HI"}></MapCard>
-            {nearbyJobs.map((job) => (<MapCard position={[job.latitude, job.longitude]} message={"JOB"}></MapCard>))}
+            <MapCard position={position} message={"This is you"} job={null}></MapCard>
+            {nearbyJobs.map((job) => (<MapCard position={[job.location.latitude, job.location.longitude]} job={job} message=""></MapCard>))}
         </MapContainer>
     )
 }

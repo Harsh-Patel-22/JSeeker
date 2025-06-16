@@ -8,6 +8,7 @@ import HirerDashboard from './pages/HirerDashboard';
 import SignupPage from './pages/SignupPage';
 import Navbar from './components/Navbar';
 import SeekerDashboard from './pages/SeekerDashboard';
+import JobDescription from './pages/JobDescription';
 function App() {
 
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<LoginPage/>} />
           <Route path="/dashboard/hirer" element={<HirerDashboard/>} />
           <Route path="/dashboard/seeker" element={<SeekerDashboard/>} />
+          <Route path='/job' element={<JobDescription></JobDescription>} />
           <Route path='/signup' element={<SignupPage/>} />
         </Routes>
       </BrowserRouter>

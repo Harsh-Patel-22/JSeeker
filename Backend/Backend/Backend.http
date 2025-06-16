@@ -10,6 +10,6 @@ Content-Type: application/json
 
 {
   "latitude": 51.505,
-  "longitude": 100.00,
+  "longitude": 59.50,
   "searchdistance": 10
 }
