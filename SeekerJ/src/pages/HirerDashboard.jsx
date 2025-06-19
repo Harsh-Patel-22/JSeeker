@@ -1,9 +1,15 @@
+import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 
 const HirerDashboard = () =>
 {
-    <Navbar/>
-    return <><h1>Hirer!!!</h1></>
+    return <>
+        <Navbar/>
+        {/* <Sidebar/> */}
+        <div ></div>
+        <Footer />
+    </>
 }
 
 export default HirerDashboard;

@@ -20,7 +20,7 @@ const Map = () => {
                 "searchdistance": 10
             }
             try {
-                var response = await api.post("joblocation", locationobj);
+                var response = await api.post("jobs/location", locationobj);
                 // console.log(response.data);
                 setNearbyJobs(response.data);
                 // console.log(nearbyJobs);
@@ -38,7 +38,7 @@ const Map = () => {
       center={position} 
       zoom={5} // TODO - set the zoom level dynamically based on the search distance
       scrollWheelZoom={false} 
-      style={{ height: "100vh", width: "100vh" }}
+      style={{ height: "75vh", width: "100%" }}
     >
             <TileLayer url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
