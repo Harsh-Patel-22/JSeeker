@@ -10,17 +10,17 @@ const Map = () => {
     // TODO - Remove all the logical code from here and add it to the upper component. Just pass in the data as props to this component in order to render
     const position = [54.505, 45] // TODO - set the position dynamically based on the user lcoation 
     // TODO - Fetch the position based on the user position for the map center, also get the nearby positions of the hirers and data from the backend and populate the map with the same.
-    var [nearbyJobs, setNearbyJobs] = useState([])
+    let [nearbyJobs, setNearbyJobs] = useState([])
     
     useEffect(() => {
         async function searchAndFetchNearbyJobs() {
-            var locationobj = {
+            let locationobj = {
                 "latitude": position[0],
                 "longitude": position[1],
                 "searchdistance": 10
             }
             try {
-                var response = await api.post("jobs/location", locationobj);
+                let response = await api.post("jobs/location", locationobj);
                 // console.log(response.data);
                 setNearbyJobs(response.data);
                 // console.log(nearbyJobs);

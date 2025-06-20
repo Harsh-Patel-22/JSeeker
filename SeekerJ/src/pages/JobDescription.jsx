@@ -4,10 +4,11 @@ import Footer from "../components/Footer";
 import { useState } from "react";
 
 const JobDescription = () => {
-    var location = useLocation();
-    var {jobData} = location.state;
+    let location = useLocation();
+    let {jobData} = location.state;
 
-    let [type, setType] = useState("hirer"); 
+    // let [type, setType] = useState("hirer"); 
+    let type = sessionStorage.getItem("type");
     // console.log(job)
     return <>
         <Navbar />

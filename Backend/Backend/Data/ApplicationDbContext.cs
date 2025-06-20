@@ -10,6 +10,8 @@ public class ApplicationDbContext : DbContext {
     
     public DbSet<Location> Locations { get; set; }
     public DbSet<Job> Jobs { get; set; }
+    public DbSet<Interview> Interviews { get; set; }
+    public DbSet<Application> Applications { get; set; }
 
     /*protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);

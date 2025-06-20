@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Backend.Models;
 
 namespace Backend.DTOs;
@@ -7,5 +8,9 @@ public class CreateJobDTO {
     public required string Description { get; set; }
     public string TermsAndConditions { get; set; }
     public decimal Salary { get; set; }
-    public required Location Location { get; set; }
+    public string Status { get; set; }
+    [ForeignKey("Id")]
+    public int LocationId { get; set; }
+    public Location Location { get; set; }
+    
 }

@@ -5,11 +5,31 @@ Accept: application/json
 
 ###
 
-POST {{Backend_HostAddress}}/api/joblocation
+POST {{Backend_HostAddress}}/api/job/location
 Content-Type: application/json
 
 {
   "latitude": 51.505,
   "longitude": 59.50,
   "searchdistance": 10
+}
+
+###
+POST {{Backend_HostAddress}}/api/interview/get
+Content-Type: application/json
+
+{
+  "Id": 1
+}
+
+###
+GET {{Backend_HostAddress}}/api/interview/get
+
+###
+
+POST {{Backend_HostAddress}}/api/application/get
+Content-Type: application/json
+
+{
+  "Id": 2
 }

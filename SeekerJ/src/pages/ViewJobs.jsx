@@ -28,7 +28,8 @@ const JobCard = ({job, type}) => {
 }
 
 const ViewJobs = () => {
-    let [type, setType] = useState("hirer");
+    // let [type, setType] = useState("hirer");
+    let type = sessionStorage.getItem("type");
     let [relevantJobs, setRelevantJobs] = useState([]);
 
     const splitArray = (arr, size) => {
@@ -41,11 +42,11 @@ const ViewJobs = () => {
     
     useEffect(() => {
             async function fetchRelevantJobs() {
-                var postObj = {
+                let postObj = {
                     "clientID": ""// TODO - get the client ID from the session storage/token
                 }
                 try {
-                    var response = await api.post("jobs", postObj);
+                    let response = await api.post("jobs", postObj);
                     setRelevantJobs(response.data);
                 } catch (error) {
                     console.log(error);

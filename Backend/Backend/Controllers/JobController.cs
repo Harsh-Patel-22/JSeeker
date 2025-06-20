@@ -31,8 +31,9 @@ public class JobController : ControllerBase {
                 
             }).ToList();
         return Ok(nearbyJobs);
-        // TODO - Smart filter based on the distance in the query itself
-
+        
+        // DONE
+        // TODO - Smart filter based on the distance in the query itself - DONE!
         // TODO - Rather than returning a list of locations, return a list of jobs; Every detail for the job. - DONE!
     }
     
@@ -43,9 +44,15 @@ public class JobController : ControllerBase {
     }
     
     [HttpPost("new")]
-    public IActionResult CreateJob([FromBody] CreateJobDTO newJob) {
-        // _context.Jobs.Add(new Job())    
-        // TODO - Configure the new job object from the CreateJobDTO.
+    public async Task<IActionResult> CreateJob([FromBody] CreateJobDTO newJob) {
+        await _context.Jobs.AddAsync(new Job( _context.Jobs.Count(),newJob.Title, newJob.Description, newJob.TermsAndConditions, newJob.Salary, newJob.Status, newJob.LocationId) {
+            Title = string.Empty,
+            Description = string.Empty
+        });    
+        await _context.SaveChangesAsync();
+        
+        // TODO - Configure the new job object from the CreateJobDTO. - DONE
+        // TODO - Refactor the Job Table and Other respective classes
         return Created();
     }
 }

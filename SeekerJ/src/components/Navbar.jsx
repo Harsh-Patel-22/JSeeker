@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 
 const Navbar = () => {
-    let [type, setType] = useState("hirer");
+    // let [type, setType] = useState("hirer");
+    let type = sessionStorage.getItem("type");
 
     return <div className="px-3 py-2 text-bg-dark border-bottom">
         <div className="container">
@@ -18,10 +19,10 @@ const Navbar = () => {
                         {type == "hirer" ? <Link to={"/jobs"} className="nav-link text-white">View your jobs</Link>: <Link to={"/jobs"} className="nav-link text-white">Look for jobs</Link>} 
                     </li>
                     <li> 
-                        {type == "hirer" ? <Link to={""} className="nav-link text-white">Applications</Link>: <Link to={""} className="nav-link text-white">Resume Builder</Link>} 
+                        {type == "hirer" ? <Link to={"/applications"} className="nav-link text-white">Applications</Link>: <Link to={""} className="nav-link text-white">Resume Builder</Link>} 
                     </li>
                     <li>
-                        <Link to={""} className="nav-link text-white">Interview Schedule</Link>
+                        <Link to={"/interviews"} className="nav-link text-white">Interview Schedule</Link>
                     </li> 
                     <li> 
                         <Link to={""} className="nav-link text-white">Profile {/* Add account icon */}</Link>
