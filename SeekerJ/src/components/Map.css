@@ -1,3 +1,76 @@
-.leaflet-container{
-    height: 100vh;
+.overlay-controls {
+  position: absolute;
+  top: 100px;
+  right: 20px;
+  z-index: 1000;
+
+  background: rgba(255, 255, 255, 0.85); /* semi-transparent white */
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+
+  /* ✨ Strong, smooth shadow */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 
+              0 16px 48px rgba(0, 0, 0, 0.2);
+
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  width: 280px;
+  font-family: system-ui, sans-serif;
+}
+
+
+.search-bar {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-bar:focus {
+  background: #fff;
+  box-shadow: 0 0 0 2px #007bff55;
+}
+
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider {
+  flex: 1;
+  appearance: none;
+  height: 4px;
+  border-radius: 4px;
+  background: #ccc;
+  outline: none;
+  transition: background 0.2s;
+}
+
+.slider:hover {
+  background: #aaa;
+}
+
+.slider::-webkit-slider-thumb,
+.slider::-moz-range-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #007bff;
+  border: none;
+  cursor: pointer;
+}
+
+.slider-value {
+  min-width: 24px;
+  font-size: 14px;
+  color: #333;
 }

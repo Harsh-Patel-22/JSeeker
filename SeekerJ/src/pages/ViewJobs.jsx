@@ -43,7 +43,7 @@ const ViewJobs = () => {
     useEffect(() => {
             async function fetchRelevantJobs() {
                 let postObj = {
-                    "clientID": ""// TODO - get the client ID from the session storage/token
+                    "clientID": sessionStorage.getItem("clientId")// TODO - get the client ID from the session storage/token
                 }
                 try {
                     let response = await api.post("jobs", postObj);

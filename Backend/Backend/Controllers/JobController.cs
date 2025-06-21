@@ -55,4 +55,10 @@ public class JobController : ControllerBase {
         // TODO - Refactor the Job Table and Other respective classes
         return Created();
     }
+    
+    [HttpGet("get/{id}")]
+    public IActionResult GetJobById([FromRoute] int id) {
+        return Ok(_context.Jobs.Find(id));
+    }
+    
 }

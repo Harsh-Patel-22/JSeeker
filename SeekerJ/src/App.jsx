@@ -12,8 +12,8 @@ function App() {
 
   return (
     <>
-    {sessionStorage.setItem("type", "seeker")}
-    {sessionStorage.setItem("clientId", "1")}
+    {sessionStorage.setItem("type", "hirer")}
+    {sessionStorage.setItem("clientId", "2")}
       <BrowserRouter> 
         <Routes>
           <Route path="/" element={<LoginPage/>} />

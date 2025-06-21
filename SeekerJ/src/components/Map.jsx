@@ -11,6 +11,8 @@ const Map = () => {
     const position = [54.505, 45] // TODO - set the position dynamically based on the user lcoation 
     // TODO - Fetch the position based on the user position for the map center, also get the nearby positions of the hirers and data from the backend and populate the map with the same.
     let [nearbyJobs, setNearbyJobs] = useState([])
+    let [searchTerm, setSearchTerm] = useState("")
+    let [zoom, setZoom] = useState(5)
     
     useEffect(() => {
         async function searchAndFetchNearbyJobs() {
@@ -30,13 +32,20 @@ const Map = () => {
             }
         }
         searchAndFetchNearbyJobs();
-    }, [nearbyJobs]);
+    }, []);
     
+    useEffect(() => {
+      function logOnUpdate() {
+        console.log(zoom);
+      }
+      
+      logOnUpdate();
+    }, [zoom])
 
-    return (
+    return <>
         <MapContainer 
       center={position} 
-      zoom={5} // TODO - set the zoom level dynamically based on the search distance
+      zoom={zoom} // TODO - set the zoom level dynamically based on the search distance
       scrollWheelZoom={false} 
       style={{ height: "75vh", width: "100%" }}
     >
@@ -45,7 +54,30 @@ const Map = () => {
             <MapCard position={position} message={"This is you"} job={null}></MapCard>
             {nearbyJobs.map((job) => (<MapCard position={[job.location.latitude, job.location.longitude]} job={job} message=""></MapCard>))}
         </MapContainer>
-    )
+
+        <div className="overlay-controls">
+        <input
+          type="text"
+          placeholder="Search skill based jobs..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-bar"
+        />
+
+        <div className="slider-wrapper">
+          <input
+            type="range"
+            min="1"
+            max="10"
+            value={zoom}
+            onChange={(e) => setZoom(e.target.value)}
+            className="slider"
+          />
+          <span className="slider-value">{zoom}</span>
+        </div>
+      </div>
+    </>
+    
 }
 
 export default Map; 
