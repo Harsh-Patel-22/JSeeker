@@ -15,11 +15,11 @@ public class ApplicationController : ControllerBase {
     }
     
     
-    [HttpPost("get")]
+    [HttpGet("get/clientId={clientId}")]
     // TODO - Limit the details of job passed around using few new DTOs. Rn on passing the job model object itself, a lot of unnecessary data is being passed and making the response heavy
-    public IActionResult GetApplications([FromBody] ClientIdDTO clientIdDto) {
+    public IActionResult GetApplications([FromRoute] int clientId) {
         var applications = from application in _context.Applications
-            where application.HirerId == clientIdDto.Id 
+            where application.HirerId == clientId 
             select new ApplicationDTO() {
             ApplicantId = application.ApplicantId,
             JobId = application.JobId,

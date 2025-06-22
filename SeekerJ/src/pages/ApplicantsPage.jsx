@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { AxiosError } from "axios";
 
 const ApplicationCard = ({applicationData}) => {
     return <>
@@ -113,10 +114,17 @@ const ApplicationsPage = () => {
 
     useEffect(() => {
         async function fetchInterviews(){
-            let postObj = {"Id": clientId}
-            let response = await api.post("application/get", postObj);
-            // console.log(response.data);
-            setApplications(response.data);
+            try {
+                let response = await api.get("application/get/clientId=" + clientId);
+                // console.log(response.data);
+                setApplications(response.data);
+                
+            } catch (error) {
+                if(error == AxiosError)
+                    console.log("Axios Error")
+                else
+                    console.log(error)
+            }
         }
 
         fetchInterviews();

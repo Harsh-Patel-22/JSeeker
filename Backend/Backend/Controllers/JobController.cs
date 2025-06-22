@@ -1,15 +1,17 @@
 using Backend.Data;
 using Backend.DTOs;
+using Backend.DTOs.Job;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
 [ApiController]
-[Route("api/jobs")]
+[Route("api/job")]
 public class JobController : ControllerBase {
     private readonly ApplicationDbContext _context;
     
+    // TODO - Give the check conditions for corner cases - not found, doesnt exist, any other. Catch all exceptions that can be created.
     public JobController(ApplicationDbContext context) {
         _context = context;
     }
@@ -18,17 +20,16 @@ public class JobController : ControllerBase {
     public IActionResult GetNearbyJobs([FromBody] SearchLocationDTO searchLocationDto) {
         decimal searchDistance = searchLocationDto.SearchDistance;
         
-        List<JobDTO> nearbyJobs = (from job in _context.Jobs
+        // TODO - Set the diagonal checking in the distance. The total distance should be within the search ditance and not just in terms of latitude and longitude separately
+        List<JobForMapMarkerDTO> nearbyJobs = (from job in _context.Jobs
             join location in _context.Locations
                 on job.LocationId equals location.Id where Math.Abs(location.Latitude - searchLocationDto.Latitude) < searchDistance && Math.Abs(location.Longitude - searchLocationDto.Longitude) < searchDistance
-            select new JobDTO()
+            select new JobForMapMarkerDTO()
             {
+                Id = job.Id,
                 Title = job.Title,
-                Description = job.Description,
-                TermsAndConditions = job.TermsAndConditions,
-                Salary = job.Salary,
-                Location = location,
-                
+                Distance = (decimal) Math.Sqrt(Math.Pow((double) (location.Latitude - searchLocationDto.Latitude), 2) + Math.Pow((double) (location.Latitude - searchLocationDto.Latitude), 2)),
+                Location = location
             }).ToList();
         return Ok(nearbyJobs);
         
@@ -37,10 +38,26 @@ public class JobController : ControllerBase {
         // TODO - Rather than returning a list of locations, return a list of jobs; Every detail for the job. - DONE!
     }
     
-    [HttpPost]
-    public IActionResult GetRelevantJobs([FromBody] ClientIdDTO clientIdDto) {
+    [HttpGet("get/clientId={clientId}")]
+    public IActionResult GetRelevantJobs([FromRoute] int clientId) {
+        Console.WriteLine(clientId);
+        List<Job> relevantJobs = _context.Jobs.ToList();
+        List<JobCardDTO> relevantJobCards = new List<JobCardDTO>();
+        
+        foreach (Job job in relevantJobs) {
+            relevantJobCards.Add(new JobCardDTO() {
+                Id = job.Id,
+                Title = job.Title,
+                Status = job.Status,
+                WorkMode = "On-Site",
+                Location = (from location in _context.Locations where location.Id == job.LocationId select location).First(),
+                MinSalary = job.Salary,
+                MaxSalary = job.Salary + 100000,
+            });
+        }
+        
         // TODO - Add the code to filter jobs based on the hirer's posts (belonging to the hirer) and seeker's interest (based on skills and experience)
-        return Ok(_context.Jobs.ToList());
+        return Ok(relevantJobCards);
     }
     
     [HttpPost("new")]
@@ -56,9 +73,30 @@ public class JobController : ControllerBase {
         return Created();
     }
     
-    [HttpGet("get/{id}")]
-    public IActionResult GetJobById([FromRoute] int id) {
-        return Ok(_context.Jobs.Find(id));
+    [HttpGet("description/{id}")]
+    public async Task<IActionResult> GetJobDescriptionById([FromRoute] int id) {
+        Job? job = await _context.Jobs.FindAsync(id);
+        if(job == null) {
+            return BadRequest();
+        }
+        
+        return Ok(new JobDescriptionDTO() {
+            Id = job.Id,
+            Title = job.Title,
+            Status = job.Status,
+            WorkMode = "On-Site",
+            MinSalary = job.Salary,
+            MaxSalary = job.Salary + 100000,
+            Location = (from location in _context.Locations where location.Id == job.LocationId select location).First(),
+            
+            Description = job.Description,
+            TermsAndConditions = job.TermsAndConditions,
+            Requirements = "Requirements",
+            Miscellaneous = "lorem32",
+            
+            PostedDaysAgo = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
+            NumberOfApplicants = _context.Applications.Count(),
+        });
     }
     
 }

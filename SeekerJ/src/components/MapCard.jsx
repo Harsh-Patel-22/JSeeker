@@ -7,9 +7,9 @@ const JobCard = ({job}) => {
                 <img src="..." className="card-img-top" alt="..." />
                 <div className="card-body">
                     <h5 className="card-title">{job.title}</h5>
-                    <p className="card-text">{job.description}</p>
+                    <p className="card-text">Distance in coordinates: {job.distance}</p>
                     <a href="#" className="btn btn-primary text-light">Apply</a>
-                    <Link to="/job" state={{'jobData': job}} className="btn btn-danger text-light">More Details</Link>
+                    <Link to="/job" state={{'jobData': job.id}} className="btn btn-danger text-light">More Details</Link>
                 </div>
             </div>
 }

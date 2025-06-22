@@ -1,15 +1,34 @@
 import { useLocation } from "react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "../services/APIClient";
+import { Axios, AxiosError } from "axios";
 
 const JobDescription = () => {
     let location = useLocation();
     let {jobData} = location.state;
+    let [job, setJob] = useState({});
 
-    // let [type, setType] = useState("hirer"); 
     let type = sessionStorage.getItem("type");
     // console.log(job)
+
+    useEffect(() => {
+      async function getAllJobDetails() {
+        try {
+          let response = await api.get("job/description/"+ jobData);
+          setJob(response.data);
+        } catch (error) {
+          if(error == AxiosError)
+            console.log("Axios Error!");
+          else
+            console.log(error);
+        }
+      }
+      
+      getAllJobDetails();
+    }, [])
+
     return <>
         <Navbar />
 <div className="container mt-4 mb-5">
@@ -18,7 +37,7 @@ const JobDescription = () => {
       <div className="d-flex align-items-start">
         <img src="company-logo.png" alt="Company Logo" className="me-3 rounded" style={{width: "64px", height: "64px"}} />
         <div>
-          <h4 className="mb-1">{jobData.title}</h4>
+          <h4 className="mb-1">{job.title}</h4>
           <p className="mb-0 text-muted">Techify Solutions · Full-time</p>
           <p className="mb-0 text-muted">Bangalore, Karnataka, India · On-site</p>
           <small className="text-muted">Posted 2 days ago · 23 applicants</small>

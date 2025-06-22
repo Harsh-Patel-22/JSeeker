@@ -14,13 +14,13 @@ public class InterviewController : ControllerBase {
         _context = context;
     }
     
-    [HttpPost("get")]
-    public async Task<IActionResult> GetInterviews([FromBody] ClientIdDTO clientIdDto) {
+    [HttpGet("get/clientId={clientId}")]
+    public async Task<IActionResult> GetInterviews([FromRoute] int clientId) {
         var interviews = 
             from interview in _context.Interviews
             join job in _context.Jobs on interview.JobId equals job.Id
             join location in _context.Locations on job.LocationId equals location.Id
-            where clientIdDto.Id == interview.HirerId || clientIdDto.Id == interview.SeekerId 
+            where clientId == interview.HirerId || clientId == interview.SeekerId 
             select new InterviewDTO() {
             SeekerId = interview.SeekerId,
             HirerId = interview.HirerId,

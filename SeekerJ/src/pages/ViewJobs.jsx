@@ -5,6 +5,7 @@ import { Link } from 'react-router';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { api } from '../services/APIClient';
+import { AxiosError } from 'axios';
 
 const JobCard = ({job, type}) => {
     return <div className="col-lg-4 col-md-6 col-12 mt-4 pt-2">
@@ -19,7 +20,7 @@ const JobCard = ({job, type}) => {
                 </div>
                 
                 <div className="mt-3">
-                    <Link to={"/job"} state={{jobData: job}} className="btn btn-primary">View Details</Link>
+                    <Link to={"/job"} state={{jobData: job.id}} className="btn btn-primary">View Details</Link>
                     {type == "hirer" ? <a href="#" className="btn btn-danger" style={{float: 'right'}}>Close Applications</a> : <a href="#" className="btn btn-primary" style={{float: 'right'}}>Apply Now</a>}
                 </div>
             </div>
@@ -42,14 +43,14 @@ const ViewJobs = () => {
     
     useEffect(() => {
             async function fetchRelevantJobs() {
-                let postObj = {
-                    "clientID": sessionStorage.getItem("clientId")// TODO - get the client ID from the session storage/token
-                }
                 try {
-                    let response = await api.post("jobs", postObj);
+                    let response = await api.get("job/get/clientId=" + sessionStorage.getItem("clientId"));
                     setRelevantJobs(response.data);
                 } catch (error) {
-                    console.log(error);
+                    if(error == AxiosError)
+                        console.log("Axios Error");
+                    else
+                        console.log(error)
                 }
             }
             fetchRelevantJobs();

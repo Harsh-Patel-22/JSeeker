@@ -4,48 +4,41 @@ import './Map.css'
 import { useEffect, useState } from 'react';
 import { api } from '../services/APIClient';
 import MapCard from './MapCard';
+import { AxiosError } from 'axios';
 
-
+// TODO - Add a circle with the user position as the centre. A transparent green circle showing the search distance. 
 const Map = () => {
     // TODO - Remove all the logical code from here and add it to the upper component. Just pass in the data as props to this component in order to render
     const position = [54.505, 45] // TODO - set the position dynamically based on the user lcoation 
     // TODO - Fetch the position based on the user position for the map center, also get the nearby positions of the hirers and data from the backend and populate the map with the same.
     let [nearbyJobs, setNearbyJobs] = useState([])
     let [searchTerm, setSearchTerm] = useState("")
-    let [zoom, setZoom] = useState(5)
+    let [searchDistance, setSearchDistance] = useState(10)
     
     useEffect(() => {
         async function searchAndFetchNearbyJobs() {
             let locationobj = {
                 "latitude": position[0],
                 "longitude": position[1],
-                "searchdistance": 10
+                "searchdistance": searchDistance
             }
             try {
-                let response = await api.post("jobs/location", locationobj);
-                // console.log(response.data);
+                let response = await api.post("job/location", locationobj);
                 setNearbyJobs(response.data);
-                // console.log(nearbyJobs);
-                // nearbyJobs.map((job) => console.log([job.latitude, job.longitude]))
             } catch (error) {
-                console.log(error);
+                if(error == AxiosError)
+                  console.log("Axios Error");
+                else
+                  console.log(error)
             }
         }
         searchAndFetchNearbyJobs();
-    }, []);
-    
-    useEffect(() => {
-      function logOnUpdate() {
-        console.log(zoom);
-      }
-      
-      logOnUpdate();
-    }, [zoom])
+    }, [searchDistance]);
 
     return <>
         <MapContainer 
       center={position} 
-      zoom={zoom} // TODO - set the zoom level dynamically based on the search distance
+      zoom={(1 / searchDistance) * 50} // TODO - set the searchDistance level dynamically based on the search distance
       scrollWheelZoom={false} 
       style={{ height: "75vh", width: "100%" }}
     >
@@ -69,11 +62,11 @@ const Map = () => {
             type="range"
             min="1"
             max="10"
-            value={zoom}
-            onChange={(e) => setZoom(e.target.value)}
+            value={searchDistance}
+            onChange={(e) => setSearchDistance(e.target.value)}
             className="slider"
           />
-          <span className="slider-value">{zoom}</span>
+          <span className="slider-value">{searchDistance}</span>
         </div>
       </div>
     </>

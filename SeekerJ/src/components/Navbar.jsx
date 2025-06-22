@@ -15,8 +15,8 @@ const Navbar = () => {
                         {type == "hirer" ? <Link to={"/dashboard/hirer"} className="nav-link text-white">Home</Link>: <Link to={"/dashboard/seeker"} className="nav-link text-white">Home</Link>} 
                     </li>
                     <li> 
-                        {/* <Link to={"/jobs"}>{type == "hirer" ? "View your jobs" : "Look for jobs"}</Link> */}
-                        {type == "hirer" ? <Link to={"/jobs"} className="nav-link text-white">View your jobs</Link>: <Link to={"/jobs"} className="nav-link text-white">Look for jobs</Link>} 
+                        <Link to={"/jobs"} className="nav-link text-white">{type == "hirer" ? "View your jobs" : "Look for jobs"}</Link>
+                        {/* {type == "hirer" ? <Link to={"/jobs"} className="nav-link text-white">View your jobs</Link>: <Link to={"/jobs"} className="nav-link text-white">Look for jobs</Link>}  */}
                     </li>
                     <li> 
                         {type == "hirer" ? <Link to={"/applications"} className="nav-link text-white">Applications</Link>: <Link to={""} className="nav-link text-white">Resume Builder</Link>} 
