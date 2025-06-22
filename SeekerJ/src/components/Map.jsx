@@ -1,5 +1,5 @@
 import 'leaflet/dist/leaflet.css'
-import { MapContainer, Marker, TileLayer, Popup} from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, Circle} from 'react-leaflet';
 import './Map.css'
 import { useEffect, useState } from 'react';
 import { api } from '../services/APIClient';
@@ -20,7 +20,7 @@ const Map = () => {
             let locationobj = {
                 "latitude": position[0],
                 "longitude": position[1],
-                "searchdistance": searchDistance
+                "searchdistance": searchDistance / 120000
             }
             try {
                 let response = await api.post("job/location", locationobj);
@@ -38,14 +38,24 @@ const Map = () => {
     return <>
         <MapContainer 
       center={position} 
-      zoom={(1 / searchDistance) * 50} // TODO - set the searchDistance level dynamically based on the search distance
+      zoom={5} // TODO - set the searchDistance level dynamically based on the search distance
       scrollWheelZoom={false} 
       style={{ height: "75vh", width: "100%" }}
     >
             <TileLayer url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <MapViewUpdater center={position}/>
+
+            <Circle center={position} radius={searchDistance} pathOptions={{
+            color: "lightgreen",
+            fillColor: "rgba(0, 255, 123, 0.3)",
+            fillOpacity: 0.4,
+            weight: 2,
+          }}
+        />
 
             <MapCard position={position} message={"This is you"} job={null}></MapCard>
             {nearbyJobs.map((job) => (<MapCard position={[job.location.latitude, job.location.longitude]} job={job} message=""></MapCard>))}
+
         </MapContainer>
 
         <div className="overlay-controls">
@@ -57,20 +67,33 @@ const Map = () => {
           className="search-bar"
         />
 
+
         <div className="slider-wrapper">
           <input
             type="range"
             min="1"
-            max="10"
-            value={searchDistance}
-            onChange={(e) => setSearchDistance(e.target.value)}
+            max="20"
+            value={searchDistance / 120000}
+            onChange={(e) => setSearchDistance(e.target.value * 120000)}
             className="slider"
-          />
-          <span className="slider-value">{searchDistance}</span>
+            />
+          <span className="slider-value">{searchDistance/ 120000}</span>
         </div>
+        <center>Set Search Distance</center>
       </div>
     </>
     
 }
+
+const MapViewUpdater = ({ center, zoom }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [center, zoom, map]);
+
+  return null;
+};
+
 
 export default Map; 
