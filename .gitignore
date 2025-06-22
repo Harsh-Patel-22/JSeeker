@@ -1,2 +1,19 @@
 /Backend/Backend/.env
-/Backend/.idea
+
+# Ignore compiled binaries
+*.dll
+*.exe
+*.pdb
+*.obj
+
+# Ignore all bin and obj folders, recursively
+**/bin/
+**/obj/
+
+# Ignore Rider-specific files
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
