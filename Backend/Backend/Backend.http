@@ -36,3 +36,33 @@ Content-Type: application/json
 
 ###
 GET {{Backend_HostAddress}}/api/job/description/3
+
+###
+GET {{Backend_HostAddress}}/api/github/languages/Harsh-Patel-22/JSeeker
+
+
+###
+GET {{Backend_HostAddress}}/api/github/languages/
+
+
+###
+GET {{Backend_HostAddress}}/api/github/repositories/Harsh-Patel-22
+
+
+###
+GET {{Backend_HostAddress}}/api/github/repositories/Harsh-Patel-22/JSeeker
+
+
+###
+GET {{Backend_HostAddress}}/api/github/topics/Harsh-Patel-22/JSeeker
+
+
+###
+GET {{Backend_HostAddress}}/api/github/tags/Harsh-Patel-22/JSeeker
+
+
+###
+GET {{Backend_HostAddress}}/api/github/readme/Harsh-Patel-22/Tic-Tac-Toe_Game
+
+
+

@@ -8,6 +8,9 @@ import ViewJobs from './pages/ViewJobs';
 import NewJob from './pages/NewJob';
 import InterviewSchedule from './pages/InterviewSchedule';
 import ApplicationsPage from './pages/ApplicantsPage';
+import Testing from './pages/Testing';
+import ProfilePage from './pages/ProfilePage';
+
 function App() {
 
   return (
@@ -25,6 +28,8 @@ function App() {
           <Route path='/interviews' element={<InterviewSchedule/>} />
           <Route path='/applications' element={<ApplicationsPage/>}/>
           <Route path='/signup' element={<SignupPage/>} />
+          <Route path='/testing' element={<Testing/>} />
+          <Route path='/profile' element={<ProfilePage />}/>
         </Routes>
       </BrowserRouter>
     </>
