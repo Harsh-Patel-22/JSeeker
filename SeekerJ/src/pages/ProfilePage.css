@@ -6,21 +6,48 @@ body {
   max-width: 900px;
 } */
 
-.card {
-  background-color: #ffffff;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-}
-
 h5 {
   color: #212529;
   font-weight: 600;
 }
+
+.section-toggle {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1rem 0;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.section-toggle:hover {
+  color: #0d6efd;
+}
+
+.chevron {
+  transition: transform 0.3s ease;
+  font-size: 1rem;
+}
+
+.chevron.rotate {
+  transform: rotate(180deg);
+}
+
+.section-content {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: max-height 0.5s ease, opacity 0.3s ease, transform 0.3s ease;
+  padding-left: 1rem;
+}
+
+.section-content.open {
+  max-height: 1000px;
+  opacity: 1;
+  transform: translateX(0);
+  margin-bottom: 1.5rem;
+}
+

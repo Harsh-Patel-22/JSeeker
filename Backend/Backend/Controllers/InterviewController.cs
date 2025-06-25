@@ -21,11 +21,11 @@ public class InterviewController : ControllerBase {
             join job in _context.Jobs on interview.JobId equals job.Id
             join location in _context.Locations on job.LocationId equals location.Id
             where clientId == interview.HirerId || clientId == interview.SeekerId 
-            select new InterviewDTO() {
+            select new InterviewDto() {
             SeekerId = interview.SeekerId,
             HirerId = interview.HirerId,
             JobId = interview.JobId,
-            Job = new JobDTO() {
+            Job = new JobDto() {
                 Title = job.Title, 
                 Description = job.Description,
                 TermsAndConditions = job.TermsAndConditions,
@@ -46,7 +46,7 @@ public class InterviewController : ControllerBase {
     }
     
     [HttpPost("create")]
-    public async Task<IActionResult> CreateInterview([FromBody] CreateInterviewDTO interviewDto) {
+    public async Task<IActionResult> CreateInterview([FromBody] CreateInterviewDto interviewDto) {
         await _context.Interviews.AddAsync(new Interview() {
             Date = interviewDto.Date,
             Time = interviewDto.Time,

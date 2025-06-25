@@ -23,17 +23,22 @@ public class UserController : ControllerBase {
     public IActionResult GetUserProfile([FromRoute] int clientId, [FromRoute] Role role) {
         switch (role) {
             case Role.Hirer:
-                var hirerData = from user in _context.Users join hirer in _context.Hirers on user.Id equals hirer.Id join address in _context.Addresses on hirer.CompanyAddressId equals address.Id where user.Id == clientId select new HirerProfileDTO() {
-                    CompanyAddress = address,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Gender = user.Gender,
-                    PhoneNumber = user.PhoneNumber,
-                };
+                var hirerData = from user in _context.Users
+                    join hirer in _context.Hirers on user.Id equals hirer.Id
+                    join address in _context.Addresses on hirer.CompanyAddressId equals address.Id
+                    where user.Id == clientId
+                    select new HirerProfileDto(
+                        user.FirstName,
+                        user.LastName,
+                        user.PhoneNumber,
+                        user.Gender,
+                        address
+                        ); 
+                    
                 return Ok(hirerData);
             
             case Role.Seeker:
-                var seekerData = from user in _context.Users join seeker in _context.Seekers on user.Id equals seeker.Id join address in _context.Addresses on seeker.AddressId equals address.Id where user.Id == clientId select new SeekerProfileDTO() {
+                var seekerData = from user in _context.Users join seeker in _context.Seekers on user.Id equals seeker.Id join address in _context.Addresses on seeker.AddressId equals address.Id where user.Id == clientId select new SeekerProfileDto() {
                     Address = address,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
@@ -41,11 +46,15 @@ public class UserController : ControllerBase {
                     PhoneNumber = user.PhoneNumber,
                     GithubUsername = seeker.GithubUsername,
                     WorkExperienceInYears = seeker.WorkExperienceInYears,
-                    ResumeURL = seeker.ResumeURL,
+                    ResumeURL = seeker.ResumeUrl,
                 };
                 return Ok(seekerData);
         }
 
         return BadRequest();
-    } 
+    }
+    [HttpGet]
+    public IActionResult GetBasicDetails() {
+        return Ok();
+    }
 }

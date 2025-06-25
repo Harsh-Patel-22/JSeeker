@@ -17,14 +17,14 @@ public class JobController : ControllerBase {
     }
     
     [HttpPost("location")]
-    public IActionResult GetNearbyJobs([FromBody] SearchLocationDTO searchLocationDto) {
+    public IActionResult GetNearbyJobs([FromBody] SearchLocationDto searchLocationDto) {
         decimal searchDistance = searchLocationDto.SearchDistance;
         
         // TODO - Set the diagonal checking in the distance. The total distance should be within the search ditance and not just in terms of latitude and longitude separately
-        List<JobForMapMarkerDTO> nearbyJobs = (from job in _context.Jobs
+        List<JobForMapMarkerDto> nearbyJobs = (from job in _context.Jobs
             join location in _context.Locations
                 on job.LocationId equals location.Id where Math.Abs(location.Latitude - searchLocationDto.Latitude) < searchDistance && Math.Abs(location.Longitude - searchLocationDto.Longitude) < searchDistance
-            select new JobForMapMarkerDTO()
+            select new JobForMapMarkerDto()
             {
                 Id = job.Id,
                 Title = job.Title,
@@ -42,10 +42,10 @@ public class JobController : ControllerBase {
     public IActionResult GetRelevantJobs([FromRoute] int clientId) {
         Console.WriteLine(clientId);
         List<Job> relevantJobs = _context.Jobs.ToList();
-        List<JobCardDTO> relevantJobCards = new List<JobCardDTO>();
+        List<JobCardDto> relevantJobCards = new List<JobCardDto>();
         
         foreach (Job job in relevantJobs) {
-            relevantJobCards.Add(new JobCardDTO() {
+            relevantJobCards.Add(new JobCardDto() {
                 Id = job.Id,
                 Title = job.Title,
                 Status = job.Status,
@@ -61,7 +61,7 @@ public class JobController : ControllerBase {
     }
     
     [HttpPost("new")]
-    public async Task<IActionResult> CreateJob([FromBody] CreateJobDTO newJob) {
+    public async Task<IActionResult> CreateJob([FromBody] CreateJobDto newJob) {
         await _context.Jobs.AddAsync(new Job( _context.Jobs.Count(),newJob.Title, newJob.Description, newJob.TermsAndConditions, newJob.Salary, newJob.Status, newJob.LocationId) {
             Title = string.Empty,
             Description = string.Empty
@@ -80,7 +80,7 @@ public class JobController : ControllerBase {
             return BadRequest();
         }
         
-        return Ok(new JobDescriptionDTO() {
+        return Ok(new JobDescriptionDto() {
             Id = job.Id,
             Title = job.Title,
             Status = job.Status,

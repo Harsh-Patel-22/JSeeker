@@ -13,7 +13,7 @@ const BasicDetailsSection = () => {
         />
         <div>
           <h4 className="fw-bold mb-0">Harsh Patel</h4>
-          <p className="text-muted mb-1">B.Tech CSE Student (Education) • Gujarat, India (Location)</p>
+          <p className="text-muted mb-1">B.Tech CSE Student • Gujarat, India</p>
           <p className="text-muted small">
             Focused on Full Stack Development | Game Dev | YouTuber (About/Description)
           </p>

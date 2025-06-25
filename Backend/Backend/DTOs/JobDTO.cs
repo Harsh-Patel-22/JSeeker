@@ -2,7 +2,7 @@ using Backend.Models;
 
 namespace Backend.DTOs;
 
-public class JobDTO {
+public class JobDto {
     public required string Title { get; set; }
     public required string Description { get; set; }
     public string TermsAndConditions { get; set; }

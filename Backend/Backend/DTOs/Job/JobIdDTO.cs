@@ -1,5 +1,5 @@
 namespace Backend.DTOs.Job;
 
-public class JobIdDTO {
+public class JobIdDto {
     public int Id { get; set; }
 }

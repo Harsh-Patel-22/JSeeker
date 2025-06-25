@@ -1,6 +1,6 @@
 namespace Backend.DTOs;
 
-public class CreateApplicationDTO {
+public class CreateApplicationDto {
     public int ApplicantId { get; set; }
     public int JobId { get; set; }
     public int HirerId { get; set; }

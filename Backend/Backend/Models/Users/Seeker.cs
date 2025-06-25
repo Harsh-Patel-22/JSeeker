@@ -10,7 +10,7 @@ public class Seeker {
     public int AddressId { get; set; }
     public string GithubUsername { get; set; }
     public int WorkExperienceInYears { get; set; }  
-    public string ResumeURL { get; set; }
+    public string ResumeUrl { get; set; }
     // TODO - To find a way to store the resume itself... 
     // education
     

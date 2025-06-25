@@ -20,7 +20,7 @@ public class ApplicationController : ControllerBase {
     public IActionResult GetApplications([FromRoute] int clientId) {
         var applications = from application in _context.Applications
             where application.HirerId == clientId 
-            select new ApplicationDTO() {
+            select new ApplicationDto() {
             ApplicantId = application.ApplicantId,
             JobId = application.JobId,
             HirerId = application.HirerId,
@@ -29,7 +29,7 @@ public class ApplicationController : ControllerBase {
     }
     
     [HttpPost("create")]
-    public async Task<IActionResult> CreateApplication([FromBody] CreateApplicationDTO applicationDto) {
+    public async Task<IActionResult> CreateApplication([FromBody] CreateApplicationDto applicationDto) {
         await _context.Applications.AddAsync(new Application() {
             ApplicantId = applicationDto.ApplicantId,
             JobId = applicationDto.JobId,

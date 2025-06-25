@@ -2,7 +2,7 @@ using Backend.Models.Users;
 
 namespace Backend.DTOs.Users;
 
-public class SeekerProfileDTO {
+public class SeekerProfileDto {
     public int Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }

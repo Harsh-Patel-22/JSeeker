@@ -12,9 +12,9 @@ builder.Services.AddControllers();
 
 builder.Services.AddHttpClient<GithubService>();
 
-var MyAllowedServices = "_myAllowedServices";
+var myAllowedServices = "_myAllowedServices";
 builder.Services.AddCors(options => {
-    options.AddPolicy(name:MyAllowedServices,builder => {
+    options.AddPolicy(name:myAllowedServices,builder => {
         builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
@@ -27,5 +27,5 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseHttpsRedirection();
 app.MapControllers();
-app.UseCors(MyAllowedServices);
+app.UseCors(myAllowedServices);
 app.Run();

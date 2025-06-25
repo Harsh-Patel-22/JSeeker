@@ -2,7 +2,7 @@ using Backend.Models;
 
 namespace Backend.DTOs.Job;
 
-public class JobCardDTO {
+public class JobCardDto {
     public int Id { get; set; }
     public string Title { get; set; }
     public string Status { get; set; }

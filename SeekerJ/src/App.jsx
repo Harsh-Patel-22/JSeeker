@@ -10,13 +10,16 @@ import InterviewSchedule from './pages/InterviewSchedule';
 import ApplicationsPage from './pages/ApplicantsPage';
 import Testing from './pages/Testing';
 import ProfilePage from './pages/ProfilePage';
+import Footer from './components/Footer';
+import Navbar from './components/Navbar';
 
 function App() {
 
   return (
     <>
-    {sessionStorage.setItem("type", "hirer")}
-    {sessionStorage.setItem("clientId", "2")}
+      {sessionStorage.setItem("type", "hirer")}
+      {sessionStorage.setItem("clientId", "2")}
+      {/* <Navbar /> */}
       <BrowserRouter> 
         <Routes>
           <Route path="/" element={<LoginPage/>} />
@@ -32,6 +35,7 @@ function App() {
           <Route path='/profile' element={<ProfilePage />}/>
         </Routes>
       </BrowserRouter>
+      <Footer />
     </>
   )
 }
