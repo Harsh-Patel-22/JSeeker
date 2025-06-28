@@ -1,14 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Backend.Models.Users;
+namespace Backend.Models.Mapping;
 
-public class UserCredentials {
+public class UserHobby
+{
     [Key]
     public int Id { get; set; }
-    public string Username { get; set; }
-    public string HashedPassword { get; set; }
-    public string Email { get; set; }
+    [ForeignKey("Id")]
+    public int HobbyId { get; set; }
     [ForeignKey("Id")]
     public int UserId { get; set; }
 }

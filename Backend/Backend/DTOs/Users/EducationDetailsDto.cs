@@ -5,6 +5,6 @@ public record EducationDetailsDto(
     string UniversityName,
     string State,
     string Country,
-    DateTime StartDate,
-    DateTime EndDate
+    DateOnly StartDate,
+    DateOnly EndDate
     );

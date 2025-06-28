@@ -6,6 +6,12 @@ namespace Backend.Models.Users;
 public class Seeker {
     [Key]
     public int Id { get; set; }
+
+    public string AboutLine { get; set; }
+    public string Occupation { get; set; }
+    public string State { get; set; }
+    public string Country { get; set; }
+    
     [ForeignKey("id")]
     public int AddressId { get; set; }
     public string GithubUsername { get; set; }

@@ -8,4 +8,8 @@ public class Hirer {
     public int Id { get; set; }
     [ForeignKey("id")]
     public int CompanyAddressId { get; set; }
+
+    public string CompanyName { get; set; }
+    public string Designation { get; set; }
+    public string WebsiteLink { get; set; }
 }

@@ -2,7 +2,7 @@ namespace Backend.DTOs.Users;
 
 public record ProjectDetailsDto(
     string Name,
-    // TODO - Add technologies list
+    List<TechnologyUsageDto> Technologies, 
     DateOnly StartDate,
     DateOnly EndDate,
     string GithubRepoLink
