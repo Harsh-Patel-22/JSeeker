@@ -2,19 +2,16 @@ using Backend.Data;
 using Backend.DTOs;
 using Backend.DTOs.Job;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/job")]
-public class JobController : ControllerBase {
-    private readonly ApplicationDbContext _context;
+public class JobController (JobService jobService, ApplicationDbContext _context) : ControllerBase {
     
     // TODO - Give the check conditions for corner cases - not found, doesnt exist, any other. Catch all exceptions that can be created.
-    public JobController(ApplicationDbContext context) {
-        _context = context;
-    }
     
     [HttpPost("location")]
     public IActionResult GetNearbyJobs([FromBody] SearchLocationDto searchLocationDto) {
@@ -40,37 +37,19 @@ public class JobController : ControllerBase {
     
     [HttpGet("get/clientId={clientId}")]
     public IActionResult GetRelevantJobs([FromRoute] int clientId) {
-        Console.WriteLine(clientId);
-        List<Job> relevantJobs = _context.Jobs.ToList();
-        List<JobCardDto> relevantJobCards = new List<JobCardDto>();
-        
-        foreach (Job job in relevantJobs) {
-            relevantJobCards.Add(new JobCardDto() {
-                Id = job.Id,
-                Title = job.Title,
-                Status = job.Status,
-                WorkMode = "On-Site",
-                Location = (from location in _context.Locations where location.Id == job.LocationId select location).First(),
-                MinSalary = job.Salary,
-                MaxSalary = job.Salary + 100000,
-            });
-        }
-        
-        // TODO - Add the code to filter jobs based on the hirer's posts (belonging to the hirer) and seeker's interest (based on skills and experience)
-        return Ok(relevantJobCards);
+        var jobs = jobService.GetRelevantJobs(clientId);
+        if (jobs.Count == 0) {
+            return NotFound("No jobs found");
+        };
+        return Ok(jobs);
     }
     
     [HttpPost("new")]
     public async Task<IActionResult> CreateJob([FromBody] CreateJobDto newJob) {
-        await _context.Jobs.AddAsync(new Job( _context.Jobs.Count(),newJob.Title, newJob.Description, newJob.TermsAndConditions, newJob.Salary, newJob.Status, newJob.LocationId) {
-            Title = string.Empty,
-            Description = string.Empty
-        });    
-        await _context.SaveChangesAsync();
+        var isCreated = await jobService.CreateJobAsync(newJob);
+        if (isCreated) return Created();
         
-        // TODO - Configure the new job object from the CreateJobDTO. - DONE
-        // TODO - Refactor the Job Table and Other respective classes
-        return Created();
+        return BadRequest(); 
     }
     
     [HttpGet("description/{id}")]

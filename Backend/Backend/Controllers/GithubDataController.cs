@@ -13,7 +13,7 @@ public class GithubDataController : ControllerBase {
     public GithubDataController(GithubService githubService) {
         _githubService = githubService;
     }
-    
+    // TODO - Add the null checks (string length 0 and return responses accordingly
     [HttpGet("languages")]
     public async Task<IActionResult> GetAllLanguages() {
         var languages = await  _githubService.GetAllLanguages();
@@ -55,23 +55,6 @@ public class GithubDataController : ControllerBase {
     [HttpGet("readme/{owner}/{repo}")]
     public async Task<IActionResult> GetReadme([FromRoute] string owner, [FromRoute] string repo) {
         var readmeString = await  _githubService.GetRepoReadme(owner, repo);
-        using var doc = JsonDocument.Parse(readmeString);
-        var root = doc.RootElement;
-
-        if (!root.TryGetProperty("content", out var contentElement))
-            throw new Exception("Content field not found in GitHub response.");
-
-        var base64Content = contentElement.GetString();
-
-        if (string.IsNullOrWhiteSpace(base64Content))
-            return Ok(string.Empty);
-
-        // Remove any line breaks in base64 string (GitHub adds \n every 76 chars)
-        base64Content = base64Content.Replace("\n", "").Replace("\r", "");
-
-        var bytes = Convert.FromBase64String(base64Content);
-        var decodedString = Encoding.UTF8.GetString(bytes);
-
-        return Ok(decodedString);
+        return Ok(readmeString);
     }
 }

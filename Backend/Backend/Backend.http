@@ -65,4 +65,24 @@ GET {{Backend_HostAddress}}/api/github/tags/Harsh-Patel-22/JSeeker
 GET {{Backend_HostAddress}}/api/github/readme/Harsh-Patel-22/Tic-Tac-Toe_Game
 
 
+###
+POST {{Backend_HostAddress}}//api/auth/register
+Content-Type: application/json
+
+{
+  "username": "Agent Dual Shards",
+  "password": "Agent!!",
+  "email": "hp22022005@gmail.com"
+}
+
+###
+POST {{Backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "Agent Dual Shards",
+  "password": "Agent!!"
+}
+
+
 
