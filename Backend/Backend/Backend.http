@@ -1,18 +1,18 @@
 @Backend_HostAddress = http://localhost:5275
 
-GET {{Backend_HostAddress}}/weatherforecast/
-Accept: application/json
-
 ###
 
 POST {{Backend_HostAddress}}/api/job/location
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjMWE0NTZlZC1kOWViLTRlMWEtOTAyMC0xNTRkMjM5MjZhYjEiLCJuYW1lIjoiQWdlbnQgRHVhbCBTaGFyZHMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTZWVrZXIiLCJleHAiOjE3NTE2MTMxNzEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSJ9.QIJIeXMKw-XW9zaUPPnM8giajmwNX9jbiCPsTKyG3Rg
 
 {
   "latitude": 51.505,
   "longitude": 59.50,
   "searchdistance": 10
 }
+
+
 
 ###
 POST {{Backend_HostAddress}}/api/interview/get
@@ -24,6 +24,7 @@ Content-Type: application/json
 
 ###
 GET {{Backend_HostAddress}}/api/interview/get
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjMWE0NTZlZC1kOWViLTRlMWEtOTAyMC0xNTRkMjM5MjZhYjEiLCJuYW1lIjoiQWdlbnQgRHVhbCBTaGFyZHMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTZWVrZXIiLCJleHAiOjE3NTE2MTMxNzEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSJ9.QIJIeXMKw-XW9zaUPPnM8giajmwNX9jbiCPsTKyG3Rg
 
 ###
 
@@ -64,6 +65,9 @@ GET {{Backend_HostAddress}}/api/github/tags/Harsh-Patel-22/JSeeker
 ###
 GET {{Backend_HostAddress}}/api/github/readme/Harsh-Patel-22/Tic-Tac-Toe_Game
 
+###
+GET {{Backend_HostAddress}}/api/github/allinsights/repo=ComfyUI
+
 
 ###
 POST {{Backend_HostAddress}}//api/auth/register
@@ -72,7 +76,8 @@ Content-Type: application/json
 {
   "username": "Agent Dual Shards",
   "password": "Agent!!",
-  "email": "hp22022005@gmail.com"
+  "email": "hp22022005@gmail.com",
+  "role": "Seeker"
 }
 
 ###
@@ -81,8 +86,25 @@ Content-Type: application/json
 
 {
   "username": "Agent Dual Shards",
-  "password": "Agent!!"
+  "password": "Agent!!",
+  "role": "Seeker"
 }
 
+###
+GET {{Backend_HostAddress}}/api/resume/prompt=Give me a resume description for a person who has worked on technologies like, react, asp.net and c#. Write all related keywords and make it such that it ranks higher in the automated testing.
 
+###
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=AIzaSyBWhcoipXZ0rZu5EN8-NO5_yVOM_MeI83Q
+Content-Type: application/json
+
+{
+  "contents": [
+    {
+      "parts": [{ "text": "Give me a resume description for a person who has worked on technologies like, react, asp.net and c#. Write all related keywords and make it such that it ranks higher in the automated testing." }]
+    }
+  ]
+}
+
+###
+GET {{Backend_HostAddress}}/api/testing
 

@@ -15,6 +15,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddControllers();
 
 builder.Services.AddHttpClient<GithubService>();
+builder.Services.AddHttpClient<AIService>();
+builder.Services.AddScoped<ResumeBuilderService>();
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -33,6 +35,7 @@ builder.Services.AddAuthentication(options => {
     };
 });
 
+builder.Services.AddAuthorization();
 
 builder.Services.AddAuthModule();
 builder.Services.AddJobModule();

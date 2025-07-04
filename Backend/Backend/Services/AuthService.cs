@@ -34,10 +34,11 @@ public class AuthService (IConfiguration config, AuthRepository repository) {
         var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         
         List<Claim> claims = [new Claim(JwtRegisteredClaimNames.NameId, Guid.NewGuid().ToString()), 
-            new Claim(JwtRegisteredClaimNames.Name, credentials.Username)];
+            new Claim(JwtRegisteredClaimNames.Name, credentials.Username), new Claim(ClaimTypes.Role, credentials.Role)];
 
         var tokenOptions = new JwtSecurityToken(
-            audience:config.GetValue<string>("jwt:audience"),
+            audience: config.GetValue<string>("jwt:audience"),
+            issuer: config.GetValue<string>("jwt:issuer"),
             claims: claims,
             expires: DateTime.Now.AddHours(1),
             signingCredentials: signingCredentials

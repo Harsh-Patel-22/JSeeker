@@ -5,5 +5,6 @@ namespace Backend.DTOs;
 public record RegisterCredentialsDto(
     string Username,
     string Password,
-    string Email
+    string Email,
+    string Role
     ) : IJwtUser;

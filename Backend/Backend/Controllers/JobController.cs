@@ -3,12 +3,14 @@ using Backend.DTOs;
 using Backend.DTOs.Job;
 using Backend.Models;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/job")]
+[Authorize(Roles = "Hirer,Seeker")]
 public class JobController (JobService jobService, ApplicationDbContext _context) : ControllerBase {
     
     // TODO - Give the check conditions for corner cases - not found, doesnt exist, any other. Catch all exceptions that can be created.

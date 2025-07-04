@@ -1,12 +1,14 @@
 using Backend.Data;
 using Backend.DTOs;
 using Backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/interview")]
+[Authorize(Roles = "Hirer,Seeker")]
 public class InterviewController : ControllerBase {
     private readonly ApplicationDbContext  _context;
 

@@ -3,12 +3,14 @@ using Backend.DTOs.Users;
 using Backend.Models.Users;
 using Backend.Models.Users.WorkRelated;
 using Backend.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/user")]
+[Authorize(Roles = "Hirer,Seeker")]
 public class UserController (UserRepository repository) : ControllerBase {
     
     [HttpGet("profile/basic/clientId={clientId}")]
