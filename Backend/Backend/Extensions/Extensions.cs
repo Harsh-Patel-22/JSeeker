@@ -6,6 +6,8 @@ namespace Backend.Extensions;
 public static class Extensions {
     public static IServiceCollection AddJobModule(this IServiceCollection services) {
         services.AddScoped<JobRepository>();
+        services.AddScoped<InterviewRepository>();
+        services.AddScoped<ApplicationRepository>();
         services.AddScoped<JobService>();
         return services;
     }

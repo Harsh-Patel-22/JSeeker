@@ -1,8 +1,8 @@
 namespace Backend.DTOs;
 
 public class InterviewDto {
-    public int SeekerId { get; set; }
-    public int HirerId { get; set; }
+    public Guid SeekerId { get; set; }
+    public Guid HirerId { get; set; }
     // TODO - remove the JobId. Not needed
     public int JobId { get; set; }
     public JobDto Job { get; set; }

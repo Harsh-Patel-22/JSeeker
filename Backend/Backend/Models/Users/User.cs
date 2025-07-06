@@ -1,4 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Backend.Models.Mapping;
+using Backend.Models.Users.Cocurricular;
+using Backend.Models.Users.WorkRelated;
 
 namespace Backend.Models.Users;
 
@@ -11,9 +14,10 @@ public enum Gender {
 }
 
 public class User {
+    // TODO - Find a way to properly populate the link between credentials class and this class
     
     // Section - Personal Details
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Occupation { get; set; }
@@ -30,6 +34,18 @@ public class User {
     public string LinkedInProfileLink { get; set; }
     
     // TODO - In the ui, while creating new post, if the mode in on site, give 2 options, company location and add new location. Also, only ask for location if its on site, else no need to show.
-    [ForeignKey("Id")]
     public bool IsSeeker { get; set; }
+    
+    // Section - Professional Details
+    public ICollection<Project> Projects { get; set; }
+    public ICollection<WorkExperience> WorkExperiences { get; set; }
+    public ICollection<Education> Educations { get; set; }
+    
+    // Section - Other Details
+    public ICollection<Hobby> Hobbies { get; set; }
+    public ICollection<UserVocalLanguage> UserVocalLanguages { get; set; }
+    
+    // Navigation Properties
+    [ForeignKey("AddressId")]
+    public Address Address { get; set; }
 }

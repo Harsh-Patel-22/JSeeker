@@ -21,6 +21,9 @@ public class Job {
     public string TermsAndConditions { get; set; }
     public decimal Salary { get; set; }
     public string Status { get; set; }
-    [ForeignKey("Id")]
     public int LocationId { get; set; }
+    
+    // Navigation Property
+    [ForeignKey("LocationId")]
+    public Location Location { get; set; }
 }

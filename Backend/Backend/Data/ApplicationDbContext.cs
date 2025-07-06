@@ -22,7 +22,7 @@ public class ApplicationDbContext : DbContext {
     public DbSet<Seeker> Seekers { get; set; }
     public DbSet<Address> Addresses { get; set; }
     public DbSet<Hobby> Hobbies { get; set; }
-    public DbSet<VocalLanguages> VocalLanguages { get; set; }
+    public DbSet<VocalLanguage> VocalLanguages { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<Technology> Technologies { get; set; }
     public DbSet<WorkExperience> WorkExperiences { get; set; }

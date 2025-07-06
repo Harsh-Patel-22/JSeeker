@@ -15,7 +15,7 @@ public class AuthRepository (ApplicationDbContext context) {
                 Username = credentials.Username,
                 Email = credentials.Email,
                 HashedPassword = passwordHasher.HashPassword(new UserCredentials() ,credentials.Password),
-                UserId = context.UserCredentials.Count()
+                UserId = Guid.NewGuid()
             });
 
             await context.SaveChangesAsync();

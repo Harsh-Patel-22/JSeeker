@@ -1,6 +1,7 @@
 using Backend.Data;
 using Backend.DTOs;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,56 +10,20 @@ namespace Backend.Controllers;
 [ApiController]
 [Route("api/interview")]
 [Authorize(Roles = "Hirer,Seeker")]
-public class InterviewController : ControllerBase {
-    private readonly ApplicationDbContext  _context;
-
-    public InterviewController(ApplicationDbContext context) {
-        _context = context;
-    }
-    
+public class InterviewController (JobService jobService) : ControllerBase {
     [HttpGet("get/clientId={clientId}")]
-    public async Task<IActionResult> GetInterviews([FromRoute] int clientId) {
-        var interviews = 
-            from interview in _context.Interviews
-            join job in _context.Jobs on interview.JobId equals job.Id
-            join location in _context.Locations on job.LocationId equals location.Id
-            where clientId == interview.HirerId || clientId == interview.SeekerId 
-            select new InterviewDto() {
-            SeekerId = interview.SeekerId,
-            HirerId = interview.HirerId,
-            JobId = interview.JobId,
-            Job = new JobDto() {
-                Title = job.Title, 
-                Description = job.Description,
-                TermsAndConditions = job.TermsAndConditions,
-                Salary = job.Salary, 
-                Location = location
-            } ,
-            Date = interview.Date,
-            Time = interview.Time,
-            Mode = interview.Mode,
-            };  
-        
-        return Ok(interviews.ToList());
+    public async Task<IActionResult> GetInterviewsAsync([FromRoute] Guid clientId) {
+        var interviews = await jobService.GetInterviewsByIdAsync(clientId);
+        return Ok(interviews);
     }
     
-    [HttpGet("get")]
-    public IActionResult GetAllInterviews() {
-        return Ok(_context.Interviews.ToList());
-    }
     
     [HttpPost("create")]
     public async Task<IActionResult> CreateInterview([FromBody] CreateInterviewDto interviewDto) {
-        await _context.Interviews.AddAsync(new Interview() {
-            Date = interviewDto.Date,
-            Time = interviewDto.Time,
-            Mode = interviewDto.Mode,
-            HirerId = interviewDto.HirerId,
-            SeekerId = interviewDto.SeekerId,
-            JobId = interviewDto.JobId
-        });
-        await _context.SaveChangesAsync();
-        return Ok();
+        if (await jobService.CreateInterviewAsync(interviewDto)) {
+            return Ok();
+        }
+        return BadRequest("Failed to create interview");
     }
     
 }

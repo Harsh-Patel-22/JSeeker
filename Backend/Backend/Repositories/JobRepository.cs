@@ -8,8 +8,8 @@ namespace Backend.Repositories;
 
 public class JobRepository (ApplicationDbContext context) {
     
-    public List<JobCardDto> GetRelevantJobs(int clientId) {
-        List<Job> relevantJobs = context.Jobs.ToList();
+    public async Task<List<JobCardDto>> GetRelevantJobsAsync(Guid clientId) {
+        List<Job> relevantJobs = await context.Jobs.ToListAsync();
         List<JobCardDto> relevantJobCards = new List<JobCardDto>();
         
         foreach (Job job in relevantJobs) {
@@ -43,6 +43,40 @@ public class JobRepository (ApplicationDbContext context) {
             return false;
         }
     }
-    
-    // public 
+
+    public async Task<List<JobForMapMarkerDto>> GetNearbyJobsAsync(Location targetLocation, Decimal searchDistance) {
+        List<JobForMapMarkerDto> nearbyJobs = await context.Jobs.Include(job => job.Location).Where(job => (decimal) Math.Sqrt(Math.Pow((double) (job.Location.Latitude - targetLocation.Latitude), 2) + Math.Pow((double) (job.Location.Latitude - targetLocation.Latitude), 2)) < searchDistance).Select(j => 
+            new JobForMapMarkerDto() { 
+                Id = j.Id,
+                Title = j.Title,
+                Distance = (decimal) Math.Sqrt(Math.Pow((double) (j.Location.Latitude - targetLocation.Latitude), 2) + Math.Pow((double) (j.Location.Latitude - targetLocation.Latitude), 2)),
+                Location = j.Location
+            }).ToListAsync();
+        return nearbyJobs;
+    }
+
+    public async Task<JobDescriptionDto?> GetJobDescriptionByIdAsync(int id) {
+        Job? job = await context.Jobs.FindAsync(id);
+        if(job == null) {
+            return null;
+        }
+        
+        return new JobDescriptionDto() {
+            Id = job.Id,
+            Title = job.Title,
+            Status = job.Status,
+            WorkMode = "On-Site",
+            MinSalary = job.Salary,
+            MaxSalary = job.Salary + 100000,
+            Location = (from location in context.Locations where location.Id == job.LocationId select location).First(),
+            
+            Description = job.Description,
+            TermsAndConditions = job.TermsAndConditions,
+            Requirements = "Requirements",
+            Miscellaneous = "lorem32",
+            
+            PostedDaysAgo = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
+            NumberOfApplicants = context.Applications.Count(),
+        };
+    }
 }

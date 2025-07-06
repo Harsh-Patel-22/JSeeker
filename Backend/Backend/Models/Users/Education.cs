@@ -6,12 +6,14 @@ namespace Backend.Models.Users;
 public class Education {
     [Key]
     public int Id { get; set; }
-    [ForeignKey("Id")] 
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     public string Study { get; set; }
     public string InstituteName { get; set; }
     public string State { get; set; }
     public string Country { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
+    
+    [ForeignKey("UserId")]
+    public User User { get; set; }
 }
