@@ -7,11 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Data;
 
-public class ApplicationDbContext : DbContext {
-    public ApplicationDbContext(DbContextOptions options) : base(options) {
-        
-    }
-    
+public class ApplicationDbContext(DbContextOptions options) : DbContext(options) {
     public DbSet<Location> Locations { get; set; }
     public DbSet<Job> Jobs { get; set; }
     public DbSet<Interview> Interviews { get; set; }
@@ -34,8 +30,61 @@ public class ApplicationDbContext : DbContext {
     
     
 
-    /*protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        base.OnModelCreating(modelBuilder);
-        Locations.
-    }*/
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        // CONFIGURATION FOR THE PROJECT-TECHNOLOGY JOIN MAPPING
+        modelBuilder.Entity<ProjectTechnology>()
+            .HasKey(pt => new { pt.ProjectId, pt.TechnologyId });
+
+        modelBuilder.Entity<ProjectTechnology>()
+            .HasOne(pt => pt.Project)
+            .WithMany(pt => pt.ProjectTechnologies)
+            .HasForeignKey(pt => pt.ProjectId);
+
+        modelBuilder.Entity<ProjectTechnology>()
+            .HasOne(pt => pt.Technology)
+            .WithMany(pt => pt.ProjectTechnologies)
+            .HasForeignKey(pt => pt.TechnologyId);
+
+        
+        // CONFIGURATION FOR THE USER-LANGUAGE JOIN MAPPING
+        modelBuilder.Entity<UserVocalLanguage>()
+            .HasKey(uv => new { uv.UserId, uv.VocalLanguageId });
+        
+        
+        modelBuilder.Entity<UserVocalLanguage>()
+            .HasOne(uv => uv.User)
+            .WithMany(uv => uv.UserVocalLanguages)
+            .HasForeignKey(uv => uv.UserId);
+
+        modelBuilder.Entity<UserVocalLanguage>()
+            .HasOne(uv => uv.VocalLanguage)
+            .WithMany(uv => uv.UserVocalLanguages)
+            .HasForeignKey(uv => uv.VocalLanguageId);
+        
+        
+        // CONFIGURATION FOR DUAL DELETE RESTRICTIONS
+        modelBuilder.Entity<Application>()
+            .HasOne(a => a.Hirer)
+            .WithMany()
+            .HasForeignKey(a => a.HirerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Application>()
+            .HasOne(a => a.Applicant)
+            .WithMany()
+            .HasForeignKey(a => a.ApplicantId)
+            .OnDelete(DeleteBehavior.Cascade); 
+
+        modelBuilder.Entity<Interview>()
+            .HasOne(i => i.Hirer)
+            .WithMany()
+            .HasForeignKey(i => i.HirerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Interview>()
+            .HasOne(i => i.Seeker)
+            .WithMany()
+            .HasForeignKey(i => i.SeekerId)
+            .OnDelete(DeleteBehavior.Cascade); 
+    }
 }

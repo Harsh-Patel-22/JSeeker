@@ -22,7 +22,7 @@ public class User {
     public string LastName { get; set; }
     public string Occupation { get; set; }
     public Gender Gender { get; set; }
-    public int AddressId { get; set; }
+    public int? AddressId { get; set; }
     
     // Section - Know more
     public string AboutLine { get; set; }

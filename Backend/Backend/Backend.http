@@ -74,9 +74,9 @@ POST {{Backend_HostAddress}}//api/auth/register
 Content-Type: application/json
 
 {
-  "username": "Agent Dual Shards",
+  "username": "Agent Dual Shardss",
   "password": "Agent!!",
-  "email": "hp22022005@gmail.com",
+  "email": "hp22022005@gmail.co.in",
   "role": "Seeker"
 }
 

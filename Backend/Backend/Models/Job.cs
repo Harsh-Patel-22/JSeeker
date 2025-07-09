@@ -13,6 +13,10 @@ public class Job {
         Status = status;
         LocationId = locationId;
     }
+    
+    public Job() {
+        
+    }
 
     [Key]
     public int Id { get; set; }

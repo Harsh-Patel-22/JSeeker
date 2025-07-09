@@ -17,5 +17,5 @@ public class ProjectTechnology
     [ForeignKey("ProjectId")]
     public Project Project { get; set; }
     [ForeignKey("TechnologyId")]
-    public Project Technology { get; set; }
+    public Technology Technology { get; set; }
 }

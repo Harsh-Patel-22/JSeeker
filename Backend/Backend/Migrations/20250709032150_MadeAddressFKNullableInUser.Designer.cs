@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250630085054_AddedUserTables")]
-    partial class AddedUserTables
+    [Migration("20250709032150_MadeAddressFKNullableInUser")]
+    partial class MadeAddressFKNullableInUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,39 +27,48 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Application", b =>
                 {
-                    b.Property<int>("ApplicationId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApplicationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApplicantId")
+                    b.Property<Guid>("ApplicantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ApplicationState")
                         .HasColumnType("int");
 
-                    b.Property<int>("HirerId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("HirerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("JobId")
                         .HasColumnType("int");
 
-                    b.HasKey("ApplicationId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.HasIndex("HirerId");
+
+                    b.HasIndex("JobId");
 
                     b.ToTable("Applications");
                 });
 
             modelBuilder.Entity("Backend.Models.Interview", b =>
                 {
-                    b.Property<int>("InterviewId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InterviewId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
-                    b.Property<int>("HirerId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("HirerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("JobId")
                         .HasColumnType("int");
@@ -68,13 +77,19 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SeekerId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SeekerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<TimeOnly>("Time")
                         .HasColumnType("time");
 
-                    b.HasKey("InterviewId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("HirerId");
+
+                    b.HasIndex("JobId");
+
+                    b.HasIndex("SeekerId");
 
                     b.ToTable("Interviews");
                 });
@@ -111,6 +126,8 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LocationId");
+
                     b.ToTable("Jobs");
                 });
 
@@ -135,22 +152,21 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Mapping.ProjectTechnology", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<float>("PercentUsage")
-                        .HasColumnType("real");
-
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
                     b.Property<int>("TechnologyId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<float>("PercentUsage")
+                        .HasColumnType("real");
+
+                    b.HasKey("ProjectId", "TechnologyId");
+
+                    b.HasIndex("TechnologyId");
 
                     b.ToTable("ProjectTechnologies");
                 });
@@ -166,8 +182,8 @@ namespace Backend.Migrations
                     b.Property<int>("HobbyId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -176,22 +192,21 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Mapping.UserVocalLanguage", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("VocalLanguageId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "VocalLanguageId");
+
+                    b.HasIndex("VocalLanguageId");
 
                     b.ToTable("UserVocalLanguages");
                 });
@@ -252,7 +267,7 @@ namespace Backend.Migrations
                     b.ToTable("Hobbies");
                 });
 
-            modelBuilder.Entity("Backend.Models.Users.Cocurricular.VocalLanguages", b =>
+            modelBuilder.Entity("Backend.Models.Users.Cocurricular.VocalLanguage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -299,10 +314,12 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Educations");
                 });
@@ -332,41 +349,22 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyAddressId");
+
                     b.ToTable("Hirers");
                 });
 
             modelBuilder.Entity("Backend.Models.Users.Seeker", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AboutLine")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AddressId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("GithubUsername")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Occupation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ResumeUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -380,17 +378,15 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Users.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AboutLine")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -429,6 +425,8 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AddressId");
+
                     b.ToTable("Users");
                 });
 
@@ -448,8 +446,11 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("Role")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -482,10 +483,12 @@ namespace Backend.Migrations
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Projects");
                 });
@@ -541,12 +544,226 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("WorkExperiences");
+                });
+
+            modelBuilder.Entity("HobbyUser", b =>
+                {
+                    b.Property<int>("HobbiesId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("HobbiesId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HobbyUser");
+                });
+
+            modelBuilder.Entity("Backend.Models.Application", b =>
+                {
+                    b.HasOne("Backend.Models.Users.User", "Applicant")
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Users.User", "Hirer")
+                        .WithMany()
+                        .HasForeignKey("HirerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Applicant");
+
+                    b.Navigation("Hirer");
+
+                    b.Navigation("Job");
+                });
+
+            modelBuilder.Entity("Backend.Models.Interview", b =>
+                {
+                    b.HasOne("Backend.Models.Users.User", "Hirer")
+                        .WithMany()
+                        .HasForeignKey("HirerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Users.User", "Seeker")
+                        .WithMany()
+                        .HasForeignKey("SeekerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hirer");
+
+                    b.Navigation("Job");
+
+                    b.Navigation("Seeker");
+                });
+
+            modelBuilder.Entity("Backend.Models.Job", b =>
+                {
+                    b.HasOne("Backend.Models.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("Backend.Models.Mapping.ProjectTechnology", b =>
+                {
+                    b.HasOne("Backend.Models.Users.WorkRelated.Project", "Project")
+                        .WithMany("ProjectTechnologies")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Users.WorkRelated.Technology", "Technology")
+                        .WithMany("ProjectTechnologies")
+                        .HasForeignKey("TechnologyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("Technology");
+                });
+
+            modelBuilder.Entity("Backend.Models.Mapping.UserVocalLanguage", b =>
+                {
+                    b.HasOne("Backend.Models.Users.User", "User")
+                        .WithMany("UserVocalLanguages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Users.Cocurricular.VocalLanguage", "VocalLanguage")
+                        .WithMany("UserVocalLanguages")
+                        .HasForeignKey("VocalLanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("VocalLanguage");
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.Education", b =>
+                {
+                    b.HasOne("Backend.Models.Users.User", "User")
+                        .WithMany("Educations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.Hirer", b =>
+                {
+                    b.HasOne("Backend.Models.Users.Address", "CompanyAddress")
+                        .WithMany()
+                        .HasForeignKey("CompanyAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CompanyAddress");
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.User", b =>
+                {
+                    b.HasOne("Backend.Models.Users.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId");
+
+                    b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.WorkRelated.Project", b =>
+                {
+                    b.HasOne("Backend.Models.Users.User", "User")
+                        .WithMany("Projects")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.WorkRelated.WorkExperience", b =>
+                {
+                    b.HasOne("Backend.Models.Users.User", "User")
+                        .WithMany("WorkExperiences")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HobbyUser", b =>
+                {
+                    b.HasOne("Backend.Models.Users.Cocurricular.Hobby", null)
+                        .WithMany()
+                        .HasForeignKey("HobbiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.Cocurricular.VocalLanguage", b =>
+                {
+                    b.Navigation("UserVocalLanguages");
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.User", b =>
+                {
+                    b.Navigation("Educations");
+
+                    b.Navigation("Projects");
+
+                    b.Navigation("UserVocalLanguages");
+
+                    b.Navigation("WorkExperiences");
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.WorkRelated.Project", b =>
+                {
+                    b.Navigation("ProjectTechnologies");
+                });
+
+            modelBuilder.Entity("Backend.Models.Users.WorkRelated.Technology", b =>
+                {
+                    b.Navigation("ProjectTechnologies");
                 });
 #pragma warning restore 612, 618
         }

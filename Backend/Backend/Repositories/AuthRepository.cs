@@ -11,7 +11,6 @@ public class AuthRepository (ApplicationDbContext context) {
     public async Task<bool> RegisterUserCredentialsAsync(RegisterCredentialsDto credentials) {
         try {
             await context.UserCredentials.AddAsync(new UserCredentials() {
-                Id = context.UserCredentials.Count(),
                 Username = credentials.Username,
                 Email = credentials.Email,
                 HashedPassword = passwordHasher.HashPassword(new UserCredentials() ,credentials.Password),
