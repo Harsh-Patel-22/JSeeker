@@ -1,21 +1,17 @@
-import { Link } from "react-router";
-import LoginPage from "./LoginPage";
+import AuthForm from '../components/AuthForm';
+import { Link } from 'react-router-dom';
 
 const SignupPage = () => {
-    return <>
-        <div>
-            {/* <label htmlFor="username">Username</label> */}
-            <form action="http:localhost:5150/api/login">
-                <h1>Its signup alright?</h1>
-                <input type="text" placeholder="Username or email"/>
-                <br />
-                <input type="password" placeholder="Password"/>
-                <br />
-                <button type="submit">Submit</button>
-            </form>
-            <Link to={{pathname: "/"}}>Already Registered? Login</Link>
-        </div>
-    </> 
+  return (
+    <div className="auth-page d-flex justify-content-center align-items-center vh-100">
+      <div className="w-100" style={{ maxWidth: '420px' }}>
+        <AuthForm mode="signup" />
+        <p className="text-center mt-3">
+          Already have an account? <Link to="/login">Log in</Link>
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export default SignupPage;

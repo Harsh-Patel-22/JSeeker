@@ -106,5 +106,5 @@ Content-Type: application/json
 }
 
 ###
-GET {{Backend_HostAddress}}/api/testing
+GET {{Backend_HostAddress}}/api/testing/
 

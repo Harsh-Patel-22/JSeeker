@@ -12,32 +12,46 @@ import Testing from './pages/Testing';
 import ProfilePage from './pages/ProfilePage';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
+import 'bootstrap/dist/css/bootstrap.css';
+import UnauthorisedPage from './pages/UnauthorisedPage';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useEffect } from 'react';
 
-function App() {
-
+const App = () => {
+  const authVar = useAuth();
+  const { isAuthenticated, user } = authVar;
+  useEffect(() => {
+  if (user) {
+    console.log("User updated in context:", user);
+  }
+}, [user]);
   return (
-    <>
-      {sessionStorage.setItem("type", "hirer")}
-      {sessionStorage.setItem("clientId", "2")}
-      {/* <Navbar /> */}
-      <BrowserRouter> 
-        <Routes>
-          <Route path="/" element={<LoginPage/>} />
-          <Route path="/dashboard/hirer" element={<HirerDashboard/>} />
-          <Route path="/dashboard/seeker" element={<SeekerDashboard/>} />
-          <Route path='/job' element={<JobDescription />} />
-          <Route path='/job/new' element={<NewJob/>} />
-          <Route path='/jobs' element={<ViewJobs/>} />
-          <Route path='/interviews' element={<InterviewSchedule/>} />
-          <Route path='/applications' element={<ApplicationsPage/>}/>
-          <Route path='/signup' element={<SignupPage/>} />
-          <Route path='/testing' element={<Testing/>} />
-          <Route path='/profile' element={<ProfilePage />}/>
-        </Routes>
-      </BrowserRouter>
-      <Footer />
-    </>
-  )
-}
+    <Routes>
+      {/* {console.log("isAuthenticated:", isAuthenticated())} */}
+      {/* {console.log("isAuthenticated user:", user)} */}
+      {console.log("AuthVar:", authVar)}
+      {isAuthenticated() ? (
+        <>
+          <Route path="/dashboard/hirer" element={<HirerDashboard />} />
+          <Route path="/dashboard/seeker" element={<SeekerDashboard />} />
+          <Route path="/job" element={<JobDescription />} />
+          <Route path="/job/new" element={<NewJob />} />
+          <Route path="/jobs" element={<ViewJobs />} />
+          <Route path="/interviews" element={<InterviewSchedule />} />
+          <Route path="/applications" element={<ApplicationsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </>
+      ) : (
+        <>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/testing" element={<Testing />} />
+          <Route path="/*" element={<UnauthorisedPage />} />
+        </>
+      )}
+    </Routes>
+  );
+ 
+};
 
 export default App

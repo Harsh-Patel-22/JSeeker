@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient<GithubService>();
 builder.Services.AddHttpClient<AIService>();
 builder.Services.AddScoped<ResumeBuilderService>();
+builder.Services.AddScoped<PdfService>();
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

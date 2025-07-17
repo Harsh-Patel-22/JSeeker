@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.DTOs;
+using Backend.Interfaces;
 using Backend.Models.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,10 +26,18 @@ public class AuthRepository (ApplicationDbContext context) {
         }
     }
 
-    public bool LoginUser(LoginCredentialsDto credentials) {
-        return (from dbCreds in context.UserCredentials
-            where dbCreds.Username == credentials.Username || dbCreds.Email == credentials.Username
-            select dbCreds).FirstOrDefault() != null;
+    public async Task<bool> LoginUserAsync(LoginCredentialsDto credentials) {
+        var dbCreds = context.UserCredentials.Where(u => u.Username == credentials.Username || u.Email == credentials.Username);
+        if (await dbCreds.FirstOrDefaultAsync() == null) {
+            return false;
+        }
+
+        var hashedPassword = await context.UserCredentials.Where(u => u.Username == credentials.Username).Select(u => u.HashedPassword).FirstOrDefaultAsync();
+        if (hashedPassword == null) {
+            return false;
+        }
+        
+        return passwordHasher.VerifyHashedPassword(new UserCredentials(), hashedPassword, credentials.Password) != PasswordVerificationResult.Failed;
     }
 
     public async Task<bool> CheckIfUsernameExistAsync(string username) {
@@ -37,5 +46,9 @@ public class AuthRepository (ApplicationDbContext context) {
 
     public async Task<bool> CheckIfEmailExistAsync(string email) {
         return await  context.UserCredentials.Select(u => u.Email.Equals(email)).FirstOrDefaultAsync();
+    }
+
+    public async Task<Guid> GetUserIdAsync(IJwtUser credentials) {
+        return await context.UserCredentials.Select(u => u.UserId).FirstOrDefaultAsync();
     }
 }

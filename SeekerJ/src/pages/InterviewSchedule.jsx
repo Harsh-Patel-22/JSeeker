@@ -3,7 +3,6 @@ import { api } from "../services/APIClient";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { AxiosError } from "axios";
 
 const InterviewCard = ({interviewData}) => {
@@ -101,12 +100,11 @@ const InterviewCard = ({interviewData}) => {
 
 const InterviewSchedule = () => {
     let [interviews, setInterviews] = useState([]);
-    let clientId = parseInt(sessionStorage.getItem("clientId"))
 
     useEffect(() => {
         async function fetchInterviews(){
           try {
-            let response = await api.get("interview/get/clientId=" + clientId);
+            let response = await api.get("interview/get");
             // console.log(response.data);
             setInterviews(response.data);
           } catch (error) {
@@ -128,7 +126,6 @@ const InterviewSchedule = () => {
         console.log(interview);
         return <InterviewCard interviewData = {interview}></InterviewCard>
     })}
-    <Footer></Footer>
     </> 
 }
 

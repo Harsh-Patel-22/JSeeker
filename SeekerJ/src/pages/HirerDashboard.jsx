@@ -1,6 +1,5 @@
-import Footer from "../components/Footer";
+
 import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
 
 const HirerDashboard = () =>
 {
@@ -8,7 +7,6 @@ const HirerDashboard = () =>
         <Navbar/>
         {/* <Sidebar/> */}
         <div ></div>
-        <Footer />
     </>
 }
 

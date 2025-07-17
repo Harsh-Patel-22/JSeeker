@@ -1,11 +1,8 @@
-using Backend.Data;
+using System.Security.Claims;
 using Backend.DTOs;
-using Backend.DTOs.Job;
-using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers;
 
@@ -21,8 +18,15 @@ public class JobController (JobService jobService) : ControllerBase {
         return Ok(await jobService.GetNearbyJobs(searchLocationDto));
     }
     
-    [HttpGet("get/clientId={clientId}")]
-    public async Task<IActionResult> GetRelevantJobs([FromRoute] Guid clientId) {
+    [HttpGet("get/")]
+    public async Task<IActionResult> GetRelevantJobs() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(clientIdStr, out Guid clientId))
+        {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        };
+        
         var jobs = await jobService.GetRelevantJobsAsync(clientId);
         if (jobs.Count == 0) {
             return NotFound("No jobs found");

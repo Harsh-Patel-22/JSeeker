@@ -1,6 +1,5 @@
-using Backend.Data;
+using System.Security.Claims;
 using Backend.DTOs;
-using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +10,12 @@ namespace Backend.Controllers;
 [Route("api/interview")]
 [Authorize(Roles = "Hirer,Seeker")]
 public class InterviewController (JobService jobService) : ControllerBase {
-    [HttpGet("get/clientId={clientId}")]
-    public async Task<IActionResult> GetInterviewsAsync([FromRoute] Guid clientId) {
+    [HttpGet("get")]
+    public async Task<IActionResult> GetInterviewsAsync() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
         var interviews = await jobService.GetInterviewsByIdAsync(clientId);
         return Ok(interviews);
     }

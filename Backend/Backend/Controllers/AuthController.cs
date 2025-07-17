@@ -1,34 +1,26 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Backend.Data;
 using Backend.DTOs;
-using Backend.Models.Users;
 using Backend.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/auth")]
 public class AuthController(AuthService authService) : ControllerBase {
-    private readonly IPasswordHasher<UserCredentials> _passwordHasher = new PasswordHasher<UserCredentials>();
 
     [HttpPost("login")]
     // ReSharper disable once InconsistentNaming
-    public IActionResult VerifyLoginCredentials([FromBody] LoginCredentialsDto credentials) {
-        string jwtToken = authService.LoginUser(credentials);
+    public async Task<IActionResult> VerifyLoginCredentials([FromBody] LoginCredentialsDto credentials) {
+        string jwtToken = await authService.LoginUserAsync(credentials);
         if(jwtToken.Equals(string.Empty)) {
-            return BadRequest();
+            return BadRequest("Invalid credentials");
         }
         return Ok(jwtToken);
     }
     
     [HttpPost("register")]
     public async Task<IActionResult> RegisterNewUser([FromBody] RegisterCredentialsDto credentials) {
-        string jwtToken = await authService.RegisterNewUser(credentials);
+        string jwtToken = await authService.RegisterNewUserAsync(credentials);
         if (jwtToken.Equals(string.Empty)) {
             return BadRequest("User already registered!");
         }
@@ -38,7 +30,7 @@ public class AuthController(AuthService authService) : ControllerBase {
     // Async Calls from frontend - Checker Functions
     [HttpPost("available/username")]
     public async Task<IActionResult> UsernameAvailabilityVerifier([FromBody] string username) {
-        string response = await authService.CheckIfUsernameOrEmailExists(username);
+        string response = await authService.CheckIfUsernameOrEmailExistsAsync(username);
         if (response.Equals(string.Empty)) {
             return BadRequest("Username already taken!");
         }
@@ -47,7 +39,7 @@ public class AuthController(AuthService authService) : ControllerBase {
     
     [HttpPost("available/email")]
     public async Task<IActionResult> EmailAvailabilityVerifier([FromBody] string email) {
-        string response = await authService.CheckIfUsernameOrEmailExists(email);
+        string response = await authService.CheckIfUsernameOrEmailExistsAsync(email);
         if (response.Equals(string.Empty)) {
             return BadRequest("An account with this email already exists!");
         }

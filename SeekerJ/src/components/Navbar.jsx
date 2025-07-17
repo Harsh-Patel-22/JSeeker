@@ -1,4 +1,4 @@
-import 'bootstrap/dist/css/bootstrap.css'; 
+
 import { useState } from 'react';
 import { Link } from 'react-router';
 
@@ -25,7 +25,7 @@ const Navbar = () => {
                         <Link to={"/interviews"} className="nav-link text-white">Interview Schedule</Link>
                     </li> 
                     <li> 
-                        <Link to={""} className="nav-link text-white">Profile {/* Add account icon */}</Link>
+                        <Link to={"/profile"} className="nav-link text-white">Profile {/* Add account icon */}</Link>
                     </li>
                 </ul>
             </div>

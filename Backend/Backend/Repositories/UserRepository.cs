@@ -47,7 +47,7 @@ public class UserRepository (ApplicationDbContext context) : IProjectHolder {
         return languages;
     }
 
-    public async Task<List<ContactDetailsDto>> GetContactDetailsAsync(Guid userId) {
+    public async Task<ContactDetailsDto?> GetContactDetailsAsync(Guid userId) {
         var contactDetails = await (from userCredential in context.UserCredentials
             join user in context.Users on userCredential.UserId equals user.Id
             where user.Id == userId
@@ -56,7 +56,7 @@ public class UserRepository (ApplicationDbContext context) : IProjectHolder {
                 user.GithubProfileLink,
                 user.LinkedInProfileLink,
                 user.PhoneNumber
-            )).ToListAsync();
+            )).FirstOrDefaultAsync();
         
         return contactDetails;
     }

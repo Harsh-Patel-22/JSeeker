@@ -1,11 +1,6 @@
 using System.Security.Claims;
-using Backend.Data;
-using Backend.DTOs.Users;
-using Backend.Models.Users;
-using Backend.Models.Users.WorkRelated;
 using Backend.Repositories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
@@ -15,39 +10,66 @@ namespace Backend.Controllers;
 [Authorize(Roles = "Hirer,Seeker")]
 public class UserController (UserRepository repository) : ControllerBase {
     
-    [HttpGet("profile/basic/clientId={clientId}")]
-    public async Task<IActionResult> GetBasicDetails([FromRoute] Guid clientId) {
-        // var clientId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+    [HttpGet("profile/basic")]
+    public async Task<IActionResult> GetBasicDetails() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
         return Ok(await repository.GetBasicDetailsAsync(clientId));
     }
 
-    [HttpGet("profile/hobbies/clientId={clientId}")]
-    public async Task<IActionResult> GetClientHobbies([FromRoute] Guid clientId) {
+    [HttpGet("profile/hobbies")]
+    public async Task<IActionResult> GetClientHobbies() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
         return Ok(await repository.GetHobbiesAsync(clientId));
     }
     
-    [HttpGet("profile/languages/clientId={clientId}")]
-    public async Task<IActionResult> GetClientLanguages([FromRoute] Guid clientId) {
+    [HttpGet("profile/languages")]
+    public async Task<IActionResult> GetClientLanguages() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
         return Ok(await repository.GetVocalLanguagesAsync(clientId));
     }
     
-    [HttpGet("profile/contact/clientId={clientId}")]
-    public async Task<IActionResult> GetClientContactDetails([FromRoute] Guid clientId) {
+    [HttpGet("profile/contact")]
+    public async Task<IActionResult> GetClientContactDetails() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
         return Ok(await repository.GetContactDetailsAsync(clientId));
     }
 
-    [HttpGet("profile/projects/clientId={clientId}")]
-    public async Task<IActionResult> GetClientProjects([FromRoute] Guid clientId) {
+    [HttpGet("profile/projects")]
+    public async Task<IActionResult> GetClientProjects() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
         return Ok(await repository.GetProjectsAsync(clientId));
     }
 
-    [HttpGet("profile/education/clientId={clientId}")]
-    public async Task<IActionResult> GetClientEducationDetails([FromRoute] Guid clientId) {
+    [HttpGet("profile/education")]
+    public async Task<IActionResult> GetClientEducationDetails() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
         return Ok(await repository.GetEducationDetailsAsync(clientId));
     }
     
-    [HttpGet("profile/workexperience/clientId={clientId}")]
-    public async Task<IActionResult> GetClientWorkExperienceDetails([FromRoute] Guid clientId) {
+    [HttpGet("profile/workexperience")]
+    public async Task<IActionResult> GetClientWorkExperienceDetails() {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
         return Ok(await  repository.GetWorkExperienceDetailsAsync(clientId));
     }
 }

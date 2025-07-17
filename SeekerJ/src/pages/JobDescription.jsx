@@ -1,6 +1,5 @@
 import { useLocation } from "react-router";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { useEffect, useState } from "react";
 import { api } from "../services/APIClient";
 import { Axios, AxiosError } from "axios";
@@ -79,7 +78,6 @@ const JobDescription = () => {
   </div>
 </div>
 
-        <Footer />
     </>
 
 }

@@ -4,7 +4,6 @@ import { api } from "../services/APIClient";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { AxiosError } from "axios";
 
 const ApplicationCard = ({applicationData}) => {
@@ -110,12 +109,11 @@ const ApplicationCard = ({applicationData}) => {
 
 const ApplicationsPage = () => {
     let [applications, setApplications] = useState([]);
-    let clientId = parseInt(sessionStorage.getItem("clientId"))
 
     useEffect(() => {
         async function fetchInterviews(){
             try {
-                let response = await api.get("application/get/clientId=" + clientId);
+                let response = await api.get("application/get/");
                 // console.log(response.data);
                 setApplications(response.data);
                 
@@ -137,7 +135,6 @@ const ApplicationsPage = () => {
         console.log(application);
         return <ApplicationCard applicationData = {application}></ApplicationCard>
     })}
-    <Footer></Footer>
     </> 
 }
 

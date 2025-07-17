@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{name}} - Resume</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; color: #333; }
+    .header { background-color: #2c3e50; color: white; padding: 30px; text-align: center; }
+    .header h1 { margin: 0; font-size: 36px; }
+    .header p { margin: 5px 0 0; font-size: 14px; }
+    .container { padding: 30px; }
+    h2 { color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 5px; margin-top: 40px; }
+    .section p, .section li { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>{{name}}</h1>
+    <p>{{email}} | {{phone}} | {{linkedin}}</p>
+  </div>
+  <div class="container">
+    <div class="section">
+      <h2>Summary</h2>
+      <p>{{summary}}</p>
+    </div>
+    <div class="section">
+      <h2>Education</h2>
+      {{education_section}}
+    </div>
+    <div class="section">
+      <h2>Experience</h2>
+      {{work_experience_section}}
+    </div>
+    <div class="section">
+      <h2>Projects</h2>
+      {{projects_section}}
+    </div>
+    <div class="section">
+      <h2>Hobbies</h2>
+      <p>{{hobbies}}</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{name}} - Resume</title>
+  <style>
+    body { margin: 0; font-family: 'Calibri', sans-serif; background-color: #f4f4f4; }
+    .resume-box { max-width: 800px; background: white; margin: 40px auto; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .header { border-bottom: 3px solid #27ae60; padding-bottom: 15px; margin-bottom: 20px; }
+    .header h1 { margin: 0; }
+    .header p { margin: 5px 0 0; color: #777; }
+    h2 { color: #27ae60; border-left: 4px solid #27ae60; padding-left: 10px; margin-top: 30px; }
+    p, li { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="resume-box">
+    <div class="header">
+      <h1>{{name}}</h1>
+      <p>{{email}} | {{phone}} | {{linkedin}}</p>
+    </div>
+
+    <h2>Summary</h2>
+    <p>{{summary}}</p>
+
+    <h2>Education</h2>
+    {{education_section}}
+
+    <h2>Experience</h2>
+    {{work_experience_section}}
+
+    <h2>Projects</h2>
+    {{projects_section}}
+
+    <h2>Hobbies</h2>
+    <p>{{hobbies}}</p>
+  </div>
+</body>
+</html>

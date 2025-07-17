@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import './ViewJobs.css'
 import { Link } from 'react-router';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import { api } from '../services/APIClient';
 import { AxiosError } from 'axios';
 
@@ -44,7 +43,7 @@ const ViewJobs = () => {
     useEffect(() => {
             async function fetchRelevantJobs() {
                 try {
-                    let response = await api.get("job/get/clientId=" + sessionStorage.getItem("clientId"));
+                    let response = await api.get("job/get");
                     setRelevantJobs(response.data);
                 } catch (error) {
                     if(error == AxiosError)
@@ -90,7 +89,6 @@ const ViewJobs = () => {
     {/* TODO - Add a search bar */}
         
     </div>
-    <Footer />
     </>
 }
 
