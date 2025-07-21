@@ -5,7 +5,7 @@ namespace Backend.Models.Users;
 
 public class Hirer {
     [Key]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int CompanyAddressId { get; set; }
 
     public string CompanyName { get; set; }

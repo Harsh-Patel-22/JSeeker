@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using Backend.DTOs;
+using Backend.DTOs.Job;
+using Backend.Models.Users;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,22 +15,34 @@ public class JobController (JobService jobService) : ControllerBase {
     
     // TODO - Give the check conditions for corner cases - not found, doesnt exist, any other. Catch all exceptions that can be created.
     
-    [HttpPost("location")]
-    public async Task<IActionResult> GetNearbyJobsAsync([FromBody] SearchLocationDto searchLocationDto) {
-        return Ok(await jobService.GetNearbyJobs(searchLocationDto));
+    [HttpPost("location/searchRadius={searchRadius}")]
+    public async Task<IActionResult> GetNearbyJobsAsync([FromRoute] decimal searchRadius) {
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var roleStr = User.FindFirstValue(ClaimTypes.Role);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
+
+        if (!Enum.TryParse(roleStr, out Roles role)) {
+            throw new Exception("Invalid or missing Role claim in JWT.");
+        }
+        return Ok(await jobService.GetNearbyJobs(clientId, role, searchRadius));
     }
     
     [HttpGet("get/")]
     public async Task<IActionResult> GetRelevantJobs() {
         var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var roleStr = User.FindFirstValue(ClaimTypes.Role);
 
         if (!Guid.TryParse(clientIdStr, out Guid clientId))
         {
             throw new Exception("Invalid or missing NameId claim in JWT.");
         };
-        
-        var jobs = await jobService.GetRelevantJobsAsync(clientId);
-        if (jobs.Count == 0) {
+        if (!Roles.TryParse(roleStr, out Roles role)) {
+            throw new Exception("Invalid or missing Role claim in JWT.");
+        }
+        var jobs = await jobService.GetRelevantJobsAsync(clientId, role);
+        if (jobs is { Count: 0 }) {
             return NotFound("No jobs found");
         };
         return Ok(jobs);
@@ -36,10 +50,14 @@ public class JobController (JobService jobService) : ControllerBase {
     
     [HttpPost("new")]
     public async Task<IActionResult> CreateJob([FromBody] CreateJobDto newJob) {
-        var isCreated = await jobService.CreateJobAsync(newJob);
+        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
+        var isCreated = await jobService.CreateJobAsync(clientId, newJob);
         if (isCreated) return Created();
         
-        return BadRequest(); 
+        return BadRequest("Could not create the job"); 
     }
     
     [HttpGet("description/{id}")]

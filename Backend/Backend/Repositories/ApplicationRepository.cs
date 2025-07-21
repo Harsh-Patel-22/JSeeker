@@ -16,6 +16,7 @@ public class ApplicationRepository (ApplicationDbContext context) {
     }
 
 
+
     public async Task<bool> CreateApplicationAsync(CreateApplicationDto newApplicationDto) {
         try {
             await context.Applications.AddAsync(new Application() {
@@ -29,5 +30,10 @@ public class ApplicationRepository (ApplicationDbContext context) {
         catch (Exception e) {
             return false;
         }
+    }
+    
+    // Helper Methods - Getters/Setters
+    public async Task<int> GetApplicationsCountAsync(int jobId) {
+        return await context.Applications.Where(application => application.JobId == jobId).CountAsync();
     }
 }

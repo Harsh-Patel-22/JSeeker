@@ -1,16 +1,26 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Backend.Models;
+using Backend.Models.Users;
 
 namespace Backend.DTOs;
 
 public class CreateJobDto {
-    public required string Title { get; set; }
-    public required string Description { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
     public string TermsAndConditions { get; set; }
-    public decimal Salary { get; set; }
-    public string Status { get; set; }
-    [ForeignKey("Id")]
-    public int LocationId { get; set; }
-    public Location Location { get; set; }
+    public string Responsibilities { get; set; }
+    
+    [Range(0, 10)]
+    public int RequiredWorkExperience { get; set; }
+    public decimal MinSalary { get; set; }
+    public decimal MaxSalary { get; set; }
+    
+    // Post Details
+    public JobStatus Status { get; set; }
+    public JobType Type { get; set; }
+    public WorkMode WorkMode { get; set; }
+    public int ApplicationsLimit { get; set; }
+    
     
 }

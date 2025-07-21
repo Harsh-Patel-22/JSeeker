@@ -9,7 +9,7 @@ public class InterviewRepository (ApplicationDbContext context) {
     
     public async Task<List<InterviewDto>> GetInterviewsByIdAsync(Guid userId) {
         List<InterviewDto> interviews = await context.Interviews.Include(i => i.Job)
-            .ThenInclude(job => job.Location)
+            .ThenInclude(job => job.Address)
             .Where(i => i.HirerId == userId || i.SeekerId == userId)
             .Select(interview => new InterviewDto() {
                 SeekerId = interview.SeekerId,
@@ -19,8 +19,9 @@ public class InterviewRepository (ApplicationDbContext context) {
                     Title = interview.Job.Title, 
                     Description = interview.Job.Description,
                     TermsAndConditions = interview.Job.TermsAndConditions,
-                    Salary = interview.Job.Salary, 
-                    Location = interview.Job.Location
+                    MinSalary = interview.Job.MinSalary, 
+                    MaxSalary = interview.Job.MaxSalary, 
+                    Address = interview.Job.Address
                 } ,
                 Date = interview.Date,
                 Time = interview.Time,
