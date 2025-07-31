@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Backend.Data;
 using Backend.Extensions;
 using Backend.Services;
@@ -12,12 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 Env.Load();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});;
 
-builder.Services.AddHttpClient<GithubService>();
-builder.Services.AddHttpClient<AIService>();
-builder.Services.AddScoped<ResumeBuilderService>();
-builder.Services.AddScoped<PdfService>();
+builder.Services.AddHttpClients();
+
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -38,9 +40,11 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddServices();
 builder.Services.AddAuthModule();
 builder.Services.AddJobModule();
 builder.Services.AddUserModule();
+builder.Services.AddMetricsModule();
 
 var myAllowedServices = "_myAllowedServices";
 builder.Services.AddCors(options => {

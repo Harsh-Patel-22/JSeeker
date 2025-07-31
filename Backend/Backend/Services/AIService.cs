@@ -38,8 +38,5 @@ public class AIService {
         var stringResponse = rawResponse.GetProperty("candidates")[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").ToString();
         return stringResponse;
     }
-
-    // public async Task<JsonElement> GetResumeDescription() {
-    //     
-    // }
+    
 }

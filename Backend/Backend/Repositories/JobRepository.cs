@@ -3,45 +3,18 @@ using Backend.DTOs;
 using Backend.DTOs.Job;
 using Backend.Models;
 using Backend.Models.Users;
+using Backend.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Repositories;
 
 public class JobRepository (ApplicationDbContext context) {
     
-    public async Task<JobStatus> GetJobStatusAsync(int jobId) {
-        JobStatus status = await context.Jobs.Where(j => j.Id == jobId).Select(j => j.Status).FirstOrDefaultAsync();
-        return status;
-    }
-    
-    public async Task<int> GetJobApplicationLimitAsync(int jobId) {
-        int jobApplicationLimit = await context.Jobs.Where(j => j.Id == jobId).Select(j => j.ApplicationsLimit).FirstOrDefaultAsync();
-        return jobApplicationLimit;
-    }
-    
-    public async Task<JobType> GetJobTypeAsync( int jobId) {
-        JobType jobType = await context.Jobs.Where(j => j.Id == jobId).Select(j => j.Type).FirstOrDefaultAsync();
-        return jobType;
-    }
-
-    public async Task<bool> SetJobStatusAsync(int jobId, JobStatus status) {
-        try {
-            await context.Jobs.Where(job => job.Id == jobId)
-                .ExecuteUpdateAsync(setters => setters.SetProperty(job => job.Status, status));
-            return true;
-        }
-        catch (DbUpdateConcurrencyException) {
-            return false;
-        }
-
-        return false;
-    }
-    
-    public async Task<List<JobCardDto>?> GetRelevantJobsAsync(Guid clientId, Roles  role) {
+    public async Task<List<JobCardDto>?> GetRelevantJobsBySearchFilterAsync(Guid clientId, Roles role, JobSearchFilterDto searchFilter) {
         List<JobCardDto>? relevantJobCards = new List<JobCardDto>();
         switch (role) {
             case Roles.Hirer:
-                relevantJobCards = await context.Jobs.Include(j => j.Address).Where(j => j.HirerId == clientId).Where(j => j.Status != JobStatus.Closed).Select(job => new JobCardDto() {
+                relevantJobCards = await context.Jobs.Include(j => j.Address).Where(j => j.HirerId == clientId  && j.Type == searchFilter.type && j.Status == searchFilter.status && j.WorkMode == searchFilter.mode).Select(job => new JobCardDto() {
                     Title = job.Title,
                     Status = job.Status,
                     Type = job.Type,
@@ -50,6 +23,8 @@ public class JobRepository (ApplicationDbContext context) {
                     Address = job.Address,
                     MinSalary = job.MinSalary,
                     MaxSalary = job.MaxSalary,
+                    NumberOfApplications = job.NumberOfApplications,
+                    PostDate = job.PostDate
                 }).ToListAsync();
                 break;
             
@@ -70,6 +45,8 @@ public class JobRepository (ApplicationDbContext context) {
                         Address = job.Address,
                         MinSalary = job.MinSalary,
                         MaxSalary = job.MaxSalary,
+                        NumberOfApplications = job.NumberOfApplications,
+                        PostDate = job.PostDate
                     }).ToListAsync();
 
                     relevantJobCards.AddRange(jobsPerKeyword);
@@ -78,14 +55,24 @@ public class JobRepository (ApplicationDbContext context) {
         }
         return relevantJobCards;
     }
+    
 
     public async Task<bool> CreateJobAsync(Guid hirerId, CreateJobDto newJob) {
         try {
+            if (!Enum.TryParse(newJob.Type, out JobType jobType)) {
+                throw new Exception("Invalid job type");
+            }
+
+            if (!Enum.TryParse(newJob.WorkMode, out WorkMode workMode)) {
+                throw new Exception("Invalid work mode");
+            }
             // TODO - Make a custom class/dto for company to avoid unnecessary fields..
-            Address? companyAddress = await context.Hirers.Where(u => u.Id == hirerId).Select(u => u.CompanyAddress).FirstOrDefaultAsync();
             string? companyName = await context.Hirers.Where(u => u.Id == hirerId).Select(u => u.CompanyName).FirstOrDefaultAsync();
-            int addressId = await context.Hirers.Select(h => h.CompanyAddressId).FirstOrDefaultAsync();
-            if (companyAddress == null || string.IsNullOrEmpty(companyName)) { 
+            int addressId = await context.Hirers.Where(h => h.Id == hirerId).Select(h => h.CompanyAddressId).FirstOrDefaultAsync();
+            // companyName = "DUAL SHARD";
+            
+            // TODO - Remove this code once the hirer having company details is set!!
+            if (string.IsNullOrEmpty(companyName)) { 
                 throw new Exception("Hirer not found");
             }
             await context.Jobs.AddAsync(new Job() {
@@ -99,10 +86,11 @@ public class JobRepository (ApplicationDbContext context) {
                 MinSalary = newJob.MinSalary, 
                 MaxSalary = newJob.MaxSalary, 
                 
-                Type = newJob.Type,
-                Status = newJob.Status, 
-                WorkMode = newJob.WorkMode,
+                Type = jobType,
+                Status = JobStatus.Open, 
+                WorkMode = workMode,
                 
+                NumberOfApplications = 0,
                 ApplicationsLimit = newJob.ApplicationsLimit,
                 PostDate = DateOnly.FromDateTime(DateTime.Today),
                 AddressId = addressId,
@@ -110,18 +98,17 @@ public class JobRepository (ApplicationDbContext context) {
                 });
             await context.SaveChangesAsync();
 
-            // TODO - Configure the new job object from the CreateJobDTO. - DONE
-            // TODO - Refactor the Job Table and Other respective classes
             return true;
         }
-        catch (Exception e) {
+        catch (Exception e) { // This catch also catches the custom thrown exceptions....
+            Console.WriteLine(e);
             return false;
         }
     }
 
-    public async Task<List<JobForMapMarkerDto>?> GetNearbyJobsAsync(Guid clientId, Roles role,Decimal searchDistance) {
+    public async Task<List<JobForMapMarkerDto>?> GetNearbyJobsAsync(Guid clientId, Roles role, Decimal searchDistance, JobSearchFilterDto searchFilter) {
         LocationDto? targetLocation = await context.Users.Where(u => u.Id == clientId).Include(u => u.Address).Select(u => new LocationDto(u.Address.Latitude, u.Address.Longitude)).FirstOrDefaultAsync();
-        List<JobCardDto>? relevantJobCards = await GetRelevantJobsAsync(clientId, role);
+        List<JobCardDto>? relevantJobCards = await GetRelevantJobsBySearchFilterAsync(clientId, role, searchFilter);
         if (targetLocation == null) {
             throw new Exception("User doesn't exist!");
         }
@@ -153,10 +140,11 @@ public class JobRepository (ApplicationDbContext context) {
         return new JobDescriptionDto() {
             Id = job.Id,
             Title = job.Title,
-            CompanyName = job.CompanyName,
             Description = job.Description,
             TermsAndConditions = job.TermsAndConditions,
             Responsibilites = job.Responsibilities,
+            RequiredWorkExperience = job.RequiredWorkExperience,
+            CompanyName = job.CompanyName,
             MinSalary = job.MinSalary,
             MaxSalary = job.MaxSalary,
             
@@ -167,7 +155,79 @@ public class JobRepository (ApplicationDbContext context) {
             WorkMode = job.WorkMode,
             
             PostDate = job.PostDate,
-            NumberOfApplicants = context.Applications.Count(a => a.HirerId == job.HirerId),
+            NumberOfApplicants = job.NumberOfApplications,
+            ApplicationsLimit = job.ApplicationsLimit
         };
     }
+
+    public async Task<bool> EditJobAsync(int jobId, EditJobDto dto) {
+        // await context.Jobs.Where(job => job.Id == dto.Id).
+        if (!Enum.TryParse(dto.Status, out JobStatus status)) {
+            throw new Exception("Invalid status");
+        }if (!Enum.TryParse(dto.Type, out JobType type)) {
+            throw new Exception("Invalid type");
+        }if (!Enum.TryParse(dto.WorkMode, out WorkMode mode)) {
+            throw new Exception("Invalid mode");
+        }
+        Job job = new Job() {
+            Id = jobId,
+            Title = dto.Title,
+            Description = dto.Description,
+            TermsAndConditions = dto.TermsAndConditions,
+            Responsibilities = dto.Responsibilities,
+            RequiredWorkExperience = dto.RequiredWorkExperience,
+            MinSalary = dto.MinSalary,
+            MaxSalary = dto.MaxSalary,
+
+            Type = type,
+            Status = status,
+            WorkMode = mode,
+
+            ApplicationsLimit = dto.ApplicationsLimit
+        };
+        return await DbUpdateHelper.UpdateAllFieldsExceptAsync(job, context, "Id","CompanyName", "PostDate", "NumberOfApplications", "AddressId", "HirerId");
+        // return true;
+    }
+    
+    
+    // Helper Methods - Getters/Setters
+    // public async Task<int> GetApplicationsCountAsync(int jobId) {
+    //     return await context.Jobs.Where(j => j.Id == jobId).Select(j => j.NumberOfApplications).FirstOrDefaultAsync();
+    // }
+
+    public async Task<JobKeyInformationDto> GetJobKeyInformationByIdAsync(int id) {
+        
+        JobKeyInformationDto? jobKeyInformation = await context.Jobs.Where(job =>  job.Id == id).Select(j => new JobKeyInformationDto(j.Status, j.Type, j.ApplicationsLimit)).FirstOrDefaultAsync();
+        if(jobKeyInformation == null) throw new Exception("Job not found");
+        
+        return jobKeyInformation;
+    }
+    public async Task<int> UpdateApplicationsCountAsync(int jobId) {
+         await context.Jobs.Where(job => job.Id == jobId).ExecuteUpdateAsync(setter => setter.SetProperty(j => j.NumberOfApplications, j => j.NumberOfApplications + 1));
+         return await context.Jobs.Where(job => job.Id == jobId).Select(job => job.NumberOfApplications).FirstOrDefaultAsync();
+    }
+    
+    // public async Task<int> GetJobApplicationLimitAsync(int jobId) {
+    //     int jobApplicationLimit = await context.Jobs.Where(j => j.Id == jobId).Select(j => j.ApplicationsLimit).FirstOrDefaultAsync();
+    //     return jobApplicationLimit;
+    // }
+    //
+    // public async Task<JobType> GetJobTypeAsync( int jobId) {
+    //     JobType jobType = await context.Jobs.Where(j => j.Id == jobId).Select(j => j.Type).FirstOrDefaultAsync();
+    //     return jobType;
+    // }
+    //
+    public async Task<bool> SetJobStatusAsync(int jobId, JobStatus status) {
+        try {
+            await context.Jobs.Where(job => job.Id == jobId)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(job => job.Status, status));
+            return true;
+        }
+        catch (DbUpdateConcurrencyException) {
+            return false;
+        }
+    
+        return false;
+    }
+
 }

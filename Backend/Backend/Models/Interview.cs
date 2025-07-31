@@ -4,6 +4,16 @@ using Backend.Models.Users;
 
 namespace Backend.Models;
 
+public enum InterviewMode {
+    Online,
+    InPerson
+}
+
+public enum SeekerStatus {
+    Employed,
+    Rejected
+}
+
 public class Interview {
     [Key]
     public int Id { get; set; }
@@ -12,7 +22,9 @@ public class Interview {
     public int JobId { get; set; }
     public DateOnly Date { get; set; }
     public TimeOnly Time { get; set; }
-    public string Mode { get; set; }
+    public InterviewMode Mode { get; set; }
+    public bool ConfirmedByHirer { get; set; }
+    public bool ConfirmedBySeeker { get; set; }
     
     
     // Navigation Properties

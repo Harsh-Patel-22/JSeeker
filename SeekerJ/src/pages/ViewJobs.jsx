@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import './ViewJobs.css'
 import { Link } from 'react-router';
-import Navbar from '../components/Navbar';
 import { api } from '../services/APIClient';
 import { AxiosError } from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const JobCard = ({job, type}) => {
     return <div className="col-lg-4 col-md-6 col-12 mt-4 pt-2">
@@ -29,7 +29,8 @@ const JobCard = ({job, type}) => {
 
 const ViewJobs = () => {
     // let [type, setType] = useState("hirer");
-    let type = sessionStorage.getItem("type");
+    let {user} = useAuth();
+    let type = user.role.toLowerCase();
     let [relevantJobs, setRelevantJobs] = useState([]);
 
     const splitArray = (arr, size) => {
@@ -60,7 +61,6 @@ const ViewJobs = () => {
 // }, [relevantJobs]);
 
     return <>
-    <Navbar />
     <div className="container mt-5 pt-4">
         <div className="row align-items-end mb-4 pb-2">
             <div className="col-md-8">

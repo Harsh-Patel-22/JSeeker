@@ -13,7 +13,8 @@ public enum JobStatus {
 
 public enum JobType {
     Internship,
-    Job
+    PartTime,
+    FullTime
 }
 
 public enum WorkMode {

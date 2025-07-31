@@ -1,13 +1,74 @@
 using Backend.Data;
 using Backend.DTOs.Users;
+using Backend.DTOs.Users.Hirer;
 using Backend.Interfaces;
+using Backend.Models.Users;
 using Backend.Models.Users.WorkRelated;
+using Backend.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Repositories;
 
 public class UserRepository (ApplicationDbContext context) : IProjectHolder {
     
+    // Section - Register User as Hirer
+    public async Task RegisterUserAsHirerAsync(Guid userId, HirerProfessionalDetailsDto dto, int companyAddressId) {
+        
+        Hirer h = new Hirer {
+            Id = userId,
+            CompanyName = dto.CompanyName,
+            Designation = dto.Designation,
+            WebsiteLink = dto.WebsiteLink,
+            CompanyAddressId = companyAddressId,
+        };
+        
+        await DbUpdateHelper.UpdateAllFieldsExceptAsync(h, context, "Id");
+    }
+    
+    // Section - Resume Related
+    public async Task SetResumeJsonStringAsync(Guid userId, string ResumeJsonString) {
+        await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(user => user.ResumeJsonString , ResumeJsonString));
+    }
+
+    public async Task<string?> GetResumeJsonStringAsync(Guid userId) {
+        return await context.Users.Where(user => user.Id == userId).Select(user => user.ResumeJsonString).FirstOrDefaultAsync();
+    }
+    
+    // Section - Fetching
+    public async Task<UserProfessionalDetailsDto> GetUserProfessionalDetailsAsync(Guid userId) {
+        // TODO - Remove the inidvidual methods....
+        return new UserProfessionalDetailsDto(
+            await GetProjectsAsync(userId),
+            await GetWorkExperienceDetailsAsync(userId),
+            await GetEducationDetailsAsync(userId)
+            );
+    }
+    
+    // Section - Updating the metric fields
+    public async Task IncrementSuccessCountAsync(Guid userId) {
+        try {
+            await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter =>
+                setter.SetProperty(user => user.NumberOfSuccessfulEmployments,
+                    user => user.NumberOfSuccessfulEmployments + 1));
+        }
+        catch (Exception e) {
+            Console.WriteLine(e);
+        }
+    }
+
+    public async Task IncrementRejectedCountAsync(Guid userId) {
+        try {
+
+            await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter =>
+                setter.SetProperty(user => user.NumberOfSuccessfulEmployments,
+                    user => user.NumberOfSuccessfulEmployments + 1));
+        }
+        catch (Exception e) {
+            Console.WriteLine(e);
+        }
+    }
+    
+    // Section - Profile Related
     public async Task<BasicDetailsDto?> GetBasicDetailsAsync(Guid userId) {
         var details = await (from user in context.Users
             join address in context.Addresses on user.AddressId equals address.Id 
@@ -53,7 +114,7 @@ public class UserRepository (ApplicationDbContext context) : IProjectHolder {
             where user.Id == userId
             select new ContactDetailsDto(
                 userCredential.Email,
-                user.GithubProfileLink,
+                user.GithubUsername,
                 user.LinkedInProfileLink,
                 user.PhoneNumber
             )).FirstOrDefaultAsync();

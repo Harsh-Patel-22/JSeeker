@@ -17,9 +17,8 @@ public class CreateJobDto {
     public decimal MaxSalary { get; set; }
     
     // Post Details
-    public JobStatus Status { get; set; }
-    public JobType Type { get; set; }
-    public WorkMode WorkMode { get; set; }
+    public string Type { get; set; }
+    public string WorkMode { get; set; }
     public int ApplicationsLimit { get; set; }
     
     

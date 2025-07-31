@@ -1,18 +1,65 @@
 @Backend_HostAddress = http://localhost:5275
+@seeker_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJmYjg1ZDBkYy05YWFlLTRhOTAtOGY5Yy02N2I5YWRmMzJjNGUiLCJuYW1lIjoiaGFyc2giLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTZWVrZXIiLCJleHAiOjE3NTM4MDU0MTQsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSJ9.lhcKaklO-pG0nFJazgou9Qc2n2igaGbhrUpRw7SHwNk
 
-###
+@hirer_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkZWVmYTI2Yy03NzlkLTQyNjYtYTM3ZC00ZTc2M2ZiNmY2NjAiLCJuYW1lIjoiaCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkhpcmVyIiwiZXhwIjoxNzUzODA2OTg4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUifQ.9X5wjavGTgLSCHEVlSlFS7VYpp8QiKJesTq3PjNUk8Q
 
-POST {{Backend_HostAddress}}/api/job/location
+POST {{Backend_HostAddress}}/api/user/update/hirer
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjMWE0NTZlZC1kOWViLTRlMWEtOTAyMC0xNTRkMjM5MjZhYjEiLCJuYW1lIjoiQWdlbnQgRHVhbCBTaGFyZHMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTZWVrZXIiLCJleHAiOjE3NTE2MTMxNzEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSJ9.QIJIeXMKw-XW9zaUPPnM8giajmwNX9jbiCPsTKyG3Rg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkZWVmYTI2Yy03NzlkLTQyNjYtYTM3ZC00ZTc2M2ZiNmY2NjAiLCJuYW1lIjoiaCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkhpcmVyIiwiZXhwIjoxNzUzNTM0NzE0LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUifQ.E2HwYY2JJYZ0kfOwwsTW0ERSTmd4nDZFEMdQE58kToE
 
 {
-  "latitude": 51.505,
-  "longitude": 59.50,
-  "searchdistance": 10
+  "companyName": "Agentic",
+  "designation": "HR",
+  "websiteLink": "",
+  "companyAddress": {
+    "houseNumber": "1", 
+    "society": "Agent",
+    "street": "Gaming Heights",
+    "city": "New Jersey",
+    "state": "",
+    "country": "USA",
+    "postalCode": "123456",
+    "latitude": 23.4,
+    "longitude":  235.4
+  }
 }
 
+###
+POST {{Backend_HostAddress}}/api/job/new
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkZWVmYTI2Yy03NzlkLTQyNjYtYTM3ZC00ZTc2M2ZiNmY2NjAiLCJuYW1lIjoiaCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkhpcmVyIiwiZXhwIjoxNzUzNTA1MDM2LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUifQ.6HbeMndGiSrlp-Tsssm5OOMTRapv1ZjtMdPdOCTE6pw
 
+{
+  "title": "Learner",
+  "description": "",
+  "termsAndConditions": "",
+  "Responsibilities": "",
+  "requiredWorkExperience": 5,
+  "minSalary": 55.5,
+  "maxSalary": 555.5,
+  "type": "Internship",
+  "workMode": "OnSite",
+  "applicationsLimit": 200
+}
+
+###
+POST {{Backend_HostAddress}}/api/job/update/10
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkZWVmYTI2Yy03NzlkLTQyNjYtYTM3ZC00ZTc2M2ZiNmY2NjAiLCJuYW1lIjoiaCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkhpcmVyIiwiZXhwIjoxNzUzNTA1MDM2LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUifQ.6HbeMndGiSrlp-Tsssm5OOMTRapv1ZjtMdPdOCTE6pw
+
+{
+  "title": "Learner",
+  "description": "updated",
+  "termsAndConditions": "updated",
+  "Responsibilities": "updated",
+  "requiredWorkExperience": 5,
+  "minSalary": 555.5,
+  "maxSalary": 5555.5,
+  "type": "Internship",
+  "status": "Open",
+  "workMode": "OnSite",
+  "applicationsLimit": 2000
+}
 
 ###
 POST {{Backend_HostAddress}}/api/interview/get
@@ -74,9 +121,9 @@ POST {{Backend_HostAddress}}//api/auth/register
 Content-Type: application/json
 
 {
-  "username": "Agent Dual Shardss",
-  "password": "Agent!!",
-  "email": "hp22022005@gmail.co.in",
+  "username": "harsh",
+  "password": "harsh",
+  "email": "harsh@gmail.com",
   "role": "Seeker"
 }
 
@@ -85,9 +132,19 @@ POST {{Backend_HostAddress}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "Agent Dual Shards",
-  "password": "Agent!!",
+  "username": "harsh",
+  "password": "harsh",
   "role": "Seeker"
+}
+
+###
+POST {{Backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "h",
+  "password": "h",
+  "role": "Hirer"
 }
 
 ###
@@ -106,5 +163,33 @@ Content-Type: application/json
 }
 
 ###
+// Testing
+###
 GET {{Backend_HostAddress}}/api/testing/
 
+###
+POST {{Backend_HostAddress}}/api/application/create
+Authorization: Bearer {{seeker_auth_token}}
+Content-Type: application/json
+
+{
+    "seekerId": "FB85D0DC-9AAE-4A90-8F9C-67B9ADF32C4E",
+    "jobId": 10,
+    "hirerId": "DEEFA26C-779D-4266-A37D-4E763FB6F660",
+    "jobType": "Internship",
+    "aIRating": 5
+}
+
+###
+GET {{Backend_HostAddress}}/api/application/get/SHORtlisted
+Authorization: Bearer {{hirer_auth_token}}
+
+###
+POST {{Backend_HostAddress}}/api/application/status
+Authorization: Bearer {{hirer_auth_token}}
+Content-Type: application/json
+
+{
+  "applicationId": 1,
+  "state": "Rejected"
+}

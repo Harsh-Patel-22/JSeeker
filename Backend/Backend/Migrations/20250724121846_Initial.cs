@@ -23,7 +23,9 @@ namespace Backend.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -41,20 +43,6 @@ namespace Backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Hobbies", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Locations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Locations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -132,8 +120,7 @@ namespace Backend.Migrations
                 name: "Hirers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CompanyAddressId = table.Column<int>(type: "int", nullable: false),
                     CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Designation = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -159,7 +146,7 @@ namespace Backend.Migrations
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Occupation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gender = table.Column<int>(type: "int", nullable: false),
-                    AddressId = table.Column<int>(type: "int", nullable: false),
+                    AddressId = table.Column<int>(type: "int", nullable: true),
                     AboutLine = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -174,8 +161,7 @@ namespace Backend.Migrations
                         name: "FK_Users_Addresses_AddressId",
                         column: x => x.AddressId,
                         principalTable: "Addresses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -187,19 +173,35 @@ namespace Backend.Migrations
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TermsAndConditions = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LocationId = table.Column<int>(type: "int", nullable: false)
+                    Responsibilities = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequiredWorkExperience = table.Column<int>(type: "int", nullable: false),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MinSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MaxSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    WorkMode = table.Column<int>(type: "int", nullable: false),
+                    ApplicationsLimit = table.Column<int>(type: "int", nullable: false),
+                    PostDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    NumberOfApplications = table.Column<int>(type: "int", nullable: false),
+                    AddressId = table.Column<int>(type: "int", nullable: false),
+                    HirerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Jobs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Jobs_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
+                        name: "FK_Jobs_Addresses_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Addresses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Jobs_Hirers_HirerId",
+                        column: x => x.HirerId,
+                        principalTable: "Hirers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -335,7 +337,7 @@ namespace Backend.Migrations
                     ApplicantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     JobId = table.Column<int>(type: "int", nullable: false),
                     HirerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ApplicationState = table.Column<int>(type: "int", nullable: false)
+                    State = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -371,7 +373,9 @@ namespace Backend.Migrations
                     JobId = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Time = table.Column<TimeOnly>(type: "time", nullable: false),
-                    Mode = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Mode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ConfirmedByHirer = table.Column<bool>(type: "bit", nullable: false),
+                    ConfirmedBySeeker = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -468,9 +472,14 @@ namespace Backend.Migrations
                 column: "SeekerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Jobs_LocationId",
+                name: "IX_Jobs_AddressId",
                 table: "Jobs",
-                column: "LocationId");
+                column: "AddressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Jobs_HirerId",
+                table: "Jobs",
+                column: "HirerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_UserId",
@@ -506,9 +515,6 @@ namespace Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Educations");
-
-            migrationBuilder.DropTable(
-                name: "Hirers");
 
             migrationBuilder.DropTable(
                 name: "HobbyUser");
@@ -550,7 +556,7 @@ namespace Backend.Migrations
                 name: "VocalLanguages");
 
             migrationBuilder.DropTable(
-                name: "Locations");
+                name: "Hirers");
 
             migrationBuilder.DropTable(
                 name: "Users");

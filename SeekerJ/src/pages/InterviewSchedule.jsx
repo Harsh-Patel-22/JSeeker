@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.css"
 import { api } from "../services/APIClient";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import Navbar from "../components/Navbar";
 import { AxiosError } from "axios";
 
 const InterviewCard = ({interviewData}) => {
@@ -119,7 +118,6 @@ const InterviewSchedule = () => {
     }, [])
 
     return<>
-    <Navbar></Navbar>
     {/* {console.log(interviews)} */}
     
     {interviews.map((interview) => {

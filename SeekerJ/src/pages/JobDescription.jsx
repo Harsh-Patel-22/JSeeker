@@ -1,15 +1,16 @@
 import { useLocation } from "react-router";
-import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { api } from "../services/APIClient";
 import { Axios, AxiosError } from "axios";
+import { useAuth } from "../contexts/AuthContext";
 
 const JobDescription = () => {
     let location = useLocation();
     let {jobData} = location.state;
     let [job, setJob] = useState({});
 
-    let type = sessionStorage.getItem("type");
+    let {user} = useAuth();
+    let type = user.role.toLowerCase();
     // console.log(job)
 
     useEffect(() => {
@@ -29,7 +30,6 @@ const JobDescription = () => {
     }, [])
 
     return <>
-        <Navbar />
 <div className="container mt-4 mb-5">
   <div className="card p-4 shadow-sm">
     <div className="d-flex align-items-start justify-content-between flex-wrap">

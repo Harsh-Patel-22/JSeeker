@@ -3,7 +3,6 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js"
 import { api } from "../services/APIClient";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import Navbar from "../components/Navbar";
 import { AxiosError } from "axios";
 
 const ApplicationCard = ({applicationData}) => {
@@ -129,7 +128,6 @@ const ApplicationsPage = () => {
     }, [])
 
     return<>
-    <Navbar></Navbar>
     
     {applications.map((application) => {
         console.log(application);

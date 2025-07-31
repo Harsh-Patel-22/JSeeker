@@ -1,5 +1,8 @@
 using System.Security.Claims;
+using Backend.DTOs.Users.Hirer;
+using Backend.Models.Users;
 using Backend.Repositories;
+using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,8 +11,23 @@ namespace Backend.Controllers;
 [ApiController]
 [Route("api/user")]
 [Authorize(Roles = "Hirer,Seeker")]
-public class UserController (UserRepository repository) : ControllerBase {
+public class UserController (UserRepository repository, HirerService hirerService) : ControllerBase {
+    // TODO - Add edit route for editing....
     
+    // Section - Registering as a Hirer
+    [HttpPost("update/hirer")]
+    public async Task<IActionResult> RegisterAsHirerAsync([FromBody] HirerProfessionalDetailsDto dto) {
+        string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out Guid userId)) {
+            throw new Exception("Invalid or missing NameId claim in JWT.");
+        }
+        
+        await hirerService.RegisterUserAsHirerAsync(userId, dto);
+        return Ok();
+    }
+    
+    // TODO - Make this one call. Dont fetch again and again!!
+    // Section - Profile related fetching 
     [HttpGet("profile/basic")]
     public async Task<IActionResult> GetBasicDetails() {
         var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);

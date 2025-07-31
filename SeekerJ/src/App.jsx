@@ -10,12 +10,12 @@ import InterviewSchedule from './pages/InterviewSchedule';
 import ApplicationsPage from './pages/ApplicantsPage';
 import Testing from './pages/Testing';
 import ProfilePage from './pages/ProfilePage';
-import Footer from './components/Footer';
-import Navbar from './components/Navbar';
 import 'bootstrap/dist/css/bootstrap.css';
 import UnauthorisedPage from './pages/UnauthorisedPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useEffect } from 'react';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 const App = () => {
   const authVar = useAuth();
@@ -25,7 +25,8 @@ const App = () => {
     console.log("User updated in context:", user);
   }
 }, [user]);
-  return (
+  return <>
+    {isAuthenticated() && <Navbar />}
     <Routes>
       {/* {console.log("isAuthenticated:", isAuthenticated())} */}
       {/* {console.log("isAuthenticated user:", user)} */}
@@ -50,7 +51,8 @@ const App = () => {
         </>
       )}
     </Routes>
-  );
+    {isAuthenticated() && <Footer />}
+      </>;
  
 };
 

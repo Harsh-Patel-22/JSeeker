@@ -1,10 +1,14 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
     // let [type, setType] = useState("hirer");
-    let type = sessionStorage.getItem("type");
+    let {user} = useAuth();
+    console.log("User in Navbar:", user);
+    let type = user["role"];
+    // let type = sessionStorage.getItem("type");
 
     return <div className="px-3 py-2 text-bg-dark border-bottom">
         <div className="container">

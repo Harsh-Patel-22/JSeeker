@@ -20,6 +20,27 @@ public static class Extensions {
     
     public static IServiceCollection AddUserModule(this IServiceCollection services) {
         services.AddScoped<UserRepository>();
+        services.AddScoped<AddressRepository>();
+        services.AddScoped<HirerService>();
+        services.AddScoped<UserService>();
+        return services;
+    }
+
+    public static IServiceCollection AddMetricsModule(this IServiceCollection services) {
+        services.AddScoped<MetricsRepository>();
+        return services;
+    }
+    
+    public static IServiceCollection AddHttpClients(this IServiceCollection services) {
+        services.AddHttpClient<GithubService>();
+        services.AddHttpClient<AIService>();
+        return services;
+    }
+
+    public static IServiceCollection AddServices(this IServiceCollection services) {
+        services.AddScoped<ResumeBuilderService>();
+        services.AddScoped<PdfService>();
+        services.AddScoped<RatingService>();
         return services;
     }
 }

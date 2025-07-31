@@ -6,7 +6,6 @@ namespace Backend.Models.Users;
 public enum Roles {
     Hirer,
     Seeker,
-    General
 }
 
 public class UserCredentials {

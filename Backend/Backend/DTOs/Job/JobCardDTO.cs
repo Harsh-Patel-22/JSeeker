@@ -14,4 +14,7 @@ public class JobCardDto {
     public Address Address { get; set; }
     public decimal MinSalary { get; set; }
     public decimal MaxSalary { get; set; }
+    
+    public int NumberOfApplications { get; set; }
+    public DateOnly PostDate { get; set; }
 }

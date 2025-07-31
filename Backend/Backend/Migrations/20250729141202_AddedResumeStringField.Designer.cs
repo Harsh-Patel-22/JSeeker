@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250709032150_MadeAddressFKNullableInUser")]
-    partial class MadeAddressFKNullableInUser
+    [Migration("20250729141202_AddedResumeStringField")]
+    partial class AddedResumeStringField
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,10 +33,7 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("ApplicantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ApplicationState")
+                    b.Property<int>("AIGivenRating")
                         .HasColumnType("int");
 
                     b.Property<Guid>("HirerId")
@@ -45,13 +42,19 @@ namespace Backend.Migrations
                     b.Property<int>("JobId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<Guid>("SeekerId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasIndex("ApplicantId");
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("HirerId");
 
                     b.HasIndex("JobId");
+
+                    b.HasIndex("SeekerId");
 
                     b.ToTable("Applications");
                 });
@@ -63,6 +66,12 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("ConfirmedByHirer")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ConfirmedBySeeker")
+                        .HasColumnType("bit");
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
@@ -102,19 +111,44 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ApplicationsLimit")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("HirerId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Salary")
+                    b.Property<decimal>("MaxSalary")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Status")
+                    b.Property<decimal>("MinSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("NumberOfApplications")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("PostDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("RequiredWorkExperience")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Responsibilities")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("TermsAndConditions")
                         .IsRequired()
@@ -124,30 +158,19 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.ToTable("Jobs");
-                });
-
-            modelBuilder.Entity("Backend.Models.Location", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("WorkMode")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Locations");
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("HirerId");
+
+                    b.ToTable("Jobs");
                 });
 
             modelBuilder.Entity("Backend.Models.Mapping.ProjectTechnology", b =>
@@ -229,6 +252,12 @@ namespace Backend.Migrations
 
                     b.Property<string>("HouseNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PostalCode")
                         .IsRequired()
@@ -326,11 +355,9 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Users.Hirer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CompanyAddressId")
                         .HasColumnType("int");
@@ -404,7 +431,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsSeeker")
+                    b.Property<bool>("IsHirer")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
@@ -420,6 +447,10 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResumeJsonString")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -571,12 +602,6 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Application", b =>
                 {
-                    b.HasOne("Backend.Models.Users.User", "Applicant")
-                        .WithMany()
-                        .HasForeignKey("ApplicantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Backend.Models.Users.User", "Hirer")
                         .WithMany()
                         .HasForeignKey("HirerId")
@@ -589,11 +614,17 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Applicant");
+                    b.HasOne("Backend.Models.Users.User", "Seeker")
+                        .WithMany()
+                        .HasForeignKey("SeekerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Hirer");
 
                     b.Navigation("Job");
+
+                    b.Navigation("Seeker");
                 });
 
             modelBuilder.Entity("Backend.Models.Interview", b =>
@@ -625,13 +656,21 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Job", b =>
                 {
-                    b.HasOne("Backend.Models.Location", "Location")
+                    b.HasOne("Backend.Models.Users.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("LocationId")
+                        .HasForeignKey("AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Location");
+                    b.HasOne("Backend.Models.Users.Hirer", "Hirer")
+                        .WithMany()
+                        .HasForeignKey("HirerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Hirer");
                 });
 
             modelBuilder.Entity("Backend.Models.Mapping.ProjectTechnology", b =>

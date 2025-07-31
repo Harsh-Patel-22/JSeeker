@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
-import Footer from './components/Footer.jsx'
 import { BrowserRouter } from 'react-router'
 
 createRoot(document.getElementById('root')).render(
@@ -13,6 +12,5 @@ createRoot(document.getElementById('root')).render(
         <App />
       </BrowserRouter>
     </AuthProvider>
-    <Footer />
   </StrictMode>,
 )

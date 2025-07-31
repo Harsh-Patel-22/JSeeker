@@ -29,17 +29,26 @@ public class User {
     public string Description { get; set; }
     
     // Section - Contact Details
+    public string Email { get; set; }
     public string PhoneNumber { get; set; }
-    public string GithubProfileLink { get; set; }
+    public string GithubUsername { get; set; }
     public string LinkedInProfileLink { get; set; }
+    public string? ResumeJsonString { get; set; }
+    public int? ResumeTemplateNumber { get; set; }
+    public int NumberOfSuccessfulEmployments { get; set; }
+    public int NumberOfRejections { get; set; }
+    
+    // TODO - Might wanna remove the below field...
+    public byte[]? PreCreatedResume { get; set; } 
     
     // TODO - In the ui, while creating new post, if the mode in on site, give 2 options, company location and add new location. Also, only ask for location if its on site, else no need to show.
-    public bool IsSeeker { get; set; }
+    public bool IsHirer { get; set; }
     
     // Section - Professional Details
     public ICollection<Project> Projects { get; set; }
     public ICollection<WorkExperience> WorkExperiences { get; set; }
     public ICollection<Education> Educations { get; set; }
+    public JobType JobPreference {get; set;}
     
     // Section - Other Details
     public ICollection<Hobby> Hobbies { get; set; }

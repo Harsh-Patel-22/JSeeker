@@ -17,7 +17,7 @@ public class AuthService (IConfiguration config, AuthRepository repository) {
         var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         
         List<Claim> claims = [new Claim(JwtRegisteredClaimNames.NameId, (await repository.GetUserIdAsync(credentials)).ToString()), 
-            new Claim(JwtRegisteredClaimNames.Name, credentials.Username), new Claim("role", credentials.Role)];
+            new Claim(JwtRegisteredClaimNames.Name, credentials.Username), new Claim(ClaimTypes.Role, credentials.Role)];
 
         var tokenOptions = new JwtSecurityToken(
             audience: config.GetValue<string>("jwt:audience"),

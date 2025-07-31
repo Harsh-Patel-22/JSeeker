@@ -16,7 +16,7 @@ public class JobController (JobService jobService) : ControllerBase {
     // TODO - Give the check conditions for corner cases - not found, doesnt exist, any other. Catch all exceptions that can be created.
     
     [HttpPost("location/searchRadius={searchRadius}")]
-    public async Task<IActionResult> GetNearbyJobsAsync([FromRoute] decimal searchRadius) {
+    public async Task<IActionResult> GetNearbyJobsAsync([FromRoute] decimal searchRadius, [FromBody] JobSearchFilterDto searchFilter) {
         var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var roleStr = User.FindFirstValue(ClaimTypes.Role);
         if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
@@ -26,11 +26,11 @@ public class JobController (JobService jobService) : ControllerBase {
         if (!Enum.TryParse(roleStr, out Roles role)) {
             throw new Exception("Invalid or missing Role claim in JWT.");
         }
-        return Ok(await jobService.GetNearbyJobs(clientId, role, searchRadius));
+        return Ok(await jobService.GetNearbyJobs(clientId, role, searchRadius, searchFilter));
     }
     
     [HttpGet("get/")]
-    public async Task<IActionResult> GetRelevantJobs() {
+    public async Task<IActionResult> GetRelevantJobsAsync([FromBody] JobSearchFilterDto searchFilter) {
         var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var roleStr = User.FindFirstValue(ClaimTypes.Role);
 
@@ -41,7 +41,7 @@ public class JobController (JobService jobService) : ControllerBase {
         if (!Roles.TryParse(roleStr, out Roles role)) {
             throw new Exception("Invalid or missing Role claim in JWT.");
         }
-        var jobs = await jobService.GetRelevantJobsAsync(clientId, role);
+        var jobs = await jobService.GetRelevantJobsAsync(clientId, role, searchFilter);
         if (jobs is { Count: 0 }) {
             return NotFound("No jobs found");
         };
@@ -58,6 +58,13 @@ public class JobController (JobService jobService) : ControllerBase {
         if (isCreated) return Created();
         
         return BadRequest("Could not create the job"); 
+    }
+
+    [HttpPost("update/{jobId}")]
+    public async Task<IActionResult> UpdateJob([FromRoute] int jobId,  [FromBody] EditJobDto dto) {
+        var isUpdated = await jobService.UpdateJobAsync(jobId, dto);
+        if (isUpdated) return Ok();
+        return BadRequest("Could not update the job");
     }
     
     [HttpGet("description/{id}")]
