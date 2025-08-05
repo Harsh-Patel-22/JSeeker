@@ -58,7 +58,13 @@ public class GithubDataController : ControllerBase {
 
     [HttpGet("allinsights/repo={repo}")]
     public async Task<IActionResult> GetAllInsights([FromRoute] string repo) {
-        var insights = await _githubService.GetAllInsightsFromRepoAsync(repo); 
+        var insights = await _githubService.GetAllInsightsFromRepoAsync("Harsh-Patel-22", repo); 
+        return Ok(insights);
+    }
+
+    [HttpGet("reponames/{owner}")]
+    public async Task<IActionResult> GetInsights([FromRoute] string owner) {
+        var insights = await _githubService.GetAllRepoNamesAsync(owner);
         return Ok(insights);
     }
 }

@@ -1,7 +1,9 @@
 using Backend.Data;
+using Backend.DTOs;
 using Backend.DTOs.Users;
 using Backend.DTOs.Users.Hirer;
 using Backend.Interfaces;
+using Backend.Models.Mapping;
 using Backend.Models.Users;
 using Backend.Models.Users.WorkRelated;
 using Backend.Util;
@@ -22,7 +24,61 @@ public class UserRepository (ApplicationDbContext context) : IProjectHolder {
             CompanyAddressId = companyAddressId,
         };
         
+        await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(user => user.IsHirer, true));
         await DbUpdateHelper.UpdateAllFieldsExceptAsync(h, context, "Id");
+    }
+
+    public async Task UpdateUserDetailsAsync(Guid userId) {
+        
+        // TODO - Add all details. The function could be really simple once I have the dto for it. I can directly fetch the things from it and maybe just 1 update call would be needed.
+        User u = new User() {
+            Id = userId,
+            // Keywords = csvString,
+        };
+        
+        await DbUpdateHelper.UpdateAllFieldsExceptAsync(u, context, "Id");
+        
+        List<string> keywords = await context.Projects
+            .Where(p => p.UserId == userId)
+            .SelectMany(p => p.ProjectTechnologies.Select(pt => pt.Technology.Name))
+            .Distinct()
+            .ToListAsync();
+        string csvString = String.Join(",", keywords);
+        
+        await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(user => user.Keywords, csvString));
+        
+    }
+
+    public async Task AddGithubProjectAndMappingsAsync(ProjectTechnologyMappingDto mapping) {
+        await context.Projects.AddAsync(mapping.Project);
+        await context.SaveChangesAsync();
+
+        List<ProjectTechnology> projectTechnologies = new List<ProjectTechnology>();
+        foreach (var technologyNameUsage in mapping.MappingData) {
+            int techId = await GetTechnologyIdAsync(technologyNameUsage.Key);
+            
+            projectTechnologies.Add(new ProjectTechnology() {
+                ProjectId = mapping.Project.Id,
+                TechnologyId = techId,
+                PercentUsage = technologyNameUsage.Value,
+            });
+        }
+        
+        await context.ProjectTechnologies.AddRangeAsync(projectTechnologies);
+        await context.SaveChangesAsync();
+    }
+
+    private async Task<int> GetTechnologyIdAsync(string technologyName) {
+        var tech = await context.Technologies.Where(technology => technology.Name.Equals(technologyName))
+            .FirstOrDefaultAsync();
+
+        if (tech != null) return tech.Id;
+        Technology t = new Technology() {
+            Name = technologyName
+        };
+        await context.Technologies.AddAsync(t);
+        await context.SaveChangesAsync();
+        return t.Id;
     }
     
     // Section - Resume Related
@@ -137,7 +193,7 @@ public class UserRepository (ApplicationDbContext context) : IProjectHolder {
         
         List<ProjectDetailsDto> projectDetails = new List<ProjectDetailsDto>();
         foreach (var userProject in userProjectModels) {
-            projectDetails.Add(new ProjectDetailsDto(userProject.Name, technologiesDictionary[userProject.Id], userProject.StartDate, userProject.EndDate, userProject.GithubRepoLink));
+            projectDetails.Add(new ProjectDetailsDto(userProject.Name, technologiesDictionary[userProject.Id], userProject.StartDate, userProject.LastUpdatedDate, userProject.GithubRepoLink));
         }
         
         return projectDetails;

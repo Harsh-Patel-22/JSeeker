@@ -113,8 +113,10 @@ GET {{Backend_HostAddress}}/api/github/tags/Harsh-Patel-22/JSeeker
 GET {{Backend_HostAddress}}/api/github/readme/Harsh-Patel-22/Tic-Tac-Toe_Game
 
 ###
-GET {{Backend_HostAddress}}/api/github/allinsights/repo=ComfyUI
+GET {{Backend_HostAddress}}/api/github/allinsights/repo=JSeeker
 
+###
+GET {{Backend_HostAddress}}/api/github/reponames/Harsh-Patel-22
 
 ###
 POST {{Backend_HostAddress}}//api/auth/register
@@ -166,6 +168,9 @@ Content-Type: application/json
 // Testing
 ###
 GET {{Backend_HostAddress}}/api/testing/
+
+###
+GET {{Backend_HostAddress}}/api/testing/projects
 
 ###
 POST {{Backend_HostAddress}}/api/application/create

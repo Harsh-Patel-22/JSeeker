@@ -6,54 +6,116 @@ using Backend.Repositories;
 
 namespace Backend.Services;
 
-public class JobService (JobRepository jobRepository, InterviewRepository interviewRepository, ApplicationRepository applicationRepository, UserRepository userRepository, RatingService ratingService) {
+public class JobService (JobRepository jobRepository, InterviewRepository interviewRepository, ApplicationRepository applicationRepository, UserRepository userRepository, RatingService ratingService, ValidationService validationService) {
     
     private readonly int _remainingApplicationsThresholdForClosingSoon = 10; 
     // Section - Job Related
 
    
-    public async Task<List<JobCardDto>?> GetRelevantJobsAsync(Guid clientId, Roles role, JobSearchFilterDto searchFilter) {
-        return await jobRepository.GetRelevantJobsBySearchFilterAsync(clientId, role, searchFilter);
+    public async Task<List<JobCardDto>?> GetRelevantJobsAsync(Guid userId, Roles role, JobSearchFilterDto searchFilter) {
+        if (!await validationService.UserExistsAsync(userId))
+            throw new Exception("No such user exists.");
+        if (role == Roles.Hirer && !await validationService.IsHirerAsync(userId)) {
+            throw new Exception("Wrong role provided.");
+        }
+        return await jobRepository.GetRelevantJobsBySearchFilterAsync(userId, role, searchFilter);
     }
     
     public async Task<bool> CreateJobAsync(Guid hirerId, CreateJobDto newJob) {
+        if (!await validationService.IsHirerAsync(hirerId))
+            throw new Exception("Unauthorized");
+        
         return await jobRepository.CreateJobAsync(hirerId, newJob); 
     }
 
-    public async Task<bool> UpdateJobAsync(int jobId, EditJobDto dto) {
+    public async Task<bool> UpdateJobAsync(Guid hirerId, int jobId, EditJobDto dto) {
+        if (!await validationService.IsHirerAsync(hirerId)) {
+            throw new Exception("Unauthorized");
+        }
+
+        if (!await validationService.IsTheirJobAsync(hirerId, jobId)) {
+            throw new Exception("Unauthorized");
+        }
+        
         return await jobRepository.EditJobAsync(jobId, dto);
     }
 
-    public async Task<List<JobForMapMarkerDto>?> GetNearbyJobs(Guid clientId, Roles role, decimal searchRadius, JobSearchFilterDto searchFilter) {
-        return await jobRepository.GetNearbyJobsAsync(clientId, role, searchRadius, searchFilter);
+    public async Task<List<JobForMapMarkerDto>?> GetNearbyJobs(Guid userId, Roles role, decimal searchRadius, JobSearchFilterDto searchFilter) {
+        if (!await validationService.UserExistsAsync(userId))
+            throw new Exception("No such user exists.");
+        if (role == Roles.Hirer && !await validationService.IsHirerAsync(userId)) {
+            throw new Exception("Wrong role provided.");
+        }
+        return await jobRepository.GetNearbyJobsAsync(userId, role, searchRadius, searchFilter);
     }
 
-    public async Task<JobDescriptionDto?> GetJobDescriptionByIdAsync(int id) {
-        return await jobRepository.GetJobDescriptionByIdAsync(id);
+    public async Task<JobDescriptionDto> GetJobDescriptionByIdAsync(int id) {
+        var jobDescription = await jobRepository.GetJobDescriptionByIdAsync(id);
+        if(jobDescription == null) 
+            throw new Exception("Job Does Not Exist");
+        return jobDescription;
     }
     
     // Section - Interview Related
     public async Task<List<InterviewDto>> GetInterviewsByIdByScheduleStatusAsync(Guid userId, bool scheduled) {
+        if (!await validationService.UserExistsAsync(userId))
+            throw new Exception("No such user Exist");
         return await interviewRepository.GetInterviewsByIdByScheduleStatusAsync(userId, scheduled);
     }
 
-    public async Task<InterviewDto> GetInterviewByIdAsync(int interviewId) {
-        var interviewDto = await interviewRepository.GetInterviewByIdAsync(interviewId);
-        if (interviewDto == null) {
-            throw new Exception("Interview not found");
+    public async Task<InterviewDto> GetInterviewByIdAsync(Guid userId, int interviewId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new Exception("No such user exists");
         }
+
+        if (!await validationService.InterviewExistsAsync(interviewId)) {
+            throw new Exception("Interview Does Not Exist");
+        }
+        
+        if (!await validationService.IsTheirInterviewAsync(userId, interviewId)) {
+            throw new Exception("Unauthorized");
+        }
+        var interviewDto = await interviewRepository.GetInterviewByIdAsync(interviewId);
         return interviewDto;
     }
     
-    public async Task UpdateInterviewDateTimeAsync(int interviewId, Roles role, DateAndTimeDto dto) {
+    public async Task UpdateInterviewDateTimeAsync(Guid userId, int interviewId, Roles role, DateAndTimeDto dto) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new Exception("No such user exists");
+        }
+
+        if (!await validationService.IsTheirInterviewAsync(userId, interviewId)) {
+            throw new Exception("Unauthorized");
+        }
+        
         await interviewRepository.UpdateInterviewDateTimeAsync(interviewId, dto);
     }
     
     public async Task<bool> CreateInterviewAsync(CreateInterviewDto newInterviewDto) {
+        if (!await validationService.UserExistsAsync(newInterviewDto.SeekerId)) {
+            throw new Exception("No such seeker exists");
+        }
+
+        if (!await validationService.IsHirerAsync(newInterviewDto.HirerId)) {
+            throw new Exception("Unauthorized");
+        }
+
+        if (!await validationService.JobExistsAsync(newInterviewDto.JobId)) {
+            throw new Exception("No such job exists");
+        }
+        
         return await interviewRepository.CreateInterviewsAsync(newInterviewDto);
     }
 
-    public async Task UpdateSeekerSuccessFailureJobLanding(int interviewId, bool successful) {
+    public async Task UpdateSeekerSuccessFailureJobLanding(Guid hirerId, int interviewId, bool successful) {
+        if (!await validationService.InterviewExistsAsync(interviewId)) {
+            throw new Exception("No such interview exists");
+        }
+
+        if (!await validationService.IsTheirInterviewAsync(hirerId, interviewId)) {
+            throw new Exception("Unauthorized");
+        }
+        
         Guid userId = await interviewRepository.GetSeekerIdByInterviewId(interviewId);
         if (successful) {
             await userRepository.IncrementSuccessCountAsync(userId);
@@ -64,30 +126,66 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
     }
     
     // Section - Application Related
-    public async Task<List<ApplicationDto>> GetAllApplicationsByHirerIdByStateAsync(Guid userId, ApplicationState state) {
-        return await applicationRepository.GetAllApplicationsByHirerIdByStateAsync(userId, state);
+    public async Task<List<ApplicationDto>> GetAllApplicationsByUserIdByStateAsync(Guid userId, ApplicationState state) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new Exception("No such user exists");
+        }
+        return await applicationRepository.GetAllApplicationsByUserIdByStateAsync(userId, state);
     }
 
-    public async Task<ApplicationDto> GetApplicationByIdAsync(int applicationId) {
-        var applicationDto = await applicationRepository.GetApplicationByIdAsync(applicationId);
-        if (applicationDto == null) {
-            throw new Exception("Application Doesn't Exist");
+    public async Task<ApplicationDto> GetApplicationByIdAsync(Guid userId, int applicationId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new Exception("No such user exists");
         }
+
+        if (!await validationService.ApplicationExistsAsync(applicationId)) {
+            throw new Exception("No such application exists");
+        }
+
+        if (!await validationService.IsTheirApplicationAsync(userId, applicationId)) {
+            throw new Exception("Unauthorized");
+        }
+        
+        var applicationDto = await applicationRepository.GetApplicationByIdAsync(applicationId);
         return applicationDto;
     }
 
-    public async Task UpdateApplicationStateAsync(ApplicationStateUpdateDto dto) {
-        if (dto.State != ApplicationState.Rejected) {
-            await applicationRepository.UpdateApplicationStateAsync(dto.ApplicationId, dto.State);
+    public async Task UpdateApplicationStateAsync(Guid hirerId, ApplicationStateUpdateDto dto) {
+        if (!await validationService.IsHirerAsync(hirerId)) {
+            throw new Exception("Unauthorized");
         }
-        else {
+
+        if (!await validationService.ApplicationExistsAsync(dto.ApplicationId)) {
+            throw new Exception("No such application exists");
+        }
+        
+        if (!await validationService.IsTheirApplicationAsync(hirerId, dto.ApplicationId)) {
+            throw new Exception("Unauthorized");
+        }
+        
+       
+        await applicationRepository.UpdateApplicationStateAsync(dto.ApplicationId, dto.State);
+        if (dto.State == ApplicationState.Rejected) {
             Guid userId = await applicationRepository.GetSeekerIdByApplicationIdAsync(dto.ApplicationId);
             await userRepository.IncrementRejectedCountAsync(userId);
         }
+        
     }
 
     
     public async Task<bool> CheckAndCreateApplicationAsync(CreateApplicationDto newApplicationDto) {
+        if (!await validationService.JobExistsAsync(newApplicationDto.JobId)) {
+            throw new Exception("No such job exists");
+        }
+        if (!await validationService.UserExistsAsync(newApplicationDto.SeekerId)) {
+            throw new Exception("No such seeker exists");
+        }
+
+        if (!await validationService.IsHirerAsync(newApplicationDto.HirerId)) {
+            throw new Exception("No such hirer exists");
+        }
+        
+        
         JobKeyInformationDto job = await jobRepository.GetJobKeyInformationByIdAsync(newApplicationDto.JobId);
         if (newApplicationDto.JobType != job.JobType || job.JobStatus == JobStatus.Closed) return false;
         
@@ -109,7 +207,15 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
         return true;
     }
 
-    public async Task DeleteApplicationAsync(int applicationId) {
+    public async Task DeleteApplicationAsync(Guid userId, int applicationId) {
+        if (!await validationService.ApplicationExistsAsync(applicationId)) {
+            throw new Exception("No such application exists");
+        }
+
+        if (!await validationService.IsTheirApplicationAsync(userId, applicationId)) {
+            throw new Exception("Unauthorized");
+        }
+        
         await applicationRepository.DeleteApplicationAsync(applicationId);
     }
 }

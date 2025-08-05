@@ -7,8 +7,6 @@ namespace Backend.Models.Mapping;
 
 public class ProjectTechnology
 {
-    [Key]
-    public int Id { get; set; }
     public int ProjectId { get; set; }
     public int TechnologyId { get; set; }
 

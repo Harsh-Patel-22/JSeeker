@@ -9,10 +9,13 @@ public class Project
     [Key]
     public int Id { get; set; }
     public string Name { get; set; }
+    public string Description { get; set; }
     
     public Guid UserId { get; set; }
     public DateOnly StartDate { get; set; }
-    public DateOnly EndDate { get; set; }
+    public DateOnly LastUpdatedDate { get; set; }
+    
+    public bool IsCompleted { get; set; }
     public string GithubRepoLink { get; set; }
     
     

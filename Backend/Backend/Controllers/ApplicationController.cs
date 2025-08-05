@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Backend.DTOs;
 using Backend.DTOs.Job;
+using Backend.Extensions;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -17,12 +18,9 @@ public class ApplicationController (JobService jobService) : ControllerBase {
     [HttpGet("get/state={state}")]
     // TODO - Limit the details of job passed around using few new DTOs. Rn on passing the job model object itself, a lot of unnecessary data is being passed and making the response heavy
     public async Task<IActionResult> GetApplicationsByStatusAsync([FromRoute] ApplicationState state) {
-        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
-            throw new Exception("Invalid or missing NameId claim in JWT.");
-        }
+        Guid clientId = User.GetNameIdentifier();
         
-        var applications = await jobService.GetAllApplicationsByHirerIdByStateAsync(clientId, state); 
+        var applications = await jobService.GetAllApplicationsByUserIdByStateAsync(clientId, state); 
         if (applications.Count == 0) {
             return BadRequest("No applications found for the given client.");
         }
@@ -31,13 +29,15 @@ public class ApplicationController (JobService jobService) : ControllerBase {
 
     [HttpGet("get/{applicationId}")]
     public async Task<IActionResult> GetApplicationByIdAsync(int applicationId) {
-        return Ok(await jobService.GetApplicationByIdAsync(applicationId));
+        Guid userId = User.GetNameIdentifier();
+        return Ok(await jobService.GetApplicationByIdAsync(userId, applicationId));
     }
     
     [Authorize(Roles = "Hirer")]
     [HttpPost("status")]
     public async Task<IActionResult> UpdateApplicationStatusAsync([FromBody] ApplicationStateUpdateDto dto) {
-        await jobService.UpdateApplicationStateAsync(dto);
+        Guid userId = User.GetNameIdentifier();
+        await jobService.UpdateApplicationStateAsync(userId, dto);
         // Never use redirecttoaction for an api and spa...
         // return RedirectToAction("GetApplicationsByStatus", new { state = dto.State});
         return Ok();
@@ -53,7 +53,16 @@ public class ApplicationController (JobService jobService) : ControllerBase {
 
     [HttpPost("delete/{id}")]
     public async Task<IActionResult> DeleteApplicationAsync([FromRoute] int id) {
-        await jobService.DeleteApplicationAsync(id);
+        string? idStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(idStr)) {
+            return BadRequest("Unauthorised");
+        }
+
+        if (!Guid.TryParse(idStr, out Guid userId)) {
+            return BadRequest("Unauthorised");
+        }
+        
+        await jobService.DeleteApplicationAsync(userId, id);
         return Ok();
     }
 }

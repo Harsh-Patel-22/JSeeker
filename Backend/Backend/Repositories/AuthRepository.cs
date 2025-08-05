@@ -37,17 +37,17 @@ public class AuthRepository (ApplicationDbContext context) {
 
             await context.Users.AddAsync(new User() {
                 Id = userId,
-                FirstName = ".",
-                LastName = ".",
-                Occupation = ".",
+                FirstName = "",
+                LastName = "",
+                Occupation = "",
                 Gender = Gender.PreferNotToSay,
                 AddressId = 1, 
                 
-                AboutLine = ".",
-                Description = ",",
-                
-                PhoneNumber = ".",
-                GithubUsername = ".",
+                AboutLine = "",
+                Description = "",
+                IsHirer = role == Roles.Hirer,
+                PhoneNumber = "",
+                GithubUsername = "",
                 LinkedInProfileLink = "https://linkedin.com/",
                 ResumeJsonString = "empty",
                 

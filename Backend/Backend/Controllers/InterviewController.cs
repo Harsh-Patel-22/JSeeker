@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Backend.DTOs;
+using Backend.Extensions;
 using Backend.Models.Users;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,11 +14,8 @@ namespace Backend.Controllers;
 public class InterviewController (JobService jobService) : ControllerBase {
     [HttpGet("get/scheduled={scheduled}")]
     public async Task<IActionResult> GetInterviewsAsync([FromRoute] bool scheduled) {
-        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
-            throw new Exception("Invalid or missing NameId claim in JWT.");
-        }
-        var interviews = await jobService.GetInterviewsByIdByScheduleStatusAsync(clientId,  scheduled);
+        Guid userId = User.GetNameIdentifier();
+        var interviews = await jobService.GetInterviewsByIdByScheduleStatusAsync(userId,  scheduled);
         return Ok(interviews);
     }
 
@@ -27,7 +25,9 @@ public class InterviewController (JobService jobService) : ControllerBase {
         if (!Enum.TryParse(roleStr, out Roles role)) {
             throw new Exception("Invalid or missing Role claim in JWT.");
         }
-        await jobService.UpdateInterviewDateTimeAsync(interviewId, role, dto);
+
+        Guid userId = User.GetNameIdentifier();
+        await jobService.UpdateInterviewDateTimeAsync(userId, interviewId, role, dto);
         return NoContent();
     }
     
@@ -41,7 +41,8 @@ public class InterviewController (JobService jobService) : ControllerBase {
 
     [HttpGet("get/{interviewId}")]
     public async Task<IActionResult> GetInterviewByIdAsync(int interviewId) {
-        return Ok(await jobService.GetInterviewByIdAsync(interviewId));
+        Guid userId = User.GetNameIdentifier();
+        return Ok(await jobService.GetInterviewByIdAsync(userId, interviewId));
     }
     
 }

@@ -38,8 +38,7 @@ public class User {
     public int NumberOfSuccessfulEmployments { get; set; }
     public int NumberOfRejections { get; set; }
     
-    // TODO - Might wanna remove the below field...
-    public byte[]? PreCreatedResume { get; set; } 
+    public string Keywords { get; set; }
     
     // TODO - In the ui, while creating new post, if the mode in on site, give 2 options, company location and add new location. Also, only ask for location if its on site, else no need to show.
     public bool IsHirer { get; set; }

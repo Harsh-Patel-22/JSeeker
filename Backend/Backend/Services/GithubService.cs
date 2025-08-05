@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Backend.Util;
 
 namespace Backend.Services;
 
@@ -8,6 +9,7 @@ public class GithubService {
     private readonly HttpClient _httpClient;
 
     // TODO - Add a check if the passes repos belong to the owner. Verify with the database data about the same
+    // TODO - Add a get basic + other project related details just by entering the Github username. Store that in the projects
     
     public GithubService(HttpClient httpClient) {
         _httpClient = httpClient;
@@ -49,21 +51,23 @@ public class GithubService {
         
         foreach (var repo in repos.EnumerateArray()) {
             var projectName = repo.GetProperty("name").ToString();
-            var projectDetails = await GetAllInsightsFromRepoAsync(projectName);
+            var projectDetails = await GetAllInsightsFromRepoAsync(owner, projectName);
             projects.Add(projectName, projectDetails);
         }
         
         return projects;
     }
     
-    public async Task<JsonElement> GetAllInsightsFromRepoAsync(string repoName) {
-        // var owner = "Harsh-Patel-22"; // TODO - replace the hard coded string with actual fetching from database 
-        var owner = "comfyanonymous";
+    public async Task<JsonElement> GetAllInsightsFromRepoAsync(string owner, string repoName) {
+        // TODO - Add the date fetching with this
+        // owner = "comfyanonymous";
         var rawJson = await GetRepoAsync(owner, repoName);
         
         var htmlUrl = rawJson.GetProperty("html_url").ToString(); 
         var description = rawJson.GetProperty("description").ToString();
         var isPublic = rawJson.GetProperty("visibility").ToString().Equals("public");
+        var createdAt = rawJson.GetProperty("created_at").ToString();
+        var updatedAt = rawJson.GetProperty("updated_at").ToString();
 
         var repoLanguagesWithUsages = await GetRepoLanguagesAsync(owner, repoName);
         var languageUsages = new Dictionary<string, float>();
@@ -89,9 +93,11 @@ public class GithubService {
             isPublic = isPublic.ToString(),
             desc = description,
             url = htmlUrl,
-            lanuages = languageUsages,
+            languages = languageUsages,
             readme = readmeContents,
-            config = configContents
+            config = configContents,
+            startedAt = createdAt,
+            updatedAt = updatedAt,
         }, new JsonSerializerOptions { WriteIndented = true });
         
         // TODO - Clean the configContents (remove the \n and other escape sequences and feed it to the ai to get the list of technologies and framework used. Use that reponse to then generate a killer resume description based on that.)
@@ -161,5 +167,15 @@ public class GithubService {
         var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}languages");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<JsonElement>();
+    }
+
+    public async Task<List<string>> GetAllRepoNamesAsync(string owner) {
+        var repos = await GetUserReposAsync(owner);
+        // repos.GetString("");
+        List<string> repoNames = new List<string>();
+        foreach (var repo in repos.EnumerateArray()) {
+            repoNames.Add(repo.GetProperty("name").ToString());
+        }
+        return repoNames;
     }
 }

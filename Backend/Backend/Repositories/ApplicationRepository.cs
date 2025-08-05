@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Backend.Repositories;
 
 public class ApplicationRepository (ApplicationDbContext context) {
-    public async Task<List<ApplicationDto>> GetAllApplicationsByHirerIdByStateAsync(Guid userId, ApplicationState applicationState) {
+    public async Task<List<ApplicationDto>> GetAllApplicationsByUserIdByStateAsync(Guid userId, ApplicationState applicationState) {
         var applications = await context.Applications.Include(application => application.Job).Include(application => application.Seeker).ThenInclude(seeker => seeker.Projects).Where(application => application.HirerId == userId && application.State == applicationState).Select(application => new ApplicationDto() {
             ApplicantId = application.SeekerId,
             JobId = application.JobId,
@@ -54,8 +54,8 @@ public class ApplicationRepository (ApplicationDbContext context) {
         }
     }
 
-    public async Task<ApplicationDto?> GetApplicationByIdAsync(int applicationId) {
-        return await context.Applications.Include(application => application.Job).Include(application => application.Seeker).Where(application => application.Id == applicationId).Select(application => new ApplicationDto() {
+    public async Task<ApplicationDto> GetApplicationByIdAsync(int applicationId) {
+        return (await context.Applications.Include(application => application.Job).Include(application => application.Seeker).Where(application => application.Id == applicationId).Select(application => new ApplicationDto() {
             ApplicantId = application.SeekerId,
             JobId = application.JobId,
             HirerId = application.HirerId,
@@ -69,7 +69,7 @@ public class ApplicationRepository (ApplicationDbContext context) {
             PrecreatedResume = application.PreCreatedResume,
             ResumeJsonString = application.Seeker.ResumeJsonString,
             ResumeTemplateNumber = application.Seeker.ResumeTemplateNumber,
-        }).FirstOrDefaultAsync();
+        }).FirstOrDefaultAsync())!;
     }
 
     public async Task<Guid> GetSeekerIdByApplicationIdAsync(int applicationId) {

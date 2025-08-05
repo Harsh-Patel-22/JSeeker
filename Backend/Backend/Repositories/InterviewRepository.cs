@@ -66,8 +66,8 @@ public class InterviewRepository (ApplicationDbContext context) {
         return await context.Interviews.Where(i => i.Id == interviewId).Select(i => i.SeekerId).FirstOrDefaultAsync();
     }
 
-    public async Task<InterviewDto?> GetInterviewByIdAsync(int interviewId) {
-        return await context.Interviews.Where(i => i.Id == interviewId).Select(interview => new InterviewDto() {
+    public async Task<InterviewDto> GetInterviewByIdAsync(int interviewId) {
+        return (await context.Interviews.Where(i => i.Id == interviewId).Select(interview => new InterviewDto() {
             Id = interview.Id,
             SeekerId = interview.SeekerId,
             HirerId = interview.HirerId,
@@ -83,6 +83,6 @@ public class InterviewRepository (ApplicationDbContext context) {
             Mode = interview.Mode,
             ConfirmedByHirer = interview.ConfirmedByHirer,
             ConfirmedBySeeker = interview.ConfirmedBySeeker
-        }).FirstOrDefaultAsync();
+        }).FirstOrDefaultAsync())!;
     }
 }

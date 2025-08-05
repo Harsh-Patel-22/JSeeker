@@ -14,8 +14,6 @@ public enum LanguageLevel
 
 public class UserVocalLanguage
 {
-    [Key]
-    public int Id { get; set; }
     public int VocalLanguageId { get; set; }
     public Guid UserId { get; set; }
     public LanguageLevel Level { get; set; }

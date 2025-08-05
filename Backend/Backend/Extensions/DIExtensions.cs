@@ -3,7 +3,7 @@ using Backend.Services;
 
 namespace Backend.Extensions;
 
-public static class Extensions {
+public static class DIExtensions {
     public static IServiceCollection AddJobModule(this IServiceCollection services) {
         services.AddScoped<JobRepository>();
         services.AddScoped<InterviewRepository>();
@@ -41,6 +41,7 @@ public static class Extensions {
         services.AddScoped<ResumeBuilderService>();
         services.AddScoped<PdfService>();
         services.AddScoped<RatingService>();
+        services.AddScoped<ValidationService>();
         return services;
     }
 }

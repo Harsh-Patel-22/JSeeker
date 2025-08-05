@@ -14,6 +14,7 @@ public class JobRepository (ApplicationDbContext context) {
         List<JobCardDto>? relevantJobCards = new List<JobCardDto>();
         switch (role) {
             case Roles.Hirer:
+                // TODO - What if for each parameter there's more filters
                 relevantJobCards = await context.Jobs.Include(j => j.Address).Where(j => j.HirerId == clientId  && j.Type == searchFilter.type && j.Status == searchFilter.status && j.WorkMode == searchFilter.mode).Select(job => new JobCardDto() {
                     Title = job.Title,
                     Status = job.Status,
@@ -29,11 +30,11 @@ public class JobRepository (ApplicationDbContext context) {
                 break;
             
             case Roles.Seeker:
-                List<string> keywords = await context.Projects
-                    .Where(p => p.UserId == clientId)
-                    .SelectMany(p => p.ProjectTechnologies.Select(pt => pt.Technology.Name))
-                    .Distinct()
-                    .ToListAsync();
+                string? keywordsRecord = await context.Users.Where(user => user.Id == clientId).Select(user => user.Keywords).FirstOrDefaultAsync();
+                if (keywordsRecord == null) {
+                    throw new Exception("User or keywords not found");
+                }
+                List<string> keywords = keywordsRecord.Split(",").ToList();
                 // relevantJobs = new List<Job>();
                 foreach (var keyword in keywords) {
                     var jobsPerKeyword = await context.Jobs.Include(j => j.Address).Where(j => j.Description.Contains(keyword)).Select(job => new JobCardDto() {
@@ -134,7 +135,7 @@ public class JobRepository (ApplicationDbContext context) {
     public async Task<JobDescriptionDto?> GetJobDescriptionByIdAsync(int id) {
         Job? job = await context.Jobs.Include(j => j.Address).Where(j => j.Id == id).Select(j => j).FirstOrDefaultAsync();
         if(job == null) {
-            throw new Exception("Job not found");
+            return null;
         }
         
         return new JobDescriptionDto() {

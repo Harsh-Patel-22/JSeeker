@@ -6,4 +6,5 @@ public record JobSearchFilterDto(
     JobType type,
     JobStatus status,
     WorkMode mode
+    // WorkMode[] mode
     );
