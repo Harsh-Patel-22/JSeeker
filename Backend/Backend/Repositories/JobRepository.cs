@@ -30,11 +30,12 @@ public class JobRepository (ApplicationDbContext context) {
                 break;
             
             case Roles.Seeker:
-                string? keywordsRecord = await context.Users.Where(user => user.Id == clientId).Select(user => user.Keywords).FirstOrDefaultAsync();
+                string[]? keywordsRecord = await context.Users.Where(user => user.Id == clientId).Select(user => new string[]{user.TechnicalKeywords, user.AIGeneratedTechnicalKeywords}).FirstOrDefaultAsync();
                 if (keywordsRecord == null) {
                     throw new Exception("User or keywords not found");
-                }
-                List<string> keywords = keywordsRecord.Split(",").ToList();
+                };
+                string keywordsCSV = keywordsRecord[0] + keywordsRecord[1];
+                List<string> keywords = keywordsCSV.Split(",").ToList();
                 // relevantJobs = new List<Job>();
                 foreach (var keyword in keywords) {
                     var jobsPerKeyword = await context.Jobs.Include(j => j.Address).Where(j => j.Description.Contains(keyword)).Select(job => new JobCardDto() {

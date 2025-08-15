@@ -1,12 +1,14 @@
 using Backend.DTOs;
 using Backend.DTOs.Job;
+using Backend.Exceptions;
 using Backend.Models;
 using Backend.Models.Users;
 using Backend.Repositories;
+using Backend.Services.Query;
 
 namespace Backend.Services;
 
-public class JobService (JobRepository jobRepository, InterviewRepository interviewRepository, ApplicationRepository applicationRepository, UserRepository userRepository, RatingService ratingService, ValidationService validationService) {
+public class JobService (JobRepository jobRepository, InterviewRepository interviewRepository, ApplicationRepository applicationRepository, UserRepository userRepository, RatingService ratingService, ValidationService validationService, JobsAggregateQueryService jobsQueryService) {
     
     private readonly int _remainingApplicationsThresholdForClosingSoon = 10; 
     // Section - Job Related
@@ -128,9 +130,17 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
     // Section - Application Related
     public async Task<List<ApplicationDto>> GetAllApplicationsByUserIdByStateAsync(Guid userId, ApplicationState state) {
         if (!await validationService.UserExistsAsync(userId)) {
-            throw new Exception("No such user exists");
+            throw new GlobalExceptions.Unauthorised();
         }
         return await applicationRepository.GetAllApplicationsByUserIdByStateAsync(userId, state);
+    }
+
+    public async Task<Dictionary<int, List<ApplicationDto>>> GetAllApplicationsByUserIdJobWiseAsync(Guid userId) {
+        if (!await validationService.IsHirerAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+
+        return await jobsQueryService.GetAllApplicationsByUserIdJobWiseAsync(userId);
     }
 
     public async Task<ApplicationDto> GetApplicationByIdAsync(Guid userId, int applicationId) {
