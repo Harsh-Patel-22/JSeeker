@@ -20,15 +20,15 @@ public class ApplicationRepository (ApplicationDbContext context) {
             State = application.State,
             AppliedOn =  application.AppliedOn,
             AIGivenRating = application.AIGivenRating,
-            PrecreatedResume = application.PreCreatedResume,
             ResumeJsonString = application.Seeker.ResumeJsonString,
             ResumeTemplateNumber = application.Seeker.ResumeTemplateNumber,
+            
             // TODO - Fix the technologies field
             // Technologies = application.Seeker.
         }).ToListAsync();
         return applications;
     }
-
+    
     public async Task UpdateApplicationStateAsync(int applicationId, ApplicationState applicationState) {
         await context.Applications.Where(app => app.Id == applicationId).ExecuteUpdateAsync(setter => setter.SetProperty(app => app.State, applicationState));
     }
@@ -66,7 +66,6 @@ public class ApplicationRepository (ApplicationDbContext context) {
             State = application.State,
             AppliedOn = application.AppliedOn,
             AIGivenRating = application.AIGivenRating,
-            PrecreatedResume = application.PreCreatedResume,
             ResumeJsonString = application.Seeker.ResumeJsonString,
             ResumeTemplateNumber = application.Seeker.ResumeTemplateNumber,
         }).FirstOrDefaultAsync())!;

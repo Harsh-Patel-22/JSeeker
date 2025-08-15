@@ -27,7 +27,7 @@ public class Application {
     [Range(1, 10)]
     public int AIGivenRating { get; set; }
     
-    public byte[]? PreCreatedResume { get; set; }
+    // public byte[]? PreCreatedResume { get; set; }
     
     public DateOnly AppliedOn { get; set; }
 
