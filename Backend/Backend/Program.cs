@@ -40,6 +40,7 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddQueryServices();
 builder.Services.AddServices();
 builder.Services.AddAuthModule();
 builder.Services.AddJobModule();

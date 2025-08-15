@@ -1,5 +1,7 @@
 using System.Security.Claims;
+using Backend.DTOs.Users;
 using Backend.DTOs.Users.Hirer;
+using Backend.Extensions;
 using Backend.Models.Users;
 using Backend.Repositories;
 using Backend.Services;
@@ -11,7 +13,7 @@ namespace Backend.Controllers;
 [ApiController]
 [Route("api/user")]
 [Authorize(Roles = "Hirer,Seeker")]
-public class UserController (UserRepository repository, HirerService hirerService) : ControllerBase {
+public class UserController (UserRepository repository, HirerService hirerService, UserService userService) : ControllerBase {
     // TODO - Add edit route for editing....
     
     // Section - Registering as a Hirer
@@ -26,6 +28,36 @@ public class UserController (UserRepository repository, HirerService hirerServic
         return Ok();
     }
     
+    // Section - Filling up details
+    [HttpPost("update/")]
+    public async Task<IActionResult> UpdateUserSecondaryDetails([FromBody] UserSecondaryDetailsDto dto) {
+        Guid userId = User.GetNameIdentifier();
+        await userService.UpdateUserDetailsAsync(userId, dto);
+        return Ok();
+    }
+
+    // TODO - Add checks in the workflow, Like if before the 2nd ary details are not filled, this cant be called and so on....
+    [HttpPost("update/github")]
+    public async Task<IActionResult> UpdateGithubUsernameAsync([FromBody] string githubUsername) {
+        Guid userId = User.GetNameIdentifier();
+        await userService.UpdateGithubUsernameAsync(userId, githubUsername);
+        return Ok();
+    }
+
+    [HttpPost("update/repoNames")]
+    public async Task<IActionResult> UpdateUserProjects([FromBody] List<string>? repoNames) {
+        Guid userId = User.GetNameIdentifier();
+        await userService.UpdateProjectsUsingGithubReposAsync(userId, repoNames);
+        return Ok();
+    }
+
+    [HttpPost("update/resume")]
+    public async Task<IActionResult> RegenerateAndUpdateResumeAsync() {
+        Guid userId = User.GetNameIdentifier();
+        await userService.RegenerateAndUpdateResumeAsync(userId);
+        return Ok();
+    }
+    
     // TODO - Make this one call. Dont fetch again and again!!
     // Section - Profile related fetching 
     [HttpGet("profile/basic")]
@@ -35,15 +67,6 @@ public class UserController (UserRepository repository, HirerService hirerServic
             throw new Exception("Invalid or missing NameId claim in JWT.");
         }
         return Ok(await repository.GetBasicDetailsAsync(clientId));
-    }
-
-    [HttpGet("profile/hobbies")]
-    public async Task<IActionResult> GetClientHobbies() {
-        var clientIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(clientIdStr, out Guid clientId)) {
-            throw new Exception("Invalid or missing NameId claim in JWT.");
-        }
-        return Ok(await repository.GetHobbiesAsync(clientId));
     }
     
     [HttpGet("profile/languages")]

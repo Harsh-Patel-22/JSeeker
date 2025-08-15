@@ -7,9 +7,6 @@ namespace Backend.Services;
 
 public class GithubService {
     private readonly HttpClient _httpClient;
-
-    // TODO - Add a check if the passes repos belong to the owner. Verify with the database data about the same
-    // TODO - Add a get basic + other project related details just by entering the Github username. Store that in the projects
     
     public GithubService(HttpClient httpClient) {
         _httpClient = httpClient;
@@ -41,25 +38,8 @@ public class GithubService {
 
         return result;
     }
-
-    public async Task<Dictionary<string, JsonElement>> GetAllProjects() {
-        var projects = new Dictionary<string, JsonElement>();
-        // var owner = "Harsh-Patel-22"; // TODO - Replace the hard coded value to read from database
-        var owner = "comfyanonymous"; 
-        
-        var repos = await GetUserReposAsync(owner);
-        
-        foreach (var repo in repos.EnumerateArray()) {
-            var projectName = repo.GetProperty("name").ToString();
-            var projectDetails = await GetAllInsightsFromRepoAsync(owner, projectName);
-            projects.Add(projectName, projectDetails);
-        }
-        
-        return projects;
-    }
     
     public async Task<JsonElement> GetAllInsightsFromRepoAsync(string owner, string repoName) {
-        // TODO - Add the date fetching with this
         // owner = "comfyanonymous";
         var rawJson = await GetRepoAsync(owner, repoName);
         
@@ -102,43 +82,40 @@ public class GithubService {
         
         // TODO - Clean the configContents (remove the \n and other escape sequences and feed it to the ai to get the list of technologies and framework used. Use that reponse to then generate a killer resume description based on that.)
         // TODO - Send all the data to the ai service to get the content for description and other things like contents for projects section in the resume. 
-        // TODO - For the profile section, give 2 options to add the projects, manual way and automated way with ai scraping the github
-        rawJson = await GetAllLanguagesAsync(); // List of frameworks and languages
+        
+        // rawJson = await GetAllLanguagesAsync(); // List of frameworks and languages
         return returnJson;
     }
     
-    public async Task<JsonElement> GetRepoLanguagesAsync(string owner, string repo) {
+    private async Task<JsonElement> GetRepoLanguagesAsync(string owner, string repo) {
         var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/languages");
         //Console.WriteLine($"{_httpClient.BaseAddress}repos/facebook/react/languages");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<JsonElement>();
         
     }
-    public async Task<JsonElement> GetUserReposAsync(string owner) {
+    private async Task<List<JsonElement>> GetUserPublicReposAsync(string owner) {
         var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}users/{owner}/repos");
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<JsonElement>();
+        var repos = await response.Content.ReadFromJsonAsync<JsonElement>();
+        List<JsonElement> userPublicRepos = new List<JsonElement>();
+        
+        foreach (var repo in repos.EnumerateArray()) {
+            if (repo.GetProperty("visibility").ToString().Equals("public")) {
+                userPublicRepos.Add(repo);
+            }
+        }
+        return userPublicRepos;
     }
     
-    public async Task<JsonElement> GetRepoAsync(string owner, string repo) {
+    private async Task<JsonElement> GetRepoAsync(string owner, string repo) {
         var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}");
+        // TODO - Maybe replace the EnsureSuccessStatusCode to a custom exception
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<JsonElement>();
     }
     
-    public async Task<string> GetRepoTopicsAsync(string owner, string repo) {
-        var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/topics");
-        response.EnsureSuccessStatusCode();
-        return response.Content.ReadAsStringAsync().Result;
-    }
-    
-    public async Task<string> GetRepoTagsAsync(string owner, string repo) {
-        var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/tags");
-        response.EnsureSuccessStatusCode();
-        return response.Content.ReadAsStringAsync().Result;
-    }
-    
-    public async Task<string> GetRepoReadmeAsync(string owner, string repo) {
+    private async Task<string> GetRepoReadmeAsync(string owner, string repo) {
         // TODO - Add error catch if no readme file exists in the repo
         var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/readme");
         response.EnsureSuccessStatusCode();
@@ -146,18 +123,18 @@ public class GithubService {
         
         using var doc = JsonDocument.Parse(readmeString);
         var root = doc.RootElement;
-
+    
         if (!root.TryGetProperty("content", out var contentElement))
             throw new Exception("Content field not found in GitHub response.");
-
+    
         var base64Content = contentElement.GetString();
-
+    
         if (string.IsNullOrWhiteSpace(base64Content))
             return string.Empty;
-
+    
         // Remove any line breaks in base64 string (GitHub adds \n every 76 chars)
         base64Content = base64Content.Replace("\n", "").Replace("\r", "");
-
+    
         var bytes = Convert.FromBase64String(base64Content);
         var decodedString = Encoding.UTF8.GetString(bytes);
         return decodedString;
@@ -170,12 +147,38 @@ public class GithubService {
     }
 
     public async Task<List<string>> GetAllRepoNamesAsync(string owner) {
-        var repos = await GetUserReposAsync(owner);
+        var repos = await GetUserPublicReposAsync(owner);
         // repos.GetString("");
         List<string> repoNames = new List<string>();
-        foreach (var repo in repos.EnumerateArray()) {
+        foreach (var repo in repos) {
             repoNames.Add(repo.GetProperty("name").ToString());
         }
         return repoNames;
     }
+
+    public async Task<List<string>?> GetAll3MostRecentRepoNamesAsync(string owner) {
+        var repos = await GetUserPublicReposAsync(owner);
+        List<string>? repoNames = new List<string>();
+        
+        var sortedRepos = repos.OrderByDescending(repo => repo.GetProperty("updated_at").GetDateTime()).ToList();
+
+        for (int i = 0; i < 3; i++) {
+            repoNames.Add(sortedRepos[i].GetProperty("name").ToString());
+        }
+        return repoNames;
+    }
+    
+    
+    // private async Task<string> GetRepoTopicsAsync(string owner, string repo) {
+    //     var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/topics");
+    //     response.EnsureSuccessStatusCode();
+    //     return response.Content.ReadAsStringAsync().Result;
+    // }
+    //
+    // private async Task<string> GetRepoTagsAsync(string owner, string repo) {
+    //     var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/tags");
+    //     response.EnsureSuccessStatusCode();
+    //     return response.Content.ReadAsStringAsync().Result;
+    // }
+
 }

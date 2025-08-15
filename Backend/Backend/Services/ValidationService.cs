@@ -40,12 +40,20 @@ public class ValidationService(ApplicationDbContext context) {
         return seekerId == userId || hirerId == userId;
     }
 
-    public async Task<bool> GithubProjectsAlreadyStored(Guid userId) {
-        if ((await context.Users.Where(user => user.Id == userId).Select(user => user.GithubUsername).FirstOrDefaultAsync())!.Equals("") && (await context.Projects.Where(proj => proj.UserId == userId).ToListAsync()).Count == 0) {
-            return false;
+    // public async Task<bool> GithubProjectsAlreadyStored(Guid userId) {
+    //     // GitHub Username is set to something and even some projects are added
+    //     if (!(await context.Users.Where(user => user.Id == userId).Select(user => user.GithubUsername).FirstOrDefaultAsync())!.Equals("") && (await context.Projects.Where(proj => proj.UserId == userId).ToListAsync()).Count != 0) {
+    //         return true;
+    //     }
+    //
+    //     return false;
+    // }
+
+    public async Task<bool> CanAddMoreProjects(Guid userId) {
+        if ((await context.Projects.Where(project => project.UserId == userId).ToListAsync()).Count <= 3) {
+            return true;
         }
 
-        return true;
+        return false;
     }
-
 }

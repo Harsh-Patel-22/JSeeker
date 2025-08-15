@@ -20,7 +20,6 @@ public class User {
     public Guid Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string Occupation { get; set; }
     public Gender Gender { get; set; }
     public int? AddressId { get; set; }
     
@@ -38,7 +37,8 @@ public class User {
     public int NumberOfSuccessfulEmployments { get; set; }
     public int NumberOfRejections { get; set; }
     
-    public string Keywords { get; set; }
+    public string TechnicalKeywords { get; set; }
+    public string AIGeneratedTechnicalKeywords { get; set; }
     
     // TODO - In the ui, while creating new post, if the mode in on site, give 2 options, company location and add new location. Also, only ask for location if its on site, else no need to show.
     public bool IsHirer { get; set; }
@@ -50,7 +50,6 @@ public class User {
     public JobType JobPreference {get; set;}
     
     // Section - Other Details
-    public ICollection<Hobby> Hobbies { get; set; }
     public ICollection<UserVocalLanguage> UserVocalLanguages { get; set; }
     
     // Navigation Properties

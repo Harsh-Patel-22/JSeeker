@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Backend.DTOs;
+using Backend.DTOs.Users;
 using Backend.Exceptions;
 using Backend.Models.Users.WorkRelated;
 using Backend.Repositories;
@@ -7,21 +8,44 @@ using Backend.Util;
 
 namespace Backend.Services;
 
-public class UserService (GithubService githubService, UserRepository userRepository) {
-    public async Task<List<string>> GetAllProjectNamesAsync(string githubUsername) {
-        List<string> repoNames = await githubService.GetAllRepoNamesAsync(githubUsername);
+public class UserService (GithubService githubService, UserRepository userRepository, ProjectsRepository projectsRepository, ValidationService validationService, ResumeBuilderService resumeBuilder) {
+    public async Task<List<string>> GetAllProjectNamesAsync(Guid userId) {
+        List<string> repoNames = await githubService.GetAllRepoNamesAsync(await userRepository.GetGithubUsernameAsync(userId));
         return repoNames;
     }
+
+    public async Task UpdateUserDetailsAsync(Guid userId, UserSecondaryDetailsDto dto) {
+        await userRepository.UpdateUserDetailsAsync(userId, dto);
+    }
+
+    public async Task UpdateGithubUsernameAsync(Guid userId,  string githubUsername) {
+        await userRepository.UpdateGithubUsernameFieldAsync(userId, githubUsername);
+    }
     
-    public async Task UpdateProjectsUsingGithubUsernameAsync(Guid userId, string githubUsername, List<string> repoNames) {
-        List<ProjectTechnologyMappingDto> projectTechnologyMappings = new List<ProjectTechnologyMappingDto>();
+    public async Task UpdateProjectsUsingGithubReposAsync(Guid userId, List<string>? repoNames) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        
+        if(repoNames == null) {
+            repoNames = await githubService.GetAll3MostRecentRepoNamesAsync(await userRepository.GetGithubUsernameAsync(userId));
+        }
+        
         if (repoNames.Count > 3) {
             throw new GlobalExceptions.ProjectLimitExceeded();
         }
         
+        
+        Dictionary<string, ProjectDetailsDto> projectDetails = new Dictionary<string, ProjectDetailsDto>();
+        List<string> keywords = new List<string>();
+        
+        // An Array could be used rather than a List<JsonElement>
+        List<JsonElement> allInsightsList = new List<JsonElement>(repoNames.Count);
+        
         foreach (var repoName in repoNames) {
-            var allInsights = await githubService.GetAllInsightsFromRepoAsync(githubUsername, repoName);
-
+            var allInsights = await githubService.GetAllInsightsFromRepoAsync(await userRepository.GetGithubUsernameAsync(userId), repoName);
+            allInsightsList.Add(allInsights);
+            
             if (allInsights.GetProperty("isPublic").ToString().Equals("private")) {
                 throw new Exception("The given repository/project is private!!");
             }
@@ -42,15 +66,48 @@ public class UserService (GithubService githubService, UserRepository userReposi
                 GithubRepoLink = allInsights.GetProperty("url").ToString(),
             };
             
-            var usageDictionary = allInsights.GetProperty("languages").EnumerateObject().ToDictionary(l => l.Name, l => float.Parse(l.Value.ToString()));
-            foreach (var usage in usageDictionary) {
-                Console.WriteLine(usage.Key + ": " + usage.Value);
+            var usage = allInsights.GetProperty("languages").EnumerateObject().Select(prop => new TechnologyUsageDto(prop.Name, prop.Value.GetSingle())).ToList();
+            foreach (var usageDto in usage) {
+                // Appending distinct technology names.
+                if (!keywords.Contains(usageDto.Name)) {
+                    keywords.Add(usageDto.Name);
+                }
             }
-            Console.WriteLine(usageDictionary);
-            await userRepository.AddGithubProjectAndMappingsAsync(new ProjectTechnologyMappingDto(
+            await projectsRepository.AddGithubProjectAndMappingsAsync(new ProjectTechnologyMappingDto(
                 p,
-                usageDictionary
+                usage
                 ));
+            
+            projectDetails.Add(repoName, new ProjectDetailsDto(p.Name, p.Description, usage, p.StartDate, p.LastUpdatedDate, p.GithubRepoLink));
+
         }
+
+        string AIGenKeywords = await resumeBuilder.GetAIGeneratedKeywordsAsync(allInsightsList);
+        
+        string resumeString = await resumeBuilder.GetAIGeneratedFullResumeAsync(new ResumeContentsDto() {
+            ProjectDetails = projectDetails,
+            BasicDetails = await userRepository.GetBasicDetailsAsync(userId),
+            ContactDetails = await userRepository.GetContactDetailsAsync(userId),
+            WorkExperienceDetails = await userRepository.GetWorkExperienceDetailsAsync(userId),
+            EducationDetails = await userRepository.GetEducationDetailsAsync(userId),
+            LanguageDetails = await userRepository.GetVocalLanguagesAsync(userId)
+        });
+
+        await userRepository.SetKeywordsAsync(userId, keywords, AIGenKeywords);
+        await userRepository.SetResumeJsonStringAsync(userId, resumeString);
+        
+    }
+
+    public async Task RegenerateAndUpdateResumeAsync(Guid userId) {
+        string resumeString = await resumeBuilder.GetGeneratedResumeAsync(new ResumeContentsDto() {
+            ProjectDetails = await userRepository.GetProjectsDetailsAsync(userId),
+            BasicDetails = await userRepository.GetBasicDetailsAsync(userId),
+            ContactDetails = await userRepository.GetContactDetailsAsync(userId),
+            WorkExperienceDetails = await userRepository.GetWorkExperienceDetailsAsync(userId),
+            EducationDetails = await userRepository.GetEducationDetailsAsync(userId),
+            LanguageDetails = await userRepository.GetVocalLanguagesAsync(userId)
+        });
+
+        await userRepository.SetResumeJsonStringAsync(userId ,resumeString);
     }
 }

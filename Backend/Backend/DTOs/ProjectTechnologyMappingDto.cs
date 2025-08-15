@@ -1,8 +1,9 @@
+using Backend.DTOs.Users;
 using Backend.Models.Users.WorkRelated;
 
 namespace Backend.DTOs;
 
 public record ProjectTechnologyMappingDto(
         Project Project,
-        Dictionary<string, float> MappingData
+        List<TechnologyUsageDto> TechnologyUsages
     );

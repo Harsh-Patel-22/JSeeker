@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Backend.Data;
 using Backend.DTOs;
+using Backend.DTOs.Users;
 using Backend.Interfaces;
 using Backend.Models.Users;
 using Backend.Repositories;
@@ -17,7 +18,7 @@ public class AuthService (IConfiguration config, AuthRepository repository) {
         var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         
         List<Claim> claims = [new Claim(JwtRegisteredClaimNames.NameId, (await repository.GetUserIdAsync(credentials)).ToString()), 
-            new Claim(JwtRegisteredClaimNames.Name, credentials.Username), new Claim(ClaimTypes.Role, credentials.Role)];
+            new Claim(JwtRegisteredClaimNames.Name, credentials.Username), new Claim(ClaimTypes.Role, credentials.Role.ToString())];
 
         var tokenOptions = new JwtSecurityToken(
             audience: config.GetValue<string>("jwt:audience"),
@@ -31,7 +32,7 @@ public class AuthService (IConfiguration config, AuthRepository repository) {
         return tokenString;
     }
 
-    public async Task<string> RegisterNewUserAsync(RegisterCredentialsDto credentials) {
+    public async Task<string> RegisterNewUserAsync(UserPrimaryDetailsFillUpDto credentials) {
         if (await repository.CheckIfUsernameExistAsync(credentials.Username) || await repository.CheckIfEmailExistAsync(credentials.Email)) {
             return string.Empty;
         }

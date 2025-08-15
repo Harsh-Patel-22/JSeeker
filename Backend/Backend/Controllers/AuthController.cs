@@ -1,4 +1,5 @@
 using Backend.DTOs;
+using Backend.DTOs.Users;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ public class AuthController(AuthService authService) : ControllerBase {
     }
     
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterNewUser([FromBody] RegisterCredentialsDto credentials) {
+    public async Task<IActionResult> RegisterNewUser([FromBody] UserPrimaryDetailsFillUpDto credentials) {
         string jwtToken = await authService.RegisterNewUserAsync(credentials);
         if (jwtToken.Equals(string.Empty)) {
             return BadRequest("User already registered!");

@@ -2,8 +2,9 @@ namespace Backend.DTOs.Users;
 
 public record ProjectDetailsDto(
     string Name,
-    List<TechnologyUsageDto> Technologies, 
+    string Description,
+    List<TechnologyUsageDto> TechnologiesUsages, 
     DateOnly StartDate,
-    DateOnly EndDate,
+    DateOnly LastUpdatedDate,
     string GithubRepoLink
 );

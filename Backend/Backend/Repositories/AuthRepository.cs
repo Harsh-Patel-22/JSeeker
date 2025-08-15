@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.DTOs;
+using Backend.DTOs.Users;
 using Backend.Interfaces;
 using Backend.Models;
 using Backend.Models.Users;
@@ -10,9 +11,8 @@ namespace Backend.Repositories;
 
 public class AuthRepository (ApplicationDbContext context) {
     private readonly PasswordHasher<UserCredentials> passwordHasher = new PasswordHasher<UserCredentials>();
-    public async Task<bool> RegisterUserCredentialsAsync(RegisterCredentialsDto credentials) {
+    public async Task<bool> RegisterUserCredentialsAsync(UserPrimaryDetailsFillUpDto credentials) {
         Guid userId = Guid.NewGuid();
-        Enum.TryParse(credentials.Role, out Roles role);
         
         try {
             await context.UserCredentials.AddAsync(new UserCredentials() {
@@ -20,16 +20,16 @@ public class AuthRepository (ApplicationDbContext context) {
                 Email = credentials.Email,
                 HashedPassword = passwordHasher.HashPassword(new UserCredentials() ,credentials.Password),
                 UserId = userId,
-                Role = role
+                Role = credentials.Role
             });
             
             // Adding Placeholder Data
-            if (role == Roles.Hirer) {
+            if (credentials.Role == Roles.Hirer) {
                 await context.Hirers.AddAsync(new Hirer() {
                     Id = userId,
-                    CompanyName = ".",
-                    Designation = ".",
-                    WebsiteLink = "www....",
+                    CompanyName = "",
+                    Designation = "",
+                    WebsiteLink = "",
                     CompanyAddressId = 1
                     
                 });
@@ -37,20 +37,26 @@ public class AuthRepository (ApplicationDbContext context) {
 
             await context.Users.AddAsync(new User() {
                 Id = userId,
-                FirstName = "",
-                LastName = "",
-                Occupation = "",
+                FirstName = credentials.FirstName,
+                LastName = credentials.LastName,
+                // Occupation = "",
                 Gender = Gender.PreferNotToSay,
                 AddressId = 1, 
                 
                 AboutLine = "",
                 Description = "",
-                IsHirer = role == Roles.Hirer,
-                PhoneNumber = "",
+                IsHirer = credentials.Role == Roles.Hirer,
+                PhoneNumber = credentials.PhoneNumber,
                 GithubUsername = "",
                 LinkedInProfileLink = "https://linkedin.com/",
-                ResumeJsonString = "empty",
+                ResumeJsonString = "",
+                ResumeTemplateNumber = 0,
                 
+                NumberOfRejections = 0,
+                NumberOfSuccessfulEmployments = 0,
+                TechnicalKeywords = "",
+                AIGeneratedTechnicalKeywords = "",
+                Email = credentials.Email,
                 JobPreference = JobType.Internship
                 
             });

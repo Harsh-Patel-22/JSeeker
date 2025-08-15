@@ -1,5 +1,6 @@
 using Backend.Repositories;
 using Backend.Services;
+using Backend.Services.Query;
 
 namespace Backend.Extensions;
 
@@ -23,11 +24,12 @@ public static class DIExtensions {
         services.AddScoped<AddressRepository>();
         services.AddScoped<HirerService>();
         services.AddScoped<UserService>();
+        services.AddScoped<ProjectsRepository>();
         return services;
     }
 
     public static IServiceCollection AddMetricsModule(this IServiceCollection services) {
-        services.AddScoped<MetricsRepository>();
+        services.AddScoped<MetricsQueryService>();
         return services;
     }
     
@@ -42,6 +44,12 @@ public static class DIExtensions {
         services.AddScoped<PdfService>();
         services.AddScoped<RatingService>();
         services.AddScoped<ValidationService>();
+        return services;
+    }
+
+    public static IServiceCollection AddQueryServices(this IServiceCollection services) {
+        services.AddScoped<JobsAggregateQueryService>();
+        services.AddScoped<MetricsQueryService>();
         return services;
     }
 }

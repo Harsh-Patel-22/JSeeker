@@ -1,5 +1,5 @@
 @Backend_HostAddress = http://localhost:5275
-@seeker_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJmYjg1ZDBkYy05YWFlLTRhOTAtOGY5Yy02N2I5YWRmMzJjNGUiLCJuYW1lIjoiaGFyc2giLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTZWVrZXIiLCJleHAiOjE3NTM4MDU0MTQsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSJ9.lhcKaklO-pG0nFJazgou9Qc2n2igaGbhrUpRw7SHwNk
+@seeker_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI3OWE2YWI2YS00MjdjLTRlZjEtOWQwYS1jN2MzM2E5MTg3YzciLCJuYW1lIjoidGVzdGluZyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNlZWtlciIsImV4cCI6MTc1NTI1NDMwMiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1Mjc1IiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo1Mjc1In0.xIeXlBGKNpWNsG22yosUx5OX9i1zDKVm87waJCidmhY
 
 @hirer_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkZWVmYTI2Yy03NzlkLTQyNjYtYTM3ZC00ZTc2M2ZiNmY2NjAiLCJuYW1lIjoiaCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkhpcmVyIiwiZXhwIjoxNzUzODA2OTg4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUifQ.9X5wjavGTgLSCHEVlSlFS7VYpp8QiKJesTq3PjNUk8Q
 
@@ -198,3 +198,102 @@ Content-Type: application/json
   "applicationId": 1,
   "state": "Rejected"
 }
+
+###
+### Sign Up Workflowx
+
+POST {{Backend_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+    "firstName": "test",
+    "lastName": "ing",
+    "phoneNumber": "1823482934",
+    "email": "testing@testing.com",
+    "username": "testing",
+    "password": "testing123",
+    "role": "Seeker"
+}
+
+### 
+POST {{Backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testing",
+  "password": "testing123",
+  "role": "Seeker"  
+}
+
+
+###
+
+POST {{Backend_HostAddress}}/api/user/update
+Content-Type: application/json
+Authorization: Bearer {{seeker_auth_token}}
+
+{
+  "address": {
+    "houseNumber": "B-204",
+    "society": "Sunshine Residency",
+    "street": "MG Road",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "380015",
+    "latitude": 23.0225,
+    "longitude": 72.5714
+  },
+  "aboutLine": "Passionate Software Engineer",
+  "description": "Enthusiastic developer with 3+ years in web and mobile application development, specializing in .NET Core and React.",
+  "linkedInProfileLink": "https://www.linkedin.com/in/johndoe",
+  "educationDetails": [
+    {
+      "study": "B.Tech in Computer Science",
+      "instituteName": "Indian Institute of Technology Bombay",
+      "state": "Maharashtra",
+      "country": "India",
+      "startDate": "2015-07-01",
+      "endDate": "2019-05-15"
+    }
+  ],
+  "workExperienceDetails": [
+    {
+      "role": "Software Engineer",
+      "description": "Developed scalable web applications using ASP.NET Core, React, and SQL Server.",
+      "companyName": "TechNova Solutions",
+      "startDate": "2019-06-01",
+      "endDate": "2022-12-31"
+    },
+    {
+      "role": "Senior Software Engineer",
+      "description": "Led a team of 5 developers to design and implement enterprise SaaS solutions.",
+      "companyName": "NextGen Systems",
+      "startDate": "2023-01-01",
+      "endDate": "2025-08-01"
+    }
+  ],
+  "vocalLanguageDetails": [
+    { "name": "English", "level": "Fluent" },
+    { "name": "Hindi", "level": "Native" },
+    { "name": "Gujarati", "level": "Native" },
+    { "name": "Spanish", "level": "Learning" }
+  ]
+}
+
+###
+POST {{Backend_HostAddress}}/api/user/update/github
+Content-Type: application/json
+Authorization: Bearer {{seeker_auth_token}}
+
+"Harsh-Patel-22"
+
+###
+POST {{Backend_HostAddress}}/api/user/update/repoNames
+Content-Type: application/json
+Authorization: Bearer {{seeker_auth_token}}
+
+###
+POST {{Backend_HostAddress}}/api/user/update/resume
+Authorization: Bearer {{seeker_auth_token}}
+

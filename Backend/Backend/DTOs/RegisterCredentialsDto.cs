@@ -1,4 +1,5 @@
 using Backend.Interfaces;
+using Backend.Models.Users;
 
 namespace Backend.DTOs;
 
@@ -6,5 +7,5 @@ public record RegisterCredentialsDto(
     string Username,
     string Password,
     string Email,
-    string Role
+    Roles Role
     ) : IJwtUser;
