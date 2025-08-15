@@ -2,9 +2,9 @@ using Backend.Data;
 using Backend.DTOs;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Repositories;
+namespace Backend.Services.Query;
 
-public class MetricsRepository(ApplicationDbContext context) {
+public class MetricsQueryService(ApplicationDbContext context) {
     // TODO - A count of scheduled interviews and applications could also be given...
     
     private async Task<int> GetTotalNumberOfRegisteredUsersAsync() {
