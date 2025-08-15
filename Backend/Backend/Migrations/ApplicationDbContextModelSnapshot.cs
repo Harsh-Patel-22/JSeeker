@@ -42,9 +42,6 @@ namespace Backend.Migrations
                     b.Property<int>("JobId")
                         .HasColumnType("int");
 
-                    b.Property<byte[]>("PreCreatedResume")
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<Guid>("SeekerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -193,25 +190,6 @@ namespace Backend.Migrations
                     b.ToTable("ProjectTechnologies");
                 });
 
-            modelBuilder.Entity("Backend.Models.Mapping.UserHobby", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("HobbyId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserHobbies");
-                });
-
             modelBuilder.Entity("Backend.Models.Mapping.UserVocalLanguage", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -273,23 +251,6 @@ namespace Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Addresses");
-                });
-
-            modelBuilder.Entity("Backend.Models.Users.Cocurricular.Hobby", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Hobbies");
                 });
 
             modelBuilder.Entity("Backend.Models.Users.Cocurricular.VocalLanguage", b =>
@@ -383,6 +344,10 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AIGeneratedTechnicalKeywords")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("AboutLine")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -415,10 +380,6 @@ namespace Backend.Migrations
                     b.Property<int>("JobPreference")
                         .HasColumnType("int");
 
-                    b.Property<string>("Keywords")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -433,10 +394,6 @@ namespace Backend.Migrations
                     b.Property<int>("NumberOfSuccessfulEmployments")
                         .HasColumnType("int");
 
-                    b.Property<string>("Occupation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -446,6 +403,10 @@ namespace Backend.Migrations
 
                     b.Property<int?>("ResumeTemplateNumber")
                         .HasColumnType("int");
+
+                    b.Property<string>("TechnicalKeywords")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -549,7 +510,7 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Country")
+                    b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -560,20 +521,12 @@ namespace Backend.Migrations
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<string>("InstituteName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -583,21 +536,6 @@ namespace Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("WorkExperiences");
-                });
-
-            modelBuilder.Entity("HobbyUser", b =>
-                {
-                    b.Property<int>("HobbiesId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("HobbiesId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("HobbyUser");
                 });
 
             modelBuilder.Entity("Backend.Models.Application", b =>
@@ -762,21 +700,6 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("HobbyUser", b =>
-                {
-                    b.HasOne("Backend.Models.Users.Cocurricular.Hobby", null)
-                        .WithMany()
-                        .HasForeignKey("HobbiesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Models.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Backend.Models.Users.Cocurricular.VocalLanguage", b =>

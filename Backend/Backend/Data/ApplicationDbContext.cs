@@ -15,7 +15,6 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<UserCredentials> UserCredentials { get; set; }
     public DbSet<Hirer> Hirers { get; set; }
     public DbSet<Address?> Addresses { get; set; }
-    public DbSet<Hobby> Hobbies { get; set; }
     public DbSet<VocalLanguage> VocalLanguages { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<Technology> Technologies { get; set; }
@@ -23,7 +22,6 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Education> Educations { get; set; }
     
     public DbSet<ProjectTechnology> ProjectTechnologies { get; set; }
-    public DbSet<UserHobby> UserHobbies { get; set; }
     public DbSet<UserVocalLanguage> UserVocalLanguages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
