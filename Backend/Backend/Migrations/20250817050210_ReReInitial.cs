@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class ReReInitial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,33 +30,6 @@ namespace Backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Addresses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Hobbies",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Hobbies", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Seekers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GithubUsername = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WorkExperienceInYears = table.Column<int>(type: "int", nullable: false),
-                    ResumeUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Seekers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,20 +60,6 @@ namespace Backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserCredentials", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserHobbies",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    HobbyId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserHobbies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -144,15 +103,22 @@ namespace Backend.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Occupation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gender = table.Column<int>(type: "int", nullable: false),
                     AddressId = table.Column<int>(type: "int", nullable: true),
                     AboutLine = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    GithubProfileLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GithubUsername = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LinkedInProfileLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsSeeker = table.Column<bool>(type: "bit", nullable: false)
+                    ResumeJsonString = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResumeTemplateNumber = table.Column<int>(type: "int", nullable: true),
+                    NumberOfSuccessfulEmployments = table.Column<int>(type: "int", nullable: false),
+                    NumberOfRejections = table.Column<int>(type: "int", nullable: false),
+                    TechnicalKeywords = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AIGeneratedTechnicalKeywords = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsHirer = table.Column<bool>(type: "bit", nullable: false),
+                    JobPreference = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -230,39 +196,17 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "HobbyUser",
-                columns: table => new
-                {
-                    HobbiesId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HobbyUser", x => new { x.HobbiesId, x.UserId });
-                    table.ForeignKey(
-                        name: "FK_HobbyUser_Hobbies_HobbiesId",
-                        column: x => x.HobbiesId,
-                        principalTable: "Hobbies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_HobbyUser_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Projects",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    LastUpdatedDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
                     GithubRepoLink = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -282,7 +226,6 @@ namespace Backend.Migrations
                 {
                     VocalLanguageId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Id = table.Column<int>(type: "int", nullable: false),
                     Level = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -311,9 +254,7 @@ namespace Backend.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InstituteName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    State = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false)
                 },
@@ -332,26 +273,22 @@ namespace Backend.Migrations
                 name: "Applications",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    ApplicationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SeekerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     JobId = table.Column<int>(type: "int", nullable: false),
                     HirerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    State = table.Column<int>(type: "int", nullable: false)
+                    State = table.Column<int>(type: "int", nullable: false),
+                    AIGivenRating = table.Column<int>(type: "int", nullable: false),
+                    AppliedOn = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Applications", x => x.Id);
+                    table.PrimaryKey("PK_Applications", x => x.ApplicationId);
                     table.ForeignKey(
                         name: "FK_Applications_Jobs_JobId",
                         column: x => x.JobId,
                         principalTable: "Jobs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Applications_Users_ApplicantId",
-                        column: x => x.ApplicantId,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -360,40 +297,8 @@ namespace Backend.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Interviews",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    SeekerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    HirerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    JobId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    Time = table.Column<TimeOnly>(type: "time", nullable: false),
-                    Mode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ConfirmedByHirer = table.Column<bool>(type: "bit", nullable: false),
-                    ConfirmedBySeeker = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Interviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Interviews_Jobs_JobId",
-                        column: x => x.JobId,
-                        principalTable: "Jobs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Interviews_Users_HirerId",
-                        column: x => x.HirerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Interviews_Users_SeekerId",
+                        name: "FK_Applications_Users_SeekerId",
                         column: x => x.SeekerId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -406,7 +311,6 @@ namespace Backend.Migrations
                 {
                     ProjectId = table.Column<int>(type: "int", nullable: false),
                     TechnologyId = table.Column<int>(type: "int", nullable: false),
-                    Id = table.Column<int>(type: "int", nullable: false),
                     PercentUsage = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
@@ -426,10 +330,48 @@ namespace Backend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Applications_ApplicantId",
-                table: "Applications",
-                column: "ApplicantId");
+            migrationBuilder.CreateTable(
+                name: "Interviews",
+                columns: table => new
+                {
+                    ApplicationId = table.Column<int>(type: "int", nullable: false),
+                    SeekerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    HirerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    JobId = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    Time = table.Column<TimeOnly>(type: "time", nullable: false),
+                    Mode = table.Column<int>(type: "int", nullable: false),
+                    ConfirmedByHirer = table.Column<bool>(type: "bit", nullable: false),
+                    ConfirmedBySeeker = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Interviews", x => x.ApplicationId);
+                    table.ForeignKey(
+                        name: "FK_Interviews_Applications_ApplicationId",
+                        column: x => x.ApplicationId,
+                        principalTable: "Applications",
+                        principalColumn: "ApplicationId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Interviews_Jobs_JobId",
+                        column: x => x.JobId,
+                        principalTable: "Jobs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Interviews_Users_HirerId",
+                        column: x => x.HirerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Interviews_Users_SeekerId",
+                        column: x => x.SeekerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Applications_HirerId",
@@ -442,6 +384,11 @@ namespace Backend.Migrations
                 column: "JobId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Applications_SeekerId",
+                table: "Applications",
+                column: "SeekerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Educations_UserId",
                 table: "Educations",
                 column: "UserId");
@@ -450,11 +397,6 @@ namespace Backend.Migrations
                 name: "IX_Hirers_CompanyAddressId",
                 table: "Hirers",
                 column: "CompanyAddressId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_HobbyUser_UserId",
-                table: "HobbyUser",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Interviews_HirerId",
@@ -511,13 +453,7 @@ namespace Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Applications");
-
-            migrationBuilder.DropTable(
                 name: "Educations");
-
-            migrationBuilder.DropTable(
-                name: "HobbyUser");
 
             migrationBuilder.DropTable(
                 name: "Interviews");
@@ -526,13 +462,7 @@ namespace Backend.Migrations
                 name: "ProjectTechnologies");
 
             migrationBuilder.DropTable(
-                name: "Seekers");
-
-            migrationBuilder.DropTable(
                 name: "UserCredentials");
-
-            migrationBuilder.DropTable(
-                name: "UserHobbies");
 
             migrationBuilder.DropTable(
                 name: "UserVocalLanguages");
@@ -541,10 +471,7 @@ namespace Backend.Migrations
                 name: "WorkExperiences");
 
             migrationBuilder.DropTable(
-                name: "Hobbies");
-
-            migrationBuilder.DropTable(
-                name: "Jobs");
+                name: "Applications");
 
             migrationBuilder.DropTable(
                 name: "Projects");
@@ -556,10 +483,13 @@ namespace Backend.Migrations
                 name: "VocalLanguages");
 
             migrationBuilder.DropTable(
-                name: "Hirers");
+                name: "Jobs");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Hirers");
 
             migrationBuilder.DropTable(
                 name: "Addresses");

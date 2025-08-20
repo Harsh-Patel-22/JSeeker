@@ -24,11 +24,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Application", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ApplicationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApplicationId"));
 
                     b.Property<int>("AIGivenRating")
                         .HasColumnType("int");
@@ -48,7 +48,7 @@ namespace Backend.Migrations
                     b.Property<int>("State")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("ApplicationId");
 
                     b.HasIndex("HirerId");
 
@@ -61,11 +61,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Interview", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("ApplicationId")
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("ConfirmedByHirer")
                         .HasColumnType("bit");
@@ -91,7 +88,7 @@ namespace Backend.Migrations
                     b.Property<TimeOnly>("Time")
                         .HasColumnType("time");
 
-                    b.HasKey("Id");
+                    b.HasKey("ApplicationId");
 
                     b.HasIndex("HirerId");
 
@@ -567,6 +564,12 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Interview", b =>
                 {
+                    b.HasOne("Backend.Models.Application", "Application")
+                        .WithOne("Interview")
+                        .HasForeignKey("Backend.Models.Interview", "ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Backend.Models.Users.User", "Hirer")
                         .WithMany()
                         .HasForeignKey("HirerId")
@@ -576,14 +579,16 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Models.Job", "Job")
                         .WithMany()
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Backend.Models.Users.User", "Seeker")
                         .WithMany()
                         .HasForeignKey("SeekerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Application");
 
                     b.Navigation("Hirer");
 
@@ -700,6 +705,12 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Models.Application", b =>
+                {
+                    b.Navigation("Interview")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Backend.Models.Users.Cocurricular.VocalLanguage", b =>
