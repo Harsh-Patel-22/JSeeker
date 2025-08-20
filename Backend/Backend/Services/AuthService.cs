@@ -24,7 +24,7 @@ public class AuthService (IConfiguration config, AuthRepository repository) {
             audience: config.GetValue<string>("jwt:audience"),
             issuer: config.GetValue<string>("jwt:issuer"),
             claims: claims,
-            expires: DateTime.Now.AddHours(1),
+            expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: signingCredentials
         );
         

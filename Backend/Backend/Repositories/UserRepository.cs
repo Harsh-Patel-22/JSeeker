@@ -25,8 +25,8 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
             CompanyAddressId = companyAddressId,
         };
         
-        await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(user => user.IsHirer, true));
         await DbUpdateHelper.UpdateAllFieldsExceptAsync(h, context, "Id");
+        await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(user => user.IsHirer, true));
     }
 
     public async Task UpdateUserDetailsAsync(Guid userId, UserSecondaryDetailsDto dto) {
@@ -52,7 +52,7 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
                 EndDate = workExperience.EndDate
             });
         }
-
+        // TODO - Remove the existing education/project-related/work experience related details and add the new ones.... Or simply, take those objects with id and overwrite them with the current ones..
         foreach (var edto in dto.EducationDetails) {
             await context.Educations.AddAsync(new Education() {
                 UserId = userId,
@@ -74,7 +74,7 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
             });
         }
         // The below function executes and SaveChangesAsync() therefore no need to call it anywhere else here
-        await DbUpdateHelper.UpdateAllFieldsExceptAsync(u, context, "Id", "PhoneNumber", "Email", "FirstName", "LastName", "GithubUsername", "NumberOfSuccessfulEmployments", "NumberOfRejections", "TechnicalKeywords");
+        await DbUpdateHelper.UpdateAllFieldsExceptAsync(u, context, "Id", "PhoneNumber", "Email", "FirstName", "LastName", "GithubUsername", "NumberOfSuccessfulEmployments", "NumberOfRejections", "TechnicalKeywords", "AIGeneratedTechnicalKeywords", "ResumeJsonString", "ResumeTemplateNumber");
         
         // TODO - Take the below code to else when the project details are added from github!
        }
@@ -164,8 +164,8 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         try {
 
             await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter =>
-                setter.SetProperty(user => user.NumberOfSuccessfulEmployments,
-                    user => user.NumberOfSuccessfulEmployments + 1));
+                setter.SetProperty(user => user.NumberOfRejections,
+                    user => user.NumberOfRejections + 1));
         }
         catch (Exception e) {
             Console.WriteLine(e);

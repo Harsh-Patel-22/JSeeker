@@ -26,9 +26,11 @@ public class UserService (GithubService githubService, UserRepository userReposi
         if (!await validationService.UserExistsAsync(userId)) {
             throw new GlobalExceptions.Unauthorised();
         }
+
+        List<JsonElement> allInsightsList;
         
         if(repoNames == null) {
-            repoNames = await githubService.GetAll3MostRecentRepoNamesAsync(await userRepository.GetGithubUsernameAsync(userId));
+            repoNames = await githubService.GetTop3RepoNamesAsync(await userRepository.GetGithubUsernameAsync(userId));
         }
         
         if (repoNames.Count > 3) {
@@ -40,7 +42,7 @@ public class UserService (GithubService githubService, UserRepository userReposi
         List<string> keywords = new List<string>();
         
         // An Array could be used rather than a List<JsonElement>
-        List<JsonElement> allInsightsList = new List<JsonElement>(repoNames.Count);
+        allInsightsList = new List<JsonElement>(repoNames.Count);
         
         foreach (var repoName in repoNames) {
             var allInsights = await githubService.GetAllInsightsFromRepoAsync(await userRepository.GetGithubUsernameAsync(userId), repoName);
@@ -84,7 +86,7 @@ public class UserService (GithubService githubService, UserRepository userReposi
 
         string AIGenKeywords = await resumeBuilder.GetAIGeneratedKeywordsAsync(allInsightsList);
         
-        string resumeString = await resumeBuilder.GetAIGeneratedFullResumeAsync(new ResumeContentsDto() {
+        string resumeString = await resumeBuilder.GetGeneratedResumeAsync(new ResumeContentsDto() {
             ProjectDetails = projectDetails,
             BasicDetails = await userRepository.GetBasicDetailsAsync(userId),
             ContactDetails = await userRepository.GetContactDetailsAsync(userId),
@@ -98,15 +100,9 @@ public class UserService (GithubService githubService, UserRepository userReposi
         
     }
 
-    public async Task RegenerateAndUpdateResumeAsync(Guid userId) {
-        string resumeString = await resumeBuilder.GetGeneratedResumeAsync(new ResumeContentsDto() {
-            ProjectDetails = await userRepository.GetProjectsDetailsAsync(userId),
-            BasicDetails = await userRepository.GetBasicDetailsAsync(userId),
-            ContactDetails = await userRepository.GetContactDetailsAsync(userId),
-            WorkExperienceDetails = await userRepository.GetWorkExperienceDetailsAsync(userId),
-            EducationDetails = await userRepository.GetEducationDetailsAsync(userId),
-            LanguageDetails = await userRepository.GetVocalLanguagesAsync(userId)
-        });
+    public async Task UpdateResumeAsync(Guid userId, ResumeContentsDto resumeDto) {
+        // TODO - Limit the adding/remove projects. Could only update the existing ones... Frontend handling.
+        string resumeString = await resumeBuilder.GetGeneratedResumeAsync(resumeDto);
 
         await userRepository.SetResumeJsonStringAsync(userId ,resumeString);
     }

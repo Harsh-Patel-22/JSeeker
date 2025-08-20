@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Backend.DTOs;
 using Backend.DTOs.Users;
 using Backend.DTOs.Users.Hirer;
 using Backend.Extensions;
@@ -52,9 +53,9 @@ public class UserController (UserRepository repository, HirerService hirerServic
     }
 
     [HttpPost("update/resume")]
-    public async Task<IActionResult> RegenerateAndUpdateResumeAsync() {
+    public async Task<IActionResult> RegenerateAndUpdateResumeAsync([FromBody] ResumeContentsDto resumeContents) {
         Guid userId = User.GetNameIdentifier();
-        await userService.RegenerateAndUpdateResumeAsync(userId);
+        await userService.UpdateResumeAsync(userId, resumeContents);
         return Ok();
     }
     

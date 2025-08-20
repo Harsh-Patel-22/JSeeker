@@ -41,7 +41,7 @@ public class AuthRepository (ApplicationDbContext context) {
                 LastName = credentials.LastName,
                 // Occupation = "",
                 Gender = Gender.PreferNotToSay,
-                AddressId = 1, 
+                // AddressId = 1, 
                 
                 AboutLine = "",
                 Description = "",

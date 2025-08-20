@@ -19,23 +19,23 @@ public class ValidationService(ApplicationDbContext context) {
         await context.Jobs.AnyAsync(j => j.Id == jobId);
 
     public async Task<bool> InterviewExistsAsync(int interviewId) =>
-        await context.Interviews.AnyAsync(i => i.Id == interviewId);
+        await context.Interviews.AnyAsync(i => i.ApplicationId == interviewId);
 
     public async Task<bool> ApplicationExistsAsync(int applicationId) =>
-        await context.Applications.AnyAsync(a => a.Id == applicationId);
+        await context.Applications.AnyAsync(a => a.ApplicationId == applicationId);
 
     public async Task<bool> IsTheirApplicationAsync(Guid userId, int applicationId) {
-        Guid seekerId = await context.Applications.Where(application => application.Id == applicationId)
+        Guid seekerId = await context.Applications.Where(application => application.ApplicationId == applicationId)
             .Select(application => application.SeekerId).FirstOrDefaultAsync();
-        Guid hirerId = await context.Applications.Where(application => application.Id == applicationId)
+        Guid hirerId = await context.Applications.Where(application => application.ApplicationId == applicationId)
             .Select(application => application.HirerId).FirstOrDefaultAsync();
         return seekerId == userId || hirerId == userId;
     }
 
     public async Task<bool> IsTheirInterviewAsync(Guid userId, int interviewId) {
-        Guid seekerId = await context.Interviews.Where(interview => interview.Id == interviewId)
+        Guid seekerId = await context.Interviews.Where(interview => interview.ApplicationId == interviewId)
             .Select(interview => interview.SeekerId).FirstOrDefaultAsync();
-        Guid hirerId = await context.Interviews.Where(interview => interview.Id == interviewId)
+        Guid hirerId = await context.Interviews.Where(interview => interview.ApplicationId == interviewId)
             .Select(interview => interview.HirerId).FirstOrDefaultAsync();
         return seekerId == userId || hirerId == userId;
     }
