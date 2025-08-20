@@ -156,11 +156,15 @@ public class GithubService {
         return repoNames;
     }
 
-    public async Task<List<string>?> GetAll3MostRecentRepoNamesAsync(string owner) {
+    public async Task<List<string>?> GetTop3RepoNamesAsync(string owner) {
         var repos = await GetUserPublicReposAsync(owner);
         List<string>? repoNames = new List<string>();
         
-        var sortedRepos = repos.OrderByDescending(repo => repo.GetProperty("updated_at").GetDateTime()).ToList();
+        // Last Updated within past 2 years. Rated on Score = 2 * Stars + Forks
+        var sortedRepos = repos.Where(repo => repo.GetProperty("updated_at").GetDateTime() > DateTime.UtcNow.AddYears(-2))
+            .OrderByDescending(repo => (repo.GetProperty("stargazers_count").GetInt32() * 2) + repo.GetProperty("forks_count").GetInt32())
+            .Take(3)
+            .ToList();;
 
         for (int i = 0; i < 3; i++) {
             repoNames.Add(sortedRepos[i].GetProperty("name").ToString());
