@@ -30,11 +30,11 @@ public class ApplicationRepository (ApplicationDbContext context) {
     }
     
     public async Task UpdateApplicationStateAsync(int applicationId, ApplicationState applicationState) {
-        await context.Applications.Where(app => app.Id == applicationId).ExecuteUpdateAsync(setter => setter.SetProperty(app => app.State, applicationState));
+        await context.Applications.Where(app => app.ApplicationId == applicationId).ExecuteUpdateAsync(setter => setter.SetProperty(app => app.State, applicationState));
     }
 
     public async Task DeleteApplicationAsync(int applicationId) {
-        await context.Applications.Where(app => app.Id == applicationId).ExecuteDeleteAsync();
+        await context.Applications.Where(app => app.ApplicationId == applicationId).ExecuteDeleteAsync();
     }
 
     public async Task<bool> CreateApplicationAsync(CreateApplicationDto newApplicationDto) {
@@ -44,7 +44,8 @@ public class ApplicationRepository (ApplicationDbContext context) {
                 JobId = newApplicationDto.JobId,
                 HirerId = newApplicationDto.HirerId,
                 State = ApplicationState.Pending,
-                AIGivenRating = newApplicationDto.AIRating
+                AIGivenRating = newApplicationDto.AIRating,
+                AppliedOn = DateOnly.FromDateTime(DateTime.Today),
             });
             await context.SaveChangesAsync();
             return true;
@@ -55,7 +56,7 @@ public class ApplicationRepository (ApplicationDbContext context) {
     }
 
     public async Task<ApplicationDto> GetApplicationByIdAsync(int applicationId) {
-        return (await context.Applications.Include(application => application.Job).Include(application => application.Seeker).Where(application => application.Id == applicationId).Select(application => new ApplicationDto() {
+        return (await context.Applications.Include(application => application.Job).Include(application => application.Seeker).Where(application => application.ApplicationId == applicationId).Select(application => new ApplicationDto() {
             ApplicantId = application.SeekerId,
             JobId = application.JobId,
             HirerId = application.HirerId,
@@ -72,6 +73,6 @@ public class ApplicationRepository (ApplicationDbContext context) {
     }
 
     public async Task<Guid> GetSeekerIdByApplicationIdAsync(int applicationId) {
-        return await context.Applications.Where(appl => appl.Id == applicationId).Select(appl => appl.SeekerId).FirstOrDefaultAsync();
+        return await context.Applications.Where(appl => appl.ApplicationId == applicationId).Select(appl => appl.SeekerId).FirstOrDefaultAsync();
     }
 }

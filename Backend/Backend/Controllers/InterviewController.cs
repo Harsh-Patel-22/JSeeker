@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Backend.DTOs;
+using Backend.DTOs.Job;
 using Backend.Extensions;
 using Backend.Models.Users;
 using Backend.Services;
@@ -19,7 +20,7 @@ public class InterviewController (JobService jobService) : ControllerBase {
         return Ok(interviews);
     }
 
-    [HttpPatch("updateDateTime/{id}")]
+    [HttpPost("update/DateTime/{interviewId}")]
     public async Task<IActionResult> UpdateInterviewDateTimeAsync([FromRoute] int interviewId, [FromBody] DateAndTimeDto dto) {
         var roleStr = User.FindFirstValue(ClaimTypes.Role);
         if (!Enum.TryParse(roleStr, out Roles role)) {
@@ -28,9 +29,18 @@ public class InterviewController (JobService jobService) : ControllerBase {
 
         Guid userId = User.GetNameIdentifier();
         await jobService.UpdateInterviewDateTimeAsync(userId, interviewId, role, dto);
-        return NoContent();
+        return Ok();
+    }
+
+    [HttpPost("scheduled/{id}")]
+    public async Task<IActionResult> SetInterviewScheduled([FromRoute] int id) {
+        Guid userId = User.GetNameIdentifier();
+        Roles role = User.GetRole();
+        await jobService.SetInterviewScheduledAsync(userId, role, id);
+        return Ok();
     }
     
+    [Authorize(Roles = "Hirer")]
     [HttpPost("create")]
     public async Task<IActionResult> CreateInterviewAsync([FromBody] CreateInterviewDto interviewDto) {
         if (await jobService.CreateInterviewAsync(interviewDto)) {
@@ -39,10 +49,17 @@ public class InterviewController (JobService jobService) : ControllerBase {
         return BadRequest("Failed to create interview");
     }
 
-    [HttpGet("get/{interviewId}")]
-    public async Task<IActionResult> GetInterviewByIdAsync(int interviewId) {
+    [HttpPost("update/success/{id}")]
+    public async Task<IActionResult> UpdateSuccessStatusAsync([FromRoute] int id, [FromBody] bool success) {
         Guid userId = User.GetNameIdentifier();
-        return Ok(await jobService.GetInterviewByIdAsync(userId, interviewId));
+        await jobService.UpdateSeekerSuccessFailureJobLandingAsync(userId, id, success);
+        return Ok();
+    }
+
+    [HttpGet("get/{id}")]
+    public async Task<IActionResult> GetInterviewByIdAsync(int id) {
+        Guid userId = User.GetNameIdentifier();
+        return Ok(await jobService.GetInterviewByIdAsync(userId, id));
     }
     
 }

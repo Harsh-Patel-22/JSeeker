@@ -89,8 +89,16 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
         if (!await validationService.IsTheirInterviewAsync(userId, interviewId)) {
             throw new Exception("Unauthorized");
         }
+
+        switch (role) {
+            case Roles.Hirer:
+                await interviewRepository.UpdateInterviewDateTimeAsync(interviewId, dto, true);
+                break;
+            case Roles.Seeker:
+                await interviewRepository.UpdateInterviewDateTimeAsync(interviewId, dto, false);
+                break;
+        }
         
-        await interviewRepository.UpdateInterviewDateTimeAsync(interviewId, dto);
     }
     
     public async Task<bool> CreateInterviewAsync(CreateInterviewDto newInterviewDto) {
@@ -105,11 +113,22 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
         if (!await validationService.JobExistsAsync(newInterviewDto.JobId)) {
             throw new Exception("No such job exists");
         }
-        
+        // TODO --
+        // await UpdateApplicationStateAsync(newInterviewDto.HirerId, new ApplicationStateUpdateDto(newInterviewDto.))
         return await interviewRepository.CreateInterviewsAsync(newInterviewDto);
     }
 
-    public async Task UpdateSeekerSuccessFailureJobLanding(Guid hirerId, int interviewId, bool successful) {
+    public async Task SetInterviewScheduledAsync(Guid userId, Roles role, int applicationId) {
+        if (!await interviewRepository.GetApprovedStatusAsync(applicationId, role)) {
+            await interviewRepository.SetScheduledTrueAsync(applicationId);
+            await UpdateApplicationStateAsync(userId, new ApplicationStateUpdateDto(applicationId, ApplicationState.InterviewScheduled));
+        }
+        else {
+            throw new GlobalExceptions.Unauthorised();
+        }
+    }
+    
+    public async Task UpdateSeekerSuccessFailureJobLandingAsync(Guid hirerId, int interviewId, bool successful) {
         if (!await validationService.InterviewExistsAsync(interviewId)) {
             throw new Exception("No such interview exists");
         }

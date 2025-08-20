@@ -30,6 +30,7 @@ public class JobRepository (ApplicationDbContext context) {
                 break;
             
             case Roles.Seeker:
+                // TODO - Reduce the confidence of the AI Generated Keywords. Give prio to the proper keywords...
                 string[]? keywordsRecord = await context.Users.Where(user => user.Id == clientId).Select(user => new string[]{user.TechnicalKeywords, user.AIGeneratedTechnicalKeywords}).FirstOrDefaultAsync();
                 if (keywordsRecord == null) {
                     throw new Exception("User or keywords not found");

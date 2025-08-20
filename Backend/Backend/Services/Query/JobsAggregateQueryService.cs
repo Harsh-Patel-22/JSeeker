@@ -10,7 +10,7 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
         var jobsIdList = await context.Jobs.Where(job => job.HirerId == hirerId).Select(job => job.Id).ToListAsync();
         foreach (var jobId in jobsIdList) {
             var applications = await context.Applications.Include(app => app.Job).Include(app => app.Seeker).Where(app => app.JobId == jobId).Select(app => new ApplicationDto() {
-                ApplicationId = app.Id,
+                ApplicationId = app.ApplicationId,
                 ApplicantId = app.SeekerId,
                 HirerId = app.HirerId,
                 JobId = app.JobId,
@@ -39,7 +39,7 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
         var jobsIdList = await context.Jobs.Where(job => job.HirerId == hirerId).Select(job => job.Id).ToListAsync();
         foreach (var jobId in jobsIdList) {
             var interviews = await context.Interviews.Include(i => i.Job).Include(i => i.Seeker).Where(i => i.JobId == jobId).Select(i => new InterviewDto() {
-                Id = i.Id,
+                Id = i.ApplicationId,
                 JobId = i.JobId,
                 SeekerId = i.SeekerId,
                 HirerId = i.HirerId,

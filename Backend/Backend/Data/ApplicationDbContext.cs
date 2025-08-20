@@ -14,7 +14,7 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<User> Users { get; set; }
     public DbSet<UserCredentials> UserCredentials { get; set; }
     public DbSet<Hirer> Hirers { get; set; }
-    public DbSet<Address?> Addresses { get; set; }
+    public DbSet<Address> Addresses { get; set; }
     public DbSet<VocalLanguage> VocalLanguages { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<Technology> Technologies { get; set; }
@@ -40,6 +40,12 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(pt => pt.TechnologyId);
 
 
+        // CONFIGURATION FOR THE APPLICATION-INTERVIEW 1-TO-1 MAPPING
+        modelBuilder.Entity<Application>()
+            .HasOne(a => a.Interview)
+            .WithOne(i => i.Application)
+            .HasForeignKey<Interview>(i => i.ApplicationId);
+        
         // CONFIGURATION FOR THE USER-LANGUAGE JOIN MAPPING
         modelBuilder.Entity<UserVocalLanguage>()
             .HasKey(uv => new { uv.UserId, uv.VocalLanguageId });
@@ -75,11 +81,23 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(i => i.HirerId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // modelBuilder.Entity<Interview>()
+        //     .HasOne(i => i.Application)
+        //     .WithMany()
+        //     .HasForeignKey(i => i.ApplicationId)
+        //     .OnDelete(DeleteBehavior.Cascade);
+        
         modelBuilder.Entity<Interview>()
             .HasOne(i => i.Seeker)
             .WithMany()
             .HasForeignKey(i => i.SeekerId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Interview>()
+            .HasOne(i => i.Job)
+            .WithMany()
+            .HasForeignKey(i => i.JobId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Job>()
             .HasOne(j => j.Hirer)

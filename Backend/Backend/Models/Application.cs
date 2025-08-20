@@ -14,12 +14,12 @@ public enum ApplicationState {
     // Set via the program
     InterviewScheduling,
     InterviewScheduled,
-    InterviewRescheduling
+    InterviewsFinished
 }
 
 public class Application {
     [Key]
-    public int Id { get; set; }
+    public int ApplicationId { get; set; }
     public Guid SeekerId { get; set; }
     public int JobId { get; set; }
     public Guid HirerId { get; set; }
@@ -38,4 +38,6 @@ public class Application {
     public Job Job { get; set; }
     [ForeignKey("HirerId")]
     public User Hirer { get; set; }
+    public Interview Interview { get; set; }
+    
 }

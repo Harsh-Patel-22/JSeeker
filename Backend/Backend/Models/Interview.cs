@@ -9,14 +9,9 @@ public enum InterviewMode {
     InPerson
 }
 
-public enum SeekerStatus {
-    Employed,
-    Rejected
-}
-
 public class Interview {
     [Key]
-    public int Id { get; set; }
+    public int ApplicationId { get; set; }
     public Guid SeekerId { get; set; }
     public Guid HirerId { get; set; }
     public int JobId { get; set; }
@@ -36,4 +31,6 @@ public class Interview {
     
     [ForeignKey("JobId")]
     public Job Job { get; set; }
+    [ForeignKey("ApplicationId")]
+    public Application Application { get; set; }
 }

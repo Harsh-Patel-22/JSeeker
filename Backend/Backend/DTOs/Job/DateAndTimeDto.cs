@@ -1,4 +1,4 @@
-namespace Backend.DTOs;
+namespace Backend.DTOs.Job;
 
 public record DateAndTimeDto(
     DateOnly Date,

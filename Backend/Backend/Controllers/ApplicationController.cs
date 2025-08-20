@@ -43,6 +43,7 @@ public class ApplicationController (JobService jobService) : ControllerBase {
         return Ok();
     }
     
+    [Authorize(Roles = "Seeker")]
     [HttpPost("create")]
     public async Task<IActionResult> CreateApplicationAsync([FromBody] CreateApplicationDto applicationDto) {
         if (await jobService.CheckAndCreateApplicationAsync(applicationDto)) {
