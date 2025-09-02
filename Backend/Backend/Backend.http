@@ -1,7 +1,7 @@
 @Backend_HostAddress = http://localhost:5275
-@seeker_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI3OWE2YWI2YS00MjdjLTRlZjEtOWQwYS1jN2MzM2E5MTg3YzciLCJuYW1lIjoidGVzdGluZyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNlZWtlciIsImV4cCI6MTc1NTI1NDMwMiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1Mjc1IiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo1Mjc1In0.xIeXlBGKNpWNsG22yosUx5OX9i1zDKVm87waJCidmhY
+@seeker_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI4MTY3NTM5Mi05YzFlLTRhNjctYjVhYy0wOGE5Mjg2MGIxNDkiLCJuYW1lIjoidGVzdGluZyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNlZWtlciIsImV4cCI6MTc1NTQzOTY3NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1Mjc1IiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo1Mjc1In0.Mc23rVC9r67-udpEweKA6OgKBb2DEI8ABy6R9JVxzf4
+@hirer_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIwZjVkMzhlYi04NmQ4LTQ1YjctYjcxZS03Y2VhOTU3YWJkMWEiLCJuYW1lIjoiaGlyZXJUZXN0aW5nIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiSGlyZXIiLCJleHAiOjE3NTU0Mzk1NjIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSJ9.9o4jKF-aep_dGwEHbi8LEH8afQgzf3Q0u7oQhNb9TB8
 
-@hirer_auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkZWVmYTI2Yy03NzlkLTQyNjYtYTM3ZC00ZTc2M2ZiNmY2NjAiLCJuYW1lIjoiaCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkhpcmVyIiwiZXhwIjoxNzUzODA2OTg4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUifQ.9X5wjavGTgLSCHEVlSlFS7VYpp8QiKJesTq3PjNUk8Q
 
 POST {{Backend_HostAddress}}/api/user/update/hirer
 Content-Type: application/json
@@ -24,23 +24,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkZWVmY
   }
 }
 
-###
-POST {{Backend_HostAddress}}/api/job/new
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkZWVmYTI2Yy03NzlkLTQyNjYtYTM3ZC00ZTc2M2ZiNmY2NjAiLCJuYW1lIjoiaCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkhpcmVyIiwiZXhwIjoxNzUzNTA1MDM2LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUyNzUifQ.6HbeMndGiSrlp-Tsssm5OOMTRapv1ZjtMdPdOCTE6pw
 
-{
-  "title": "Learner",
-  "description": "",
-  "termsAndConditions": "",
-  "Responsibilities": "",
-  "requiredWorkExperience": 5,
-  "minSalary": 55.5,
-  "maxSalary": 555.5,
-  "type": "Internship",
-  "workMode": "OnSite",
-  "applicationsLimit": 200
-}
 
 ###
 POST {{Backend_HostAddress}}/api/job/update/10
@@ -86,39 +70,6 @@ Content-Type: application/json
 GET {{Backend_HostAddress}}/api/job/description/3
 
 ###
-GET {{Backend_HostAddress}}/api/github/languages/Harsh-Patel-22/JSeeker
-
-
-###
-GET {{Backend_HostAddress}}/api/github/languages/
-
-
-###
-GET {{Backend_HostAddress}}/api/github/repositories/Harsh-Patel-22
-
-
-###
-GET {{Backend_HostAddress}}/api/github/repositories/Harsh-Patel-22/JSeeker
-
-
-###
-GET {{Backend_HostAddress}}/api/github/topics/Harsh-Patel-22/JSeeker
-
-
-###
-GET {{Backend_HostAddress}}/api/github/tags/Harsh-Patel-22/JSeeker
-
-
-###
-GET {{Backend_HostAddress}}/api/github/readme/Harsh-Patel-22/Tic-Tac-Toe_Game
-
-###
-GET {{Backend_HostAddress}}/api/github/allinsights/repo=JSeeker
-
-###
-GET {{Backend_HostAddress}}/api/github/reponames/Harsh-Patel-22
-
-###
 POST {{Backend_HostAddress}}//api/auth/register
 Content-Type: application/json
 
@@ -147,21 +98,6 @@ Content-Type: application/json
   "username": "h",
   "password": "h",
   "role": "Hirer"
-}
-
-###
-GET {{Backend_HostAddress}}/api/resume/prompt=Give me a resume description for a person who has worked on technologies like, react, asp.net and c#. Write all related keywords and make it such that it ranks higher in the automated testing.
-
-###
-POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=AIzaSyBWhcoipXZ0rZu5EN8-NO5_yVOM_MeI83Q
-Content-Type: application/json
-
-{
-  "contents": [
-    {
-      "parts": [{ "text": "Give me a resume description for a person who has worked on technologies like, react, asp.net and c#. Write all related keywords and make it such that it ranks higher in the automated testing." }]
-    }
-  ]
 }
 
 ###
@@ -200,7 +136,7 @@ Content-Type: application/json
 }
 
 ###
-### Sign Up Workflowx
+### Sign Up Workflow - Generic/Seeker
 
 POST {{Backend_HostAddress}}/api/auth/register
 Content-Type: application/json
@@ -296,4 +232,185 @@ Authorization: Bearer {{seeker_auth_token}}
 ###
 POST {{Backend_HostAddress}}/api/user/update/resume
 Authorization: Bearer {{seeker_auth_token}}
+
+
+###
+### Testing the AI Gen Keywords
+POST {{Backend_HostAddress}}/api/testing/AIGenKeywords
+Authorization: Bearer {{seeker_auth_token}}
+
+
+
+###
+### Hirer Signup WorkFlow
+POST {{Backend_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "hirer",
+  "lastName": "testing",
+  "phoneNumber": "43242342423",
+  "email": "hirer@testing.com",
+  "username": "hirerTesting",
+  "password": "testing123",
+  "role": "Hirer"
+}
+
+###
+POST {{Backend_HostAddress}}/api/user/update/hirer
+Authorization: Bearer {{hirer_auth_token}}
+Content-Type: application/json
+
+{
+  "companyName": "Snehmi",
+  "designation": "CEO",
+  "websiteLink": "www.snehmi.com",
+  
+  "companyAddress": {
+    "houseNumber": "B-204",
+    "society": "Sunshine Residency",
+    "street": "MG Road",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "country": "India",
+    "postalCode": "380015",
+    "latitude": 23.0225,
+    "longitude": 72.5714 
+  }
+}
+
+###
+#POST {{Backend_HostAddress}}/api/user/update/hirer
+
+### 
+POST {{Backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testing",
+  "password": "testing123",
+  "role": "Seeker"
+}
+
+### 
+POST {{Backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "hirerTesting",
+  "password": "testing123",
+  "role": "Hirer"
+}
+
+
+
+
+
+###
+### Job -> Application -> Interview WorkFlow
+POST {{Backend_HostAddress}}/api/job/new
+Content-Type: application/json
+Authorization: Bearer {{hirer_auth_token}}
+
+{
+  "title": "Learner",
+  "description": "",
+  "termsAndConditions": "",
+  "Responsibilities": "",
+  "requiredWorkExperience": 5,
+  "minSalary": 55.5,
+  "maxSalary": 555.5,
+  "type": "Internship",
+  "workMode": "OnSite",
+  "applicationsLimit": 200
+}
+
+###
+
+POST {{Backend_HostAddress}}/api/application/create
+Authorization: Bearer {{seeker_auth_token}}
+Content-Type: application/json
+
+{
+  "seekerId": "81675392-9C1E-4A67-B5AC-08A92860B149",
+  "jobId": 1,
+  "hirerId": "0F5D38EB-86D8-45B7-B71E-7CEA957ABD1A",
+  "jobType": 0
+}
+
+###
+POST {{Backend_HostAddress}}/api/application/status
+Authorization: Bearer {{hirer_auth_token}}
+Content-Type: application/json
+
+{
+  "applicationId": 1,
+  "state": "Rejected"
+}
+
+###
+POST {{Backend_HostAddress}}/api/application/status
+Authorization: Bearer {{hirer_auth_token}}
+Content-Type: application/json
+
+{
+  "applicationId": 2,
+  "state": "Shortlisted"
+}
+
+
+###
+POST {{Backend_HostAddress}}/api/interview/create
+Authorization: Bearer {{hirer_auth_token}}
+Content-Type: application/json
+
+{
+  "applicationId": 2,
+  "seekerId": "81675392-9C1E-4A67-B5AC-08A92860B149",
+  "hirerId": "0F5D38EB-86D8-45B7-B71E-7CEA957ABD1A",
+  "jobId": 1,
+  "dateProposedByHirer": "2024-08-30",
+  "timeProposedByHirer": "14:30:00",
+  "mode": "Online"
+}
+
+###
+POST {{Backend_HostAddress}}/api/interview/update/DateTime/2
+Authorization: Bearer {{seeker_auth_token}}
+Content-Type: application/json
+
+{
+  "date": "2025-08-30",
+  "time": "16:00:00"
+}
+
+###
+POST {{Backend_HostAddress}}/api/interview/update/DateTime/2
+Authorization: Bearer {{hirer_auth_token}}
+Content-Type: application/json
+
+{
+  "date": "2025-09-01",
+  "time": "16:00:00"
+}
+
+###
+POST {{Backend_HostAddress}}/api/interview/scheduled/2
+Authorization: Bearer {{seeker_auth_token}}
+
+###
+POST {{Backend_HostAddress}}/api/interview/update/success/2
+Authorization: Bearer {{hirer_auth_token}}
+Content-Type: application/json
+
+true
+
+
+
+###
+# Testing
+POST {{Backend_HostAddress}}/api/testing/repos
+
+###
+GET {{Backend_HostAddress}}/api/testing/get/resume/pdf
 

@@ -1,5 +1,9 @@
+using System.Text.Json;
+using Backend.DTOs;
 using Backend.DTOs.Job;
+using Backend.Extensions;
 using Backend.Models;
+using Backend.Repositories;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +11,7 @@ namespace Backend.Testing;
 
 [ApiController]
 [Route("api/testing")]
-public class TestingController(ResumeBuilderService resumeBuilder, PdfService pdfService, RatingService ratingService, UserService userService) : ControllerBase {
+public class TestingController(ResumeBuilderService resumeBuilder, UserRepository userRepository,GithubService githubService, PdfService pdfService, RatingService ratingService, UserService userService) : ControllerBase {
     [HttpGet]
     public async Task<IActionResult> Get() {
         // Guid userId = Guid.NewGuid();
@@ -27,15 +31,35 @@ public class TestingController(ResumeBuilderService resumeBuilder, PdfService pd
         return Ok();
     }
     
+    [HttpGet("get/resume/pdf")]
+    public async Task<IActionResult> GetResumePDFAsync() {
+        Guid.TryParse("81675392-9C1E-4A67-B5AC-08A92860B149",  out var userId);
+        var resumeContents = await userService.GetResumeTemplateAndStringAsync(userId);
+        var pdf = await pdfService.GeneratePdfAsync(resumeContents.ResumeString, resumeContents.TemplateNumber);
+        return File(pdf, "application/pdf", "resume.pdf");
+    }
+    
     [HttpGet("projects")]
     public async Task<IActionResult> GetProjects() {
-        string githubUsername = "Harsh-Patel-22";
-        var repoNames = await userService.GetAllProjectNamesAsync(githubUsername);
+        var repoNames = await userService.GetAllProjectNamesAsync(Guid.Parse("FB85D0DC-9AAE-4A90-8F9C-67B9ADF32C4E"));
         var limitedRepoNames = new List<string>();
         for (int i = 0; i < 3; i++) {
             limitedRepoNames.Add(repoNames[i]);
         }
-        await userService.UpdateProjectsUsingGithubUsernameAsync(Guid.Parse("FB85D0DC-9AAE-4A90-8F9C-67B9ADF32C4E"), githubUsername, limitedRepoNames);
+        // await userService.UpdateProjectsUsingGithubUsernameAsync(Guid.Parse("FB85D0DC-9AAE-4A90-8F9C-67B9ADF32C4E"), limitedRepoNames);
         return Ok();
+    }
+
+    [HttpPost("AIGenKeywords")]
+    public async Task<IActionResult> GetAIGenKeywords() {
+        Guid userId = User.GetNameIdentifier();
+        List<JsonElement> allInsightsList = new  List<JsonElement>(); 
+        var repoNames = await githubService.GetTop3RepoNamesAsync(await userRepository.GetGithubUsernameAsync(userId));
+        foreach (var repoName in repoNames) {
+            var allInsights = await githubService.GetAllInsightsFromRepoAsync(await userRepository.GetGithubUsernameAsync(userId), repoName);
+            allInsightsList.Add(allInsights);
+        }
+        var keywords = await resumeBuilder.GetAIGeneratedKeywordsAsync(allInsightsList);
+        return Ok(keywords);
     }
 }

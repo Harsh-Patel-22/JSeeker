@@ -13,4 +13,8 @@ public static class StringCleaner {
     public static string GetCleanDateString(string githubFormatDateString) {
         return githubFormatDateString.Substring(0, githubFormatDateString.IndexOf('T'));
     }
+
+    public static string GetCleanCSVString(string inputString) {
+        return null;
+    }
 }
