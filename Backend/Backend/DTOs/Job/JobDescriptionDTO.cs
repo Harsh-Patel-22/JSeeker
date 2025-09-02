@@ -27,6 +27,7 @@ public class JobDescriptionDto {
     public int ApplicationsLimit { get; set; }
     
     public Address Address { get; set; }
+    public Guid HirerId { get; set; }
     
     
 }

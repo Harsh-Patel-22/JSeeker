@@ -1,6 +1,6 @@
 using Backend.Models;
 
-namespace Backend.DTOs;
+namespace Backend.DTOs.Job;
 
 public class CreateApplicationDto {
     public Guid SeekerId { get; set; }

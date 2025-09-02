@@ -62,13 +62,6 @@ public class JobRepository (ApplicationDbContext context) {
 
     public async Task<bool> CreateJobAsync(Guid hirerId, CreateJobDto newJob) {
         try {
-            if (!Enum.TryParse(newJob.Type, out JobType jobType)) {
-                throw new Exception("Invalid job type");
-            }
-
-            if (!Enum.TryParse(newJob.WorkMode, out WorkMode workMode)) {
-                throw new Exception("Invalid work mode");
-            }
             // TODO - Make a custom class/dto for company to avoid unnecessary fields..
             string? companyName = await context.Hirers.Where(u => u.Id == hirerId).Select(u => u.CompanyName).FirstOrDefaultAsync();
             int addressId = await context.Hirers.Where(h => h.Id == hirerId).Select(h => h.CompanyAddressId).FirstOrDefaultAsync();
@@ -78,8 +71,7 @@ public class JobRepository (ApplicationDbContext context) {
             if (string.IsNullOrEmpty(companyName)) { 
                 throw new Exception("Hirer not found");
             }
-            await context.Jobs.AddAsync(new Job() {
-                Id = await context.Jobs.CountAsync(),    
+            await context.Jobs.AddAsync(new Job() {  
                 Title = newJob.Title, 
                 Description = newJob.Description,
                 TermsAndConditions = newJob.TermsAndConditions,
@@ -89,9 +81,9 @@ public class JobRepository (ApplicationDbContext context) {
                 MinSalary = newJob.MinSalary, 
                 MaxSalary = newJob.MaxSalary, 
                 
-                Type = jobType,
+                Type = newJob.Type,
                 Status = JobStatus.Open, 
-                WorkMode = workMode,
+                WorkMode = newJob.WorkMode,
                 
                 NumberOfApplications = 0,
                 ApplicationsLimit = newJob.ApplicationsLimit,
@@ -126,6 +118,9 @@ public class JobRepository (ApplicationDbContext context) {
                 nearbyJobs.Add(new JobForMapMarkerDto() {
                     Id = job.Id,
                     Title = job.Title,
+                    Type = job.Type,
+                    CompanyName = job.CompanyName,
+                    HirerId = job.HirerId,
                     Distance = (decimal) Math.Sqrt(Math.Pow((double) (job.Address.Latitude - targetLocation.Latitude), 2) + Math.Pow((double) (job.Address.Latitude - targetLocation.Latitude), 2)),
                     Address =  job.Address
                 });
@@ -152,6 +147,7 @@ public class JobRepository (ApplicationDbContext context) {
             MaxSalary = job.MaxSalary,
             
             Address = job.Address,
+            HirerId = job.HirerId,
             
             Type = job.Type,
             Status = job.Status,

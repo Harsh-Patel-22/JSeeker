@@ -49,6 +49,21 @@ public class ValidationService(ApplicationDbContext context) {
     //     return false;
     // }
 
+    public async Task<bool> ApplicationAlreadyExistAsync(Guid userId, int jobId) {
+        if (await context.Applications.Where(appl => appl.SeekerId == userId && appl.JobId == jobId)
+                .FirstOrDefaultAsync() == null) {
+            return false;
+        }
+        return true;
+    }
+    public async Task<bool> InterviewAlreadyExistAsync(Guid userId, int jobId) {
+        if (await context.Interviews.Where(appl => appl.SeekerId == userId && appl.JobId == jobId)
+                .FirstOrDefaultAsync() == null) {
+            return false;
+        }
+        return true;
+    }
+    
     public async Task<bool> CanAddMoreProjects(Guid userId) {
         if ((await context.Projects.Where(project => project.UserId == userId).ToListAsync()).Count <= 3) {
             return true;

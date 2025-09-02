@@ -11,14 +11,13 @@ public class CreateJobDto {
     public string TermsAndConditions { get; set; }
     public string Responsibilities { get; set; }
     
-    [Range(0, 10)]
     public int RequiredWorkExperience { get; set; }
     public decimal MinSalary { get; set; }
     public decimal MaxSalary { get; set; }
     
     // Post Details
-    public string Type { get; set; }
-    public string WorkMode { get; set; }
+    public JobType Type { get; set; }
+    public WorkMode WorkMode { get; set; }
     public int ApplicationsLimit { get; set; }
     
     

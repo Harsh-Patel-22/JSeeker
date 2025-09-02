@@ -9,7 +9,6 @@ public class JobCardDto {
     public JobType Type { get; set; }
     public JobStatus Status { get; set; }
     public WorkMode WorkMode { get; set; }
-    // public string Shift { get; set; }
     public string CompanyName { get; set; }
     public Address Address { get; set; }
     public decimal MinSalary { get; set; }
@@ -17,4 +16,5 @@ public class JobCardDto {
     
     public int NumberOfApplications { get; set; }
     public DateOnly PostDate { get; set; }
+    public Guid HirerId { get; set; }
 }

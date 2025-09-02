@@ -103,15 +103,19 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
     
     public async Task<bool> CreateInterviewAsync(CreateInterviewDto newInterviewDto) {
         if (!await validationService.UserExistsAsync(newInterviewDto.SeekerId)) {
-            throw new Exception("No such seeker exists");
+            throw new GlobalExceptions.DoesNotExist();
         }
 
         if (!await validationService.IsHirerAsync(newInterviewDto.HirerId)) {
-            throw new Exception("Unauthorized");
+            throw new GlobalExceptions.DoesNotExist();
         }
 
         if (!await validationService.JobExistsAsync(newInterviewDto.JobId)) {
-            throw new Exception("No such job exists");
+            throw new GlobalExceptions.DoesNotExist();
+        }
+
+        if (await validationService.InterviewAlreadyExistAsync(newInterviewDto.SeekerId, newInterviewDto.JobId)) {
+            throw new GlobalExceptions.AlreadyExist();  
         }
         // TODO --
         // await UpdateApplicationStateAsync(newInterviewDto.HirerId, new ApplicationStateUpdateDto(newInterviewDto.))
@@ -204,16 +208,19 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
     
     public async Task<bool> CheckAndCreateApplicationAsync(CreateApplicationDto newApplicationDto) {
         if (!await validationService.JobExistsAsync(newApplicationDto.JobId)) {
-            throw new Exception("No such job exists");
+            throw new GlobalExceptions.DoesNotExist();
         }
         if (!await validationService.UserExistsAsync(newApplicationDto.SeekerId)) {
-            throw new Exception("No such seeker exists");
+            throw new GlobalExceptions.DoesNotExist();
         }
 
         if (!await validationService.IsHirerAsync(newApplicationDto.HirerId)) {
-            throw new Exception("No such hirer exists");
+            throw new GlobalExceptions.DoesNotExist();
         }
-        
+
+        if (await validationService.ApplicationAlreadyExistAsync(newApplicationDto.SeekerId, newApplicationDto.JobId)) {
+            throw new GlobalExceptions.AlreadyExist();
+        }
         
         JobKeyInformationDto job = await jobRepository.GetJobKeyInformationByIdAsync(newApplicationDto.JobId);
         if (newApplicationDto.JobType != job.JobType || job.JobStatus == JobStatus.Closed) return false;
