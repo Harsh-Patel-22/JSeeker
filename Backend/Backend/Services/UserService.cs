@@ -5,14 +5,26 @@ using Backend.Exceptions;
 using Backend.Models.Users.WorkRelated;
 using Backend.Repositories;
 using Backend.Util;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace Backend.Services;
 
-public class UserService (GithubService githubService, UserRepository userRepository, ProjectsRepository projectsRepository, ValidationService validationService, ResumeBuilderService resumeBuilder) {
+public class UserService (GithubService githubService, UserRepository userRepository, ProjectsRepository projectsRepository, ValidationService validationService, ResumeBuilderService resumeBuilder, PdfService pdfService) {
     public async Task<List<string>> GetAllProjectNamesAsync(Guid userId) {
         List<string> repoNames = await githubService.GetAllRepoNamesAsync(await userRepository.GetGithubUsernameAsync(userId));
         return repoNames;
     }
+
+    // public async Task<ResumeContentsDto> GetResumeContentsAsync(Guid userId) {
+    //     return new ResumeContentsDto() {
+    //         BasicDetails = await userRepository.GetBasicDetailsAsync(userId),
+    //         ContactDetails = await userRepository.GetContactDetailsAsync(userId),
+    //         EducationDetails = await userRepository.GetEducationDetailsAsync(userId),
+    //         LanguageDetails = await userRepository.GetVocalLanguagesAsync(userId),
+    //         ProjectDetails = await userRepository.GetProjectsDetailsAsync(userId),
+    //         WorkExperienceDetails = await userRepository.GetWorkExperienceDetailsAsync(userId)
+    //     };
+    // }
 
     public async Task UpdateUserDetailsAsync(Guid userId, UserSecondaryDetailsDto dto) {
         await userRepository.UpdateUserDetailsAsync(userId, dto);
@@ -105,5 +117,46 @@ public class UserService (GithubService githubService, UserRepository userReposi
         string resumeString = await resumeBuilder.GetGeneratedResumeAsync(resumeDto);
 
         await userRepository.SetResumeJsonStringAsync(userId ,resumeString);
+    }
+    
+    public async Task SetResumeJsonStringAsync(Guid userId, string resumeJsonString) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        await userRepository.SetResumeJsonStringAsync(userId, resumeJsonString);
+    }
+
+    public async Task SetResumeTemplateNumberAsync(Guid userId, int resumeTemplateNumber) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        await userRepository.SetResumeTemplateNumberAsync(userId, resumeTemplateNumber);
+    }
+    
+    public async Task<string> GetResumeJsonStringAsync(Guid userId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        return await userRepository.GetResumeJsonStringAsync(userId);
+    }
+
+    public async Task<Byte[]> GetResumePdfAsync(Guid userId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+
+        ResumeTemplateAndStringDto resumeDetails = await userRepository.GetResumeAndTemplateNumberAsync(userId);
+        if (resumeDetails.ResumeString == null || resumeDetails.TemplateNumber == null) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        return await pdfService.GeneratePdfAsync(resumeDetails.ResumeString, resumeDetails.TemplateNumber);
+    }
+
+    public async Task<ResumeTemplateAndStringDto> GetResumeTemplateAndStringAsync(Guid userId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+
+        return await userRepository.GetResumeAndTemplateNumberAsync(userId);
     }
 }

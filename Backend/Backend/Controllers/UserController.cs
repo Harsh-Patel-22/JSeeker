@@ -58,6 +58,20 @@ public class UserController (UserRepository repository, HirerService hirerServic
         await userService.UpdateResumeAsync(userId, resumeContents);
         return Ok();
     }
+
+    [HttpGet("get/resume")]
+    public async Task<IActionResult> GetResumeContentsAsync() {
+        Guid userId = User.GetNameIdentifier();
+        string resumeJsonString = await userService.GetResumeJsonStringAsync(userId);
+        return Ok(resumeJsonString);
+    }
+
+    [HttpGet("get/resume/pdf")]
+    public async Task<IActionResult> GetResumePDFAsync() {
+        Guid userId = User.GetNameIdentifier();
+        var pdf = await userService.GetResumePdfAsync(userId);
+        return File(pdf, "application/pdf", "resume.pdf");
+    }
     
     // TODO - Make this one call. Dont fetch again and again!!
     // Section - Profile related fetching 

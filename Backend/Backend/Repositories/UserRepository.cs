@@ -118,10 +118,16 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(user => user.ResumeTemplateNumber, resumeTemplateNumber));
     }
     
-    public async Task<string?> GetResumeJsonStringAsync(Guid userId) {
+    public async Task<string> GetResumeJsonStringAsync(Guid userId) {
         return await context.Users.Where(user => user.Id == userId).Select(user => user.ResumeJsonString).FirstOrDefaultAsync();
     }
-    
+
+    public async Task<ResumeTemplateAndStringDto> GetResumeAndTemplateNumberAsync(Guid userId) {
+        return await context.Users.Where(user => user.Id == userId).Select(user => new ResumeTemplateAndStringDto() {
+            ResumeString = user.ResumeJsonString,
+            TemplateNumber = user.ResumeTemplateNumber
+        }).FirstOrDefaultAsync();
+    }
     
     // Section - Fetching
     public async Task<UserProfessionalDetailsDto> GetUserProfessionalDetailsAsync(Guid userId) {
