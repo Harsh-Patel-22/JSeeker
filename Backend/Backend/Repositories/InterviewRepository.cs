@@ -21,10 +21,18 @@ public class InterviewRepository (ApplicationDbContext context) {
             HirerId = interview.HirerId,
             JobId = interview.Job.Id,
                     
+            // Seeker Related
             FirstName = interview.Seeker.FirstName,
             LastName = interview.Seeker.LastName,
             Email = interview.Seeker.Email,
             PhoneNumber = interview.Seeker.PhoneNumber,
+            // GithubProjectLinks = interview.Seeker.Projects
+                    
+            // Job Related
+            JobTitle = interview.Job.Title,
+            JobDescription = interview.Job.Description,
+            JobResponsibilities = interview.Job.Responsibilities,
+            JobTermsAndConditions = interview.Job.TermsAndConditions,
                     
             Date = interview.Date,
             Time = interview.Time,
@@ -97,17 +105,25 @@ public class InterviewRepository (ApplicationDbContext context) {
     }
 
     public async Task<InterviewDto> GetInterviewByIdAsync(int interviewId) {
-        return (await context.Interviews.Where(i => i.ApplicationId == interviewId).Select(interview => new InterviewDto() {
+        return (await context.Interviews.Include(i => i.Seeker).Include(i => i.Job).Where(i => i.ApplicationId == interviewId).Select(interview => new InterviewDto() {
             Id = interview.ApplicationId,
             SeekerId = interview.SeekerId,
             HirerId = interview.HirerId,
             JobId = interview.Job.Id,
                     
+            // Seeker Related
             FirstName = interview.Seeker.FirstName,
             LastName = interview.Seeker.LastName,
             Email = interview.Seeker.Email,
             PhoneNumber = interview.Seeker.PhoneNumber,
+            // GithubProjectLinks = interview.Seeker.Projects
                     
+            // Job Related
+            JobTitle = interview.Job.Title,
+            JobDescription = interview.Job.Description,
+            JobResponsibilities = interview.Job.Responsibilities,
+            JobTermsAndConditions = interview.Job.TermsAndConditions,
+            
             Date = interview.Date,
             Time = interview.Time,
             Mode = interview.Mode,

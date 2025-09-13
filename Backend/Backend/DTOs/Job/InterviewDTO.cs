@@ -13,6 +13,14 @@ public class InterviewDto {
     public string LastName { get; set; }
     public string Email { get; set; }
     public string PhoneNumber { get; set; }
+    // TODO - Think if possible to create in an easy and efficient manner
+    // public List<string> GithubProjectLinks { get; set; }
+    
+    // Fields related to the job
+    public string JobTitle { get; set; }
+    public string JobDescription { get; set; }
+    public string JobTermsAndConditions { get; set; }
+    public string JobResponsibilities { get; set; }
     
     public DateOnly Date { get; set; }
     public TimeOnly Time { get; set; }

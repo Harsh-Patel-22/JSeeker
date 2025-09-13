@@ -13,6 +13,7 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
                 ApplicationId = app.ApplicationId,
                 ApplicantId = app.SeekerId,
                 HirerId = app.HirerId,
+                SeekerId = app.SeekerId,
                 JobId = app.JobId,
                 State = app.State,
                 
@@ -44,10 +45,18 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
                 SeekerId = i.SeekerId,
                 HirerId = i.HirerId,
                 
+                // Seeker Related
                 FirstName = i.Seeker.FirstName,
                 LastName = i.Seeker.LastName,
                 Email = i.Seeker.Email,
                 PhoneNumber = i.Seeker.PhoneNumber,
+                // GithubProjectLinks = interview.Seeker.Projects
+                    
+                // Job Related
+                JobTitle = i.Job.Title,
+                JobDescription = i.Job.Description,
+                JobResponsibilities = i.Job.Responsibilities,
+                JobTermsAndConditions = i.Job.TermsAndConditions,
                 
                 Date = i.Date,
                 Time = i.Time,

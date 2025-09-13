@@ -31,6 +31,7 @@ public class ValidationService(ApplicationDbContext context) {
             .Select(application => application.HirerId).FirstOrDefaultAsync();
         return seekerId == userId || hirerId == userId;
     }
+    
 
     public async Task<bool> IsTheirInterviewAsync(Guid userId, int interviewId) {
         Guid seekerId = await context.Interviews.Where(interview => interview.ApplicationId == interviewId)
@@ -40,6 +41,11 @@ public class ValidationService(ApplicationDbContext context) {
         return seekerId == userId || hirerId == userId;
     }
 
+    public async Task<bool> HasApplicationFor(Guid seekerId, Guid hirerId) => 
+        await context.Applications.AnyAsync(appl => appl.SeekerId == seekerId && appl.HirerId == hirerId);
+    public async Task<bool> HasInterviewFor(Guid seekerId, Guid hirerId) => 
+        await context.Applications.AnyAsync(appl => appl.SeekerId == seekerId && appl.HirerId == hirerId);
+    
     // public async Task<bool> GithubProjectsAlreadyStored(Guid userId) {
     //     // GitHub Username is set to something and even some projects are added
     //     if (!(await context.Users.Where(user => user.Id == userId).Select(user => user.GithubUsername).FirstOrDefaultAsync())!.Equals("") && (await context.Projects.Where(proj => proj.UserId == userId).ToListAsync()).Count != 0) {
