@@ -59,10 +59,10 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
     }
     
     // Section - Interview Related
-    public async Task<List<InterviewDto>> GetInterviewsByIdByScheduleStatusAsync(Guid userId, bool scheduled) {
+    public async Task<List<InterviewDto>> GetInterviewsByIdByScheduleStatusAsync(Guid userId, Roles role, bool scheduled) {
         if (!await validationService.UserExistsAsync(userId))
             throw new Exception("No such user Exist");
-        return await interviewRepository.GetInterviewsByIdByScheduleStatusAsync(userId, scheduled);
+        return await interviewRepository.GetInterviewsByIdByScheduleStatusAsync(userId, role, scheduled);
     }
 
     public async Task<InterviewDto> GetInterviewByIdAsync(Guid userId, int interviewId) {

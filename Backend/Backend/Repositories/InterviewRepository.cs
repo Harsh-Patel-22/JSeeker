@@ -10,11 +10,24 @@ namespace Backend.Repositories;
 public class InterviewRepository (ApplicationDbContext context) {
     
     // TODO - Make the fetching datewise/jobwise
-    public async Task<List<InterviewDto>> GetInterviewsByIdByScheduleStatusAsync(Guid userId, bool scheduled) {
+    public async Task<List<InterviewDto>> GetInterviewsByIdByScheduleStatusAsync(Guid userId, Roles role, bool scheduled) {
+        // Returns either those interviews that are scheduled, or the ones that are updated - meaning that it was updated from the other end and needs to be reviewed/finalised
         var query = context.Interviews.Include(i => i.Job)
             .ThenInclude(job => job.Address)
             .Where(i => i.HirerId == userId || i.SeekerId == userId);
-        query = scheduled ? query.Where(i => i.ConfirmedBySeeker == true && i.ConfirmedByHirer == true) : query.Where(i => i.ConfirmedByHirer == false || i.ConfirmedBySeeker == false);
+        if (scheduled) {
+            query = query.Where(i => i.ConfirmedBySeeker == true && i.ConfirmedByHirer == true);
+        }
+
+        else {
+            // Fetch the ones that are updated (confirmed by the other party and not by him self)
+            if (role == Roles.Hirer) {
+                query = query.Where(i => i.ConfirmedByHirer == false && i.ConfirmedBySeeker == true);
+            }
+            else {
+                query = query.Where(i => i.ConfirmedByHirer == true && i.ConfirmedBySeeker == false);
+            }
+        }
         var interviews = await query.Select(interview => new InterviewDto() {
             Id = interview.ApplicationId,
             SeekerId = interview.SeekerId,

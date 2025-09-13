@@ -16,7 +16,8 @@ public class InterviewController (JobService jobService) : ControllerBase {
     [HttpGet("get/scheduled={scheduled}")]
     public async Task<IActionResult> GetInterviewsAsync([FromRoute] bool scheduled) {
         Guid userId = User.GetNameIdentifier();
-        var interviews = await jobService.GetInterviewsByIdByScheduleStatusAsync(userId,  scheduled);
+        Roles role = User.GetRole();
+        var interviews = await jobService.GetInterviewsByIdByScheduleStatusAsync(userId, role, scheduled);
         return Ok(interviews);
     }
 
