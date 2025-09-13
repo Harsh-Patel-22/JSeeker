@@ -66,10 +66,10 @@ public class UserController (UserRepository repository, HirerService hirerServic
         return Ok(resumeJsonString);
     }
 
-    [HttpGet("get/resume/pdf")]
-    public async Task<IActionResult> GetResumePDFAsync() {
+    [HttpPost("get/resume/pdf")]
+    public async Task<IActionResult> GetResumePDFAsync([FromBody] Guid targetUserId) {
         Guid userId = User.GetNameIdentifier();
-        var pdf = await userService.GetResumePdfAsync(userId);
+        var pdf = await userService.GetResumePdfAsync(userId, targetUserId);
         return File(pdf, "application/pdf", "resume.pdf");
     }
     

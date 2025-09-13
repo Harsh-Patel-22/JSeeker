@@ -140,12 +140,22 @@ public class UserService (GithubService githubService, UserRepository userReposi
         return await userRepository.GetResumeJsonStringAsync(userId);
     }
 
-    public async Task<Byte[]> GetResumePdfAsync(Guid userId) {
-        if (!await validationService.UserExistsAsync(userId)) {
+    public async Task<Byte[]> GetResumePdfAsync(Guid accessorUserId, Guid accessedUserId) {
+        if (!await validationService.UserExistsAsync(accessedUserId)) {
             throw new GlobalExceptions.Unauthorised();
         }
 
-        ResumeTemplateAndStringDto resumeDetails = await userRepository.GetResumeAndTemplateNumberAsync(userId);
+        if (!await validationService.UserExistsAsync(accessorUserId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        
+        // CHECK IF HE actually has an application for a post hosted by the accessor.
+        if (!await validationService.HasApplicationFor(accessedUserId, accessorUserId) &&
+            !await validationService.HasInterviewFor(accessedUserId, accessorUserId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        
+        ResumeTemplateAndStringDto resumeDetails = await userRepository.GetResumeAndTemplateNumberAsync(accessedUserId);
         if (resumeDetails.ResumeString == null || resumeDetails.TemplateNumber == null) {
             throw new GlobalExceptions.Unauthorised();
         }
