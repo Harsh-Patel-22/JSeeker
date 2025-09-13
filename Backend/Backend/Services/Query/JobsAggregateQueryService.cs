@@ -54,6 +54,7 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
                     
                 // Job Related
                 JobTitle = i.Job.Title,
+                CompanyName = i.Job.CompanyName,
                 JobDescription = i.Job.Description,
                 JobResponsibilities = i.Job.Responsibilities,
                 JobTermsAndConditions = i.Job.TermsAndConditions,

@@ -18,6 +18,7 @@ public class InterviewDto {
     
     // Fields related to the job
     public string JobTitle { get; set; }
+    public string CompanyName { get; set; }
     public string JobDescription { get; set; }
     public string JobTermsAndConditions { get; set; }
     public string JobResponsibilities { get; set; }

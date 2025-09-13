@@ -43,6 +43,7 @@ public class InterviewRepository (ApplicationDbContext context) {
                     
             // Job Related
             JobTitle = interview.Job.Title,
+            CompanyName = interview.Job.CompanyName,
             JobDescription = interview.Job.Description,
             JobResponsibilities = interview.Job.Responsibilities,
             JobTermsAndConditions = interview.Job.TermsAndConditions,
@@ -133,6 +134,7 @@ public class InterviewRepository (ApplicationDbContext context) {
                     
             // Job Related
             JobTitle = interview.Job.Title,
+            CompanyName = interview.Job.CompanyName,
             JobDescription = interview.Job.Description,
             JobResponsibilities = interview.Job.Responsibilities,
             JobTermsAndConditions = interview.Job.TermsAndConditions,
