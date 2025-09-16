@@ -1,4 +1,4 @@
-import AuthForm from '../components/AuthForm';
+import AuthForm from '../components/forms/AuthForm';
 import { Link } from 'react-router-dom';
 import { ToastProvider } from '../contexts/ToastContext';
 const LoginPage = () => {

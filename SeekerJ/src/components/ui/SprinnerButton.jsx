@@ -1,8 +1,10 @@
 import { Spinner } from 'react-bootstrap';
 
-const SpinnerButton = ({ loading, children, ...props }) => (
+const SpinnerButton = ({ loading, handleClick, children, type = "button", ...props }) => (
   <button
-    className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+    onClick={handleClick}
+    type={type}
+    className="btn btn-primary mt-3 w-100 d-flex align-items-center justify-content-center"
     disabled={loading}
     {...props}
   >
