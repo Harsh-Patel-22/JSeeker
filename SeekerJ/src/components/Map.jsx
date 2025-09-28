@@ -2,9 +2,9 @@ import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, useMap, Circle} from 'react-leaflet';
 import './Map.css'
 import { useEffect, useState } from 'react';
-import { api } from '../services/APIClient';
 import MapCard from './MapCard';
 import { AxiosError } from 'axios';
+import { jobService } from '../services/apiServices';
 
 // TODO - Add a circle with the user position as the centre. A transparent green circle showing the search distance. 
 const Map = () => {
@@ -23,7 +23,7 @@ const Map = () => {
                 "searchdistance": searchDistance / 120000
             }
             try {
-                let response = await api.post("job/location", locationobj);
+                let response = await jobService.getNearbyJobs(searchDistance, {"type": "Internship", "status": "Open", "mode": "OnSite"});
                 setNearbyJobs(response.data);
             } catch (error) {
                 if(error == AxiosError)
@@ -54,7 +54,7 @@ const Map = () => {
         />
 
             <MapCard position={position} message={"This is you"} job={null}></MapCard>
-            {nearbyJobs.map((job) => (<MapCard position={[job.location.latitude, job.location.longitude]} job={job} message=""></MapCard>))}
+            {nearbyJobs && nearbyJobs.map((job) => (<MapCard position={[job.location.latitude, job.location.longitude]} job={job} message=""></MapCard>))}
 
         </MapContainer>
 

@@ -1,35 +1,56 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import { api } from '../services/APIClient';
+import { useToast } from '../contexts/ToastContext';
+import { HttpStatusCode } from 'axios';
+import { useNavigate } from 'react-router';
+import { jobService } from '../services/apiServices';
 const NewJob = () => {
+    const {showToast} = useToast();
+    const nagivate = useNavigate(); 
     async function postJob(jobData) {
         try {
-            const response = await api.post('/job/new', jobData);
-            console.log("Job posted successfully:", response.data);
+            const response = await jobService.createJob(jobData);
+            if(response.status == HttpStatusCode.Created){
+                console.log("Job posted successfully:", response.data);
+                return true;
+            }
+            else{
+                return false;
+            }
         } catch (error) {
-            console.error("Error posting job:", error)
+            console.error("Error posting job:", error);
+            return false;
         };
     }
-
-
+    
+    
     return <div className="container mt-5 mb-5">
         <div className="card shadow-sm p-4">
             <h4 className="mb-4">Create New Job</h4>
             <form onSubmit={async (e) => {
                 e.preventDefault();
                 const jobData = {
-                    title: e.target.jobTitle.value,
-                    description: e.target.description.value,
-                    responsibilities: e.target.responsibilities.value.split('\n'),
-                    termsAndConditions: e.target.termsandconditions.value.split('\n'),
-                    jobType: e.target.jobType.value,
-                    workMode: e.target.workMode.value,
-                    requiredWorkExperience: e.target.requiredWorkExperience.value,
-                    minimumSalary: e.target.minimumSalary.value,
-                    maximumSalary: e.target.maximumSalary.value,
-                    applicationsLimit: e.target.applicationLimit.value
+                    "title": e.target.jobTitle.value,
+                    "description": e.target.description.value,
+                    "responsibilities": e.target.responsibilities.value,
+                    "termsAndConditions": e.target.termsandconditions.value,
+                    "jobType": e.target.jobType.value,
+                    "workMode": e.target.workMode.value,
+                    "requiredWorkExperience": e.target.requiredWorkExperience.value,
+                    "minSalary": e.target.minimumSalary.value,
+                    "maxSalary": e.target.maximumSalary.value,
+                    "applicationsLimit": e.target.applicationLimit.value
                 }
-                await postJob(jobData);
-                e.target.reset();
+                let success = await postJob(jobData);
+                if(success){
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    showToast("Job posted successfully!", true);
+                    e.target.reset();
+                    nagivate('/jobs');
+                }
+                else{
+                    showToast("Job Could Not Be Created!", false);
+                }
                 }}>
             <div className="mb-3">
                 <label htmlFor="jobTitle" className="form-label">Job Title</label>
@@ -53,13 +74,17 @@ const NewJob = () => {
             </div>
 
             <div className="mb-3">
+                <label htmlFor="requiredWorkExperience" className="form-label">Required Work Experience (in years)</label>
+                <input type="number" className="form-control" id="requiredWorkExperience" placeholder="e.g. 5" required />
+            </div>
+
+            <div className="mb-3">
                 <label htmlFor="jobType" className="form-label">Job Type</label>
                 <select className="form-select" id="jobType" required>
                 <option value="">Select type</option>
-                <option>Full-time</option>
-                <option>Part-time</option>
-                <option>Contract</option>
-                <option>Internship</option>
+                <option value="FullTime">Full-time</option>
+                <option value="PartTime">Part-time</option>
+                <option value="Internship">Internship</option>
                 </select>
             </div>
 
@@ -68,15 +93,9 @@ const NewJob = () => {
                 <label htmlFor="workMode" className="form-label">Work Mode</label>
                 <select className="form-select" id="workMode" required>
                 <option value="">Select mode</option>
-                <option>Onsite</option>
-                <option>Remote</option>
-                <option>Hybrid</option>
+                <option value="OnSite">On-site</option>
+                <option value="WorkFromHome">Work From Home</option>
                 </select>
-            </div>
-
-            <div className="mb-3">
-                <label htmlFor="requiredWorkExperience" className="form-label">Required Work Experience (in years)</label>
-                <input type="number" className="form-control" id="requiredWorkExperience" placeholder="e.g. 5" required />
             </div>
 
             <div className="mb-3">
