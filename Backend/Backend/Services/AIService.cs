@@ -5,12 +5,10 @@ namespace Backend.Services;
 
 public class AIService {
     private readonly HttpClient _httpClient;
-    private readonly GithubService _githubService;
     private readonly string _chatEndpoint;
 
-    public AIService(HttpClient httpClient, GithubService githubService) {
+    public AIService(HttpClient httpClient) {
         _httpClient = httpClient;
-        _githubService = githubService;
         
         _httpClient.BaseAddress = new Uri("https://generativelanguage.googleapis.com");
         _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Backend", "1.0"));
@@ -37,6 +35,10 @@ public class AIService {
         var rawResponse = await response.Content.ReadFromJsonAsync<JsonElement>();
         var stringResponse = rawResponse.GetProperty("candidates")[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").ToString();
         return stringResponse;
+    }   
+
+    public JsonElement GetCleanedJson(string rawJsonString) {
+        rawJsonString = rawJsonString.Substring(rawJsonString.IndexOf("{", StringComparison.Ordinal), rawJsonString.IndexOf("}", StringComparison.Ordinal) - rawJsonString.IndexOf("{", StringComparison.Ordinal) + 1);
+        return JsonSerializer.Deserialize<JsonElement>(rawJsonString);
     }
-    
 }
