@@ -13,12 +13,19 @@ namespace Backend.Services;
 
 public class AuthService (IConfiguration config, AuthRepository repository) {
     
-    public async Task<string> GetGeneratedTokenAsync<T>(T credentials) where T : IJwtUser {
+    public async Task<string> GetGeneratedTokenAsync<T>(T credentials, bool isLogin = true) where T : IJwtUser {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetValue<string>("jwt:key") ?? string.Empty));
         var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         
         List<Claim> claims = [new Claim(JwtRegisteredClaimNames.NameId, (await repository.GetUserIdAsync(credentials)).ToString()), 
-            new Claim(JwtRegisteredClaimNames.Name, credentials.Username), new Claim(ClaimTypes.Role, credentials.Role.ToString())];
+            new Claim(JwtRegisteredClaimNames.Name, credentials.Username)];
+
+        if (isLogin) {
+            claims.Add(new Claim(ClaimTypes.Role, (await repository.GetUserRoleAsync(credentials)).ToString()));
+        }
+        else {
+            claims.Add(new Claim(ClaimTypes.Role, credentials.Role.ToString()));
+        }
 
         var tokenOptions = new JwtSecurityToken(
             audience: config.GetValue<string>("jwt:audience"),

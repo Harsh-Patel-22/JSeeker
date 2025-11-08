@@ -91,6 +91,10 @@ public class AuthRepository (ApplicationDbContext context) {
     }
 
     public async Task<Guid> GetUserIdAsync(IJwtUser credentials) {
-        return await context.UserCredentials.Where(uc => uc.Username == credentials.Username).Select(u => u.UserId).FirstOrDefaultAsync();
+        return await context.UserCredentials.Where(uc => uc.Username == credentials.Username || uc.Email == credentials.Username).Select(u => u.UserId).FirstOrDefaultAsync();
+    }
+
+    public async Task<Roles> GetUserRoleAsync(IJwtUser credentials) {
+        return await context.UserCredentials.Where(uc => uc.Username == credentials.Username || uc.Email == credentials.Username).Select(u => u.Role).FirstOrDefaultAsync();
     }
 }
