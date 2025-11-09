@@ -16,13 +16,19 @@ const AuthForm = ({ mode = "login" }) => {
   const [startRedirect, setStartRedirect] = useState(false);
 
   const onComplete = useCallback(() => {
-    if (!jwt) return;
-    const decoded = jwtDecode(jwt);
-    const role = decoded.role?.toLowerCase();
-    navigate(role === "hirer" ? "/dashboard/hirer" : "/dashboard/seeker");
-  }, [jwt, navigate]);
+  const token = localStorage.getItem("token") || jwt;
+  if (!token) {
+    console.error("No token found during redirect");
+    return;
+  }
+  const decoded = jwtDecode(token);
+  const role = decoded.role?.toLowerCase();
+  console.log("Redirecting based on role:", role);
+  navigate("/dashboard");
+}, [navigate]);
 
-  const progress = useProgressRedirect(onComplete, startRedirect ? 50 : null);
+
+  // const progress = useProgressRedirect(onComplete, startRedirect ? 50 : null);
 
   const fields =
     mode === "login"
@@ -70,16 +76,25 @@ const AuthForm = ({ mode = "login" }) => {
   };
 
   const handleSubmit = async (formData) => {
-    setLoading(true);
+    // setLoading(true);
+    console.log("Form submitted with data:", formData);
     try {
-      const res =
-        mode === "signup"
-          ? await authService.register(formData)
-          : await authService.login(formData);
+      if(mode === "login"){
+        let response = await authService.login(formData);
+        login(response.data);
+        navigate("/dashboard");
+      }
+      else if (mode === "signup") {
+        let response = await authService.register(formData)
+        login(response.data);
+        navigate(res.data.role.toLowerCase() === "hirer" ? "/hirerReg" : "/seekerReg");
 
-      login(res.data); // store token
-      showToast(`${mode === "signup" ? "Signup" : "Login"} successful!`, true);
-      setStartRedirect(true);
+      }
+      console.log(res);
+      showToast(`Authentication Successful!`, true);
+      console.log("Authentication successful, preparing to redirect...");
+
+
     } catch (err) {
       showToast(err.response?.data?.message || "Authentication Failed", false);
     } finally {
@@ -94,7 +109,7 @@ const AuthForm = ({ mode = "login" }) => {
       validate={validate}
       onSubmit={handleSubmit}
       loading={loading}
-      redirectProgress={startRedirect ? progress : null}
+      // redirectProgress={startRedirect ? progress : null}
     />
   );
 };

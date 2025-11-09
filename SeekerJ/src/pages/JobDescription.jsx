@@ -1,9 +1,10 @@
 import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
-import { api } from "../services/APIClient";
-import { Axios, AxiosError } from "axios";
+import { Axios, AxiosError, HttpStatusCode } from "axios";
 import { useAuth } from "../contexts/AuthContext";
-import { Apply } from "../components/Apply";
+// import { Apply } from "../components/Apply";
+import { applyToJob } from "../services/Utils";
+import ConfirmModal from "../components/forms/ConfirmModal";
 import { jobService } from "../services/apiServices";
 import { postedDateToText } from "../services/Utils";
 
@@ -11,10 +12,34 @@ const JobDescription = () => {
     let location = useLocation();
     let {jobData} = location.state;
     let [job, setJob] = useState({});
+    let [showConfirm, setShowConfirm] = useState(false);
+    let [loading, setLoading] = useState(false);
 
     let {user} = useAuth();
     let type = user.role.toLowerCase();
     // console.log(job)
+
+    async function apply(applicationData) {
+        setLoading(true);
+        try{
+
+          let response = await applyToJob(applicationData);
+          if(response.status == 200){
+            showToast("Application Created Successfully!", true);
+          }
+          else{
+            showToast("Error in Creating Application!", false);
+          }
+        }
+        catch(error){
+          if(error == HttpStatusCode.InternalServerError){
+            console.log("Internal Server Error");
+            showToast("Application Already Exist!", false);
+        }
+      }
+        setShowConfirm(false);
+        setLoading(false)
+    }
 
     useEffect(() => {
       async function getAllJobDetails() {
@@ -49,7 +74,8 @@ const JobDescription = () => {
         </div>
       </div>
       <div className="mt-3 mt-md-0">
-        {type == "seeker" && <button className="btn btn-primary0" onClick={Apply({seekerId:user["clientId"], hirerId:job.hirerId, jobId: job.id, jobType: job.type})}>Apply</button>}
+        {type == "seeker" && <button className="btn btn-primary" onClick={() => setShowConfirm(true)}>Apply</button>}
+        <ConfirmModal loading={loading} show={showConfirm} onConfirm={() => apply({"seekerId": user.clientId, "jobId": job.id, "hirerId": job.hirerId, "jobType": job.type})} onCancel={() => setShowConfirm(false)}  message={<>Confirm Application Creation</>}/>
       </div>
     </div>
 

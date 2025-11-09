@@ -1,4 +1,4 @@
-const ProjectsSection = () => {
+const ProjectsSection = ({details}) => {
   const projects = [
     {
       name: "Micro-Jobs Platform",
@@ -24,19 +24,20 @@ const ProjectsSection = () => {
     <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
       <h5 className="fw-bold mb-3">Projects</h5>
       <div className="row g-4">
-        {projects.map((project, idx) => (
+        {details && details.map((project, idx) => (
           <div className="col-md-6" key={idx}>
             <div className="card h-100 border-0 shadow-sm rounded-3 p-3">
               <h6 className="fw-semibold mb-1">{project.name}</h6>
               <div className="d-flex flex-wrap gap-2 mb-2">
-                {project.tech.map((t, i) => (
+                {project.technologiesUsages?.map((t, i) => (
                   <span key={i} className="badge bg-success-subtle text-success fw-medium rounded-pill px-2 py-1">
-                    {t}
+                    {t.name}
                   </span>
                 ))}
               </div>
-              <p className="text-muted small mb-2">{project.timeframe}</p>
-              <a href={project.github} target="_blank" rel="noopener noreferrer" className="btn btn-outline-dark btn-sm">
+              <p className="text-muted small mb-2">{project.description ? project.description : "NO DESCRIPTION AVAILABLE"}</p>
+              <p className="text-muted small mb-2">{project.startDate} - {project.lastUpdatedDate}</p>
+              <a href={project.githubRepoLink} target="_blank" rel="noopener noreferrer" className="btn btn-outline-dark btn-sm">
                 View on GitHub
               </a>
             </div>

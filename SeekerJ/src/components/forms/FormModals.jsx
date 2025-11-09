@@ -166,16 +166,34 @@ export const LanguageModal = ({setShowAddLanguageButton, updateState, onSubmit})
   );
 }
 
-export const InterviewSchedulingModal = ({show, setShow, onSubmit}) => {
+export const InterviewSchedulingModal = ({show, setShow, onSubmit, setInterviewData, hasMode = true}) => {
   
   const fields = [
       { name: "date", label: "Date", type: "date", required: true, twoColumn: true },
       { name: "time", label: "Time", type: "time", required: true, twoColumn: true },
+      hasMode && { name: "mode", label: "Mode", type: "select", options: [{value: "online", label: "Online"}, {value: "inPerson", label: "InPerson"}] ,required: true },
   ];
   
-  // const handleSubmit = (values) => {
-  //     console.log("Form Submitted:", values);
-  // };
+  const handleSubmit = (entries) => {
+    onSubmit();
+
+    const values = entries[0];
+
+    if(hasMode){
+
+      setInterviewData({
+        date: values.date,
+        time: values.time,
+        mode: values.mode,
+      });
+    }
+    else{
+      setInterviewData({
+        date: values.date,
+        time: values.time,
+      });
+    }
+  };
 
   const validate = (data) => {
       const errors = []
@@ -184,7 +202,7 @@ export const InterviewSchedulingModal = ({show, setShow, onSubmit}) => {
   }
 
   return (
-      <BaseModalWithoutButton title="Schedule Interview" validate={validate} show={show} setShow={setShow} handleSubmit={onSubmit} fields={fields}></BaseModalWithoutButton>
+      <BaseModalWithoutButton title="Schedule Interview" validate={validate} show={show} setShow={setShow} handleSubmit={handleSubmit} fields={fields}></BaseModalWithoutButton>
   );
 }
 

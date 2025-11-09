@@ -16,6 +16,13 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ResumeEditForm from './pages/ResumeEditForm';
+import HirerRegistrationForm from './components/forms/HirerRegistrationForm';
+import SeekerSecondaryDetails from './components/forms/SeekerSecondaryDetails';
+import GithubForm from './components/forms/GithubForm';
+import MetricsLandingPage from './pages/MetricsLandingPage';
+import UnauthNavbar from './components/UnauthNavbar';
+import ResumeBuilderPage from './pages/ResumeBuilderPage';
 
 const App = () => {
   const authVar = useAuth();
@@ -26,33 +33,74 @@ const App = () => {
   }
 }, [user]);
   return <>
-    {isAuthenticated() && <Navbar />}
+    {isAuthenticated() ? <Navbar /> : <UnauthNavbar />}
+    <div className="min-vh-100">
     <Routes>
       {/* {console.log("isAuthenticated:", isAuthenticated())} */}
       {/* {console.log("isAuthenticated user:", user)} */}
       {console.log("AuthVar:", authVar)}
       {isAuthenticated() ? (
         <>
-          <Route path="/dashboard/hirer" element={<HirerDashboard />} />
-          <Route path="/dashboard/seeker" element={<SeekerDashboard />} />
+
+          {/* <Route path="/" element={<LoginPage />} /> */}
+          {console.log(user?.role)}
+          {user.role === "Hirer" ? (
+            <>
+              <Route path="/dashboard" element={<HirerDashboard />} />
+              <Route path="/job/new" element={<NewJob />} />
+              <Route path="/applications" element={<ApplicationsPage />} />
+
+              {/* Unauthorised */}
+              {/* <Route path="/dashboard/seeker" element={<UnauthorisedPage />} /> */}
+              <Route path="/*" element={<UnauthorisedPage />} />
+            </>
+          ): (
+            <>
+              <Route path="/dashboard" element={<SeekerDashboard />} />
+              {/* Resume Builder Route */}
+
+              {/* Unauthorised */}
+              {/* <Route path="/dashboard/hirer" element={<UnauthorisedPage />} /> */}
+              <Route path="/job/new" element={<UnauthorisedPage />} />
+              <Route path="/applications" element={<UnauthorisedPage />} />
+              <Route path="/*" element={<UnauthorisedPage />} />
+            </>
+          )}
+
+          {/* Common to both */}
           <Route path="/job" element={<JobDescription />} />
-          <Route path="/job/new" element={<NewJob />} />
           <Route path="/jobs" element={<ViewJobs />} />
           <Route path="/interviews" element={<InterviewSchedule />} />
-          <Route path="/applications" element={<ApplicationsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/resume" element={<ResumeBuilderPage />} />
+
+          {/* Testing */}
+          <Route path="/seekerReg" element={<SeekerSecondaryDetails />} />
+          <Route path="/githubForm" element={<GithubForm />} />
+          <Route path="/resume/edit" element={<ResumeEditForm />} />
+          <Route path="/hirerReg" element={<HirerRegistrationForm />} />
         </>
       ) : (
         <>
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/" element={<MetricsLandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/testing" element={<Testing />} />
           <Route path="/*" element={<UnauthorisedPage />} />
+
+          {/* Testing */}
+        {/* <Route path="/jobs" element={<ViewJobs />} />
+        <Route path="/seekerReg" element={<SeekerSecondaryDetails />} />
+        <Route path="/githubForm" element={<GithubForm />} />
+        <Route path="/applications" element={<ApplicationsPage />} />
+        <Route path="/interviews" element={<InterviewSchedule />} /> */}
+          {/* <Route path="/hirerReg" element={<HirerRegistrationForm />} /> */}
         </>
       )}
     </Routes>
-    {isAuthenticated() && <Footer />}
-      </>;
+    </div>
+    <Footer />
+      </>
  
 };
 

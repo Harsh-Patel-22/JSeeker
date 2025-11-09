@@ -4,23 +4,22 @@ import './Map.css'
 import { useEffect, useState } from 'react';
 import MapCard from './MapCard';
 import { AxiosError } from 'axios';
-import { jobService } from '../services/apiServices';
+import { jobService, userService } from '../services/apiServices';
 
-// TODO - Add a circle with the user position as the centre. A transparent green circle showing the search distance. 
 const Map = () => {
     // TODO - Remove all the logical code from here and add it to the upper component. Just pass in the data as props to this component in order to render
-    const position = [54.505, 45] // TODO - set the position dynamically based on the user lcoation 
+    const [position, setPosition] = useState([54.505, 45])
     // TODO - Fetch the position based on the user position for the map center, also get the nearby positions of the hirers and data from the backend and populate the map with the same.
     let [nearbyJobs, setNearbyJobs] = useState([])
     let [searchTerm, setSearchTerm] = useState("")
-    let [searchDistance, setSearchDistance] = useState(10)
+    let [searchDistance, setSearchDistance] = useState(5)
     
     useEffect(() => {
         async function searchAndFetchNearbyJobs() {
             let locationobj = {
                 "latitude": position[0],
                 "longitude": position[1],
-                "searchdistance": searchDistance / 120000
+                "searchdistance": searchDistance / 1200
             }
             try {
                 let response = await jobService.getNearbyJobs(searchDistance, {"type": "Internship", "status": "Open", "mode": "OnSite"});
@@ -32,13 +31,84 @@ const Map = () => {
                   console.log(error)
             }
         }
+//         setNearbyJobs([
+//   {
+//     "id": 1,
+//     "title": "Frontend Developer Intern",
+//     "companyName": "TechNova Solutions",
+//     "type": "Internship",
+//     "distance": 2.3,
+//     "address": {
+//       "id": 101,
+//       "houseNumber": "12A",
+//       "society": "Silver Leaf Residency",
+//       "street": "Prahlad Nagar Road",
+//       "city": "Ahmedabad",
+//       "state": "Gujarat",
+//       "country": "India",
+//       "postalCode": "380015",
+//       "latitude": 23.0208,
+//       "longitude": 72.5714
+//     },
+//     "hirerId": "e4b50a8e-3f3a-4df1-85c3-7b6a5c3b8a21"
+//   },
+//   {
+//     "id": 2,
+//     "title": "Backend Engineer",
+//     "companyName": "CloudBridge Technologies",
+//     "type": "FullTime",
+//     "distance": 4.1,
+//     "address": {
+//       "id": 102,
+//       "houseNumber": "7B",
+//       "society": "Galaxy Business Park",
+//       "street": "SG Highway",
+//       "city": "Ahmedabad",
+//       "state": "Gujarat",
+//       "country": "India",
+//       "postalCode": "380054",
+//       "latitude": 23.0251,
+//       "longitude": 72.5642
+//     },
+//     "hirerId": "cbeec771-1df3-4207-b412-7129ef8f1e33"
+//   },
+//   {
+//     "id": 3,
+//     "title": "UI/UX Designer",
+//     "companyName": "PixelWave Studio",
+//     "type": "PartTime",
+//     "distance": 1.8,
+//     "address": {
+//       "id": 103,
+//       "houseNumber": "301",
+//       "society": "Sun Corporate Hub",
+//       "street": "Drive-In Road",
+//       "city": "Ahmedabad",
+//       "state": "Gujarat",
+//       "country": "India",
+//       "postalCode": "380052",
+//       "latitude": 23.0185,
+//       "longitude": 72.5789
+//     },
+//     "hirerId": "7e29b52f-9093-4b57-9929-f1ab9b1e34dd"
+//   }
+// ]
+// );
         searchAndFetchNearbyJobs();
     }, [searchDistance]);
+
+    useEffect(() => {
+      async function fetchUserCoordinates() {
+        let response = await userService.getCoordinates()
+        setPosition([response.data?.latitude, response.data?.longitude]);
+      }
+      fetchUserCoordinates();
+    }, []);
 
     return <>
         <MapContainer 
       center={position} 
-      zoom={5} // TODO - set the searchDistance level dynamically based on the search distance
+      zoom={11} // TODO - set the searchDistance level dynamically based on the search distance
       scrollWheelZoom={false} 
       style={{ height: "75vh", width: "100%" }}
     >
@@ -54,7 +124,8 @@ const Map = () => {
         />
 
             <MapCard position={position} message={"This is you"} job={null}></MapCard>
-            {nearbyJobs && nearbyJobs.map((job) => (<MapCard position={[job.location.latitude, job.location.longitude]} job={job} message=""></MapCard>))}
+            {nearbyJobs && nearbyJobs.map((job) => (<MapCard position={[job?.address?.latitude, job?.address?.longitude]} job={job} message=""></MapCard>))}
+            {console.log(nearbyJobs)}
 
         </MapContainer>
 
@@ -73,11 +144,11 @@ const Map = () => {
             type="range"
             min="1"
             max="20"
-            value={searchDistance / 120000}
-            onChange={(e) => setSearchDistance(e.target.value * 120000)}
+            value={searchDistance / 1200}
+            onChange={(e) => setSearchDistance(e.target.value * 1200)}
             className="slider"
             />
-          <span className="slider-value">{searchDistance/ 120000}</span>
+          <span className="slider-value">{searchDistance/ 1200}</span>
         </div>
         <center>Set Search Distance</center>
       </div>

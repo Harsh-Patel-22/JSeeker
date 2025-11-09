@@ -47,16 +47,35 @@ const GithubForm = () => {
         return errors;
     };
 
-    const handleUsernameSubmit = async (formData) => {
+    const handleSubmit = async (formData) => {
         setLoading(true);
         try {
-            console.log(formData.githubUsername);
-            // const res = await userService.updateGithubUsername(formData.githubUsername);
-        
-            if(true || res.status === HttpStatusCode.Ok){
-                showToast("Github Linked Successfully!", true);
-                setFillingState(States.RepoNamesInput);
-                // setStartRedirect(true);
+            if(fillingState == States.RepoNamesInput){
+                let res;
+                if(formData == null){
+                    res = await userService.updateAutoPickRepoNames();
+                }
+                else{
+                    const repoNamesArray = formData.repoNames.split(',').map(name => name.trim()).filter(name => name !== "");
+                    console.log(repoNamesArray);
+                    res = await userService.updateRepoNames(repoNamesArray);
+                }
+                if(true || res.status === HttpStatusCode.Ok){
+                    showToast("Repository Names Updated Successfully!", true);
+                    setFillingState(States.Completed);
+                    navigate("/dashboard");
+                    // setStartRedirect(true);
+                }
+            }
+            else if(fillingState == States.GithubUsernameInput){
+                console.log(formData.githubUsername);
+                const res = await userService.updateGithubUsername(formData.githubUsername);
+            
+                if(true || res.status === HttpStatusCode.Ok){
+                    showToast("Github Linked Successfully!", true);
+                    setFillingState(States.RepoNamesInput);
+                    // setStartRedirect(true);
+                }
             }
         } catch (err) {
         showToast(err.response?.data?.message || "Linking Failed", false);
@@ -73,7 +92,7 @@ const GithubForm = () => {
                 title="Github Linking"
                 fields={fields}
                 validate={validate}
-                onSubmit={handleUsernameSubmit}
+                onSubmit={handleSubmit}
                 loading={loading}
                 redirectProgress={startRedirect ? progress : null}
             />}
@@ -81,7 +100,7 @@ const GithubForm = () => {
             {fillingState == States.RepoNamesInput && 
             <>
                 <div className="d-flex justify-content-center">
-                    <button className="btn btn-primary mb-3 w-100" onClick={() => setFillingState(States.Completed)}>Auto select the best</button>
+                    <button className="btn btn-primary mb-3 w-100" onClick={() => handleSubmit(null)}>Auto select the best</button>
                 </div>
 
                 <div className="d-flex justify-content-center">
@@ -92,7 +111,7 @@ const GithubForm = () => {
                     subtitle="At max 3 repos"
                     fields={repoFields}
                     validate={validate}
-                    onSubmit={handleUsernameSubmit}
+                    onSubmit={handleSubmit}
                     loading={loading}
                     redirectProgress={startRedirect ? progress : null
                     }

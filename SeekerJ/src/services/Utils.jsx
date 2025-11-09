@@ -1,3 +1,5 @@
+import { blobApi } from './APIClient';
+import { applicationService, jobService } from './apiServices';
 
 export function postedDateToText(postedDate){
     console.log(postedDate)
@@ -26,4 +28,31 @@ export function postedDateToText(postedDate){
     else{
         return baseString;
     }
+}
+
+export async function fetchResumePDF(targetClientId) {
+    let response = await blobApi.post('user/get/resume/pdf', targetClientId);
+    const file = new Blob([response.data], { type: "application/pdf" });
+    const fileURL = URL.createObjectURL(file);
+
+    window.open(fileURL, "_blank");
+}
+
+export async function downloadResumePDF(targetClientId, fileName) {
+  const response = await blobApi.post('user/get/resume/pdf', targetClientId);
+  const file = new Blob([response.data], { type: "application/pdf" });
+  const url = URL.createObjectURL(file);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+export async function applyToJob(applicationData) {
+    await applicationService.apply(applicationData);
 }

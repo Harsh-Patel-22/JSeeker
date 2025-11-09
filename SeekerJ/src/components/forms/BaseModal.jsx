@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {renderFields} from "./BaseForm";
-import SpinnerButton from "../ui/SprinnerButton";
+import SpinnerButton from "../ui/SpinnerButton";
 
 const BaseModal = ({
   title,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SpinnerButton from "../ui/SprinnerButton";
+import SpinnerButton from "../ui/SpinnerButton";
 
 // TODO - Add a showRequired bool in the fields...
 
@@ -191,12 +191,13 @@ const BaseForm = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    console.log("BaseForm handleSubmit called with data:", formData);
     e.preventDefault();
     const validationErrors = validate ? validate(formData) : {};
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
-      onSubmit(formData);
+      await onSubmit(formData);
     }
   };
 
@@ -215,6 +216,7 @@ const BaseForm = ({
 
       <form onSubmit={handleSubmit}>
         {renderFields(fields, errors, handleChange, loading, formData)}
+        {/* <button type="submit">Submit</button> */}
         <SpinnerButton loading={loading} type="submit">Submit</SpinnerButton>
       </form>
 

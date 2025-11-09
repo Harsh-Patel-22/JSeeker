@@ -130,14 +130,15 @@ const SeekerBasicDetailsForm = () => {
 
         // TODO - Test the below things..
         educationDetails: formData.educationDetails,
-        workDetails: formData.workDetails,
-        languageDetails: formData.languageDetails
+        workExperienceDetails: formData.workExperienceDetails,
+        VocalLanguageDetails: formData.languageDetails
       }
       console.log("Secondary Details to be sent: ", secondaryDetails);
       const res = await userService.updateSecondaryDetails(secondaryDetails);
       if(res.status === HttpStatusCode.Ok){
         showToast("Successfully Registered!", true);
-        setStartRedirect(true);
+        navigate("/githubForm");
+        // setStartRedirect(true);
       }
     } catch (err) {
       showToast(err.response?.data?.message || "Failed", false);

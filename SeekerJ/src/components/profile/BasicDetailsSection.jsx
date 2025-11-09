@@ -1,22 +1,23 @@
 import 'bootstrap/dist/css/bootstrap.css'
 
-const BasicDetailsSection = () => {
+const BasicDetailsSection = ({details}) => {
   return (
     <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
       <div className="d-flex flex-column flex-md-row align-items-center gap-4">
         <img
-          src="https://via.placeholder.com/100"
+          src="https://www.pngmart.com/files/23/Profile-PNG-Photo.png"
           alt="Profile"
           className="rounded-circle"
           width="100"
           height="100"
         />
         <div>
-          <h4 className="fw-bold mb-0">Harsh Patel</h4>
-          <p className="text-muted mb-1">B.Tech CSE Student • Gujarat, India</p>
-          <p className="text-muted small">
+          <h4 className="fw-bold mb-3 mt-3">{details?.firstName} {details?.lastName}</h4>
+          <p className="text-muted mb-0">{details?.aboutLine} </p>
+          <p className="text-muted small">{details?.state}, {details?.country}</p>
+          {/* <p className="text-muted small">
             Focused on Full Stack Development | Game Dev | YouTuber (About/Description)
-          </p>
+          </p> */}
         </div>
       </div>
     </div>
