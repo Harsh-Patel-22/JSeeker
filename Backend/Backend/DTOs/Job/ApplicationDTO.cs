@@ -4,7 +4,6 @@ namespace Backend.DTOs.Job;
 
 public class ApplicationDto {
     public int ApplicationId { get; set; }
-    public Guid ApplicantId { get; set; }
     public int JobId { get; set; }
     public Guid HirerId { get; set; }
     public Guid SeekerId { get; set; }
@@ -21,7 +20,7 @@ public class ApplicationDto {
     
     
     // TODO - Find a way to fetch this and send... 
-    public List<string> Technologies { get; set; }
+    public string Technologies { get; set; }
     public DateOnly AppliedOn { get; set; }
     public int AIGivenRating { get; set; }
     // public byte[]? PrecreatedResume { get; set; }

@@ -11,7 +11,6 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
         foreach (var jobId in jobsIdList) {
             var applications = await context.Applications.Include(app => app.Job).Include(app => app.Seeker).Where(app => app.JobId == jobId).Select(app => new ApplicationDto() {
                 ApplicationId = app.ApplicationId,
-                ApplicantId = app.SeekerId,
                 HirerId = app.HirerId,
                 SeekerId = app.SeekerId,
                 JobId = app.JobId,
@@ -27,7 +26,8 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
                 PhoneNumber = app.Seeker.PhoneNumber,
                 
                 ResumeJsonString = app.Seeker.ResumeJsonString,
-                ResumeTemplateNumber = app.Seeker.ResumeTemplateNumber
+                ResumeTemplateNumber = app.Seeker.ResumeTemplateNumber,
+                Technologies = app.Seeker.TechnicalKeywords,
             }).ToListAsync();
             
             jobWiseApplications.Add(jobId, applications);
@@ -69,5 +69,9 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
             jobWiseInterviews.Add(jobId, interviews);
         }
         return jobWiseInterviews;
+    }
+    
+    public async Task<string?> GetUserStateFromAddressAsync(Guid userId) {
+        return  await context.Users.Where(user => user.Id == userId).Include(u => u.Address).Select(u => u.Address.State).FirstOrDefaultAsync(); 
     }
 }

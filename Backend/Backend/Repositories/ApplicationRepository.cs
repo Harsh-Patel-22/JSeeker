@@ -10,7 +10,7 @@ namespace Backend.Repositories;
 public class ApplicationRepository (ApplicationDbContext context) {
     public async Task<List<ApplicationDto>> GetAllApplicationsByUserIdByStateAsync(Guid userId, ApplicationState applicationState) {
         var applications = await context.Applications.Include(application => application.Job).Include(application => application.Seeker).ThenInclude(seeker => seeker.Projects).Where(application => application.HirerId == userId && application.State == applicationState).Select(application => new ApplicationDto() {
-            ApplicantId = application.SeekerId,
+            ApplicationId = application.ApplicationId,
             JobId = application.JobId,
             HirerId = application.HirerId,
             SeekerId = application.SeekerId,
@@ -24,9 +24,7 @@ public class ApplicationRepository (ApplicationDbContext context) {
             AIGivenRating = application.AIGivenRating,
             ResumeJsonString = application.Seeker.ResumeJsonString,
             ResumeTemplateNumber = application.Seeker.ResumeTemplateNumber,
-            
-            // TODO - Fix the technologies field
-            // Technologies = application.Seeker.
+            Technologies = application.Seeker.TechnicalKeywords,
         }).ToListAsync();
         return applications;
     }
@@ -59,7 +57,7 @@ public class ApplicationRepository (ApplicationDbContext context) {
 
     public async Task<ApplicationDto> GetApplicationByIdAsync(int applicationId) {
         return (await context.Applications.Include(application => application.Job).Include(application => application.Seeker).Where(application => application.ApplicationId == applicationId).Select(application => new ApplicationDto() {
-            ApplicantId = application.SeekerId,
+            ApplicationId = application.ApplicationId,
             JobId = application.JobId,
             HirerId = application.HirerId,
             SeekerId = application.SeekerId,
@@ -73,9 +71,19 @@ public class ApplicationRepository (ApplicationDbContext context) {
             AIGivenRating = application.AIGivenRating,
             ResumeJsonString = application.Seeker.ResumeJsonString,
             ResumeTemplateNumber = application.Seeker.ResumeTemplateNumber,
+            Technologies = application.Seeker.TechnicalKeywords,
         }).FirstOrDefaultAsync())!;
     }
 
+    public async Task<ApplicationKeyInformationDto> GetApplicationKeyDetiailsByIdAsync(int applicationId) {
+        return (await context.Applications.Where(a => a.ApplicationId == applicationId).Select(a => new ApplicationKeyInformationDto(
+            a.JobId,
+            a.SeekerId,
+            a.HirerId
+            )
+        ).FirstOrDefaultAsync())!;
+    }
+    
     public async Task<Guid> GetSeekerIdByApplicationIdAsync(int applicationId) {
         return await context.Applications.Where(appl => appl.ApplicationId == applicationId).Select(appl => appl.SeekerId).FirstOrDefaultAsync();
     }
