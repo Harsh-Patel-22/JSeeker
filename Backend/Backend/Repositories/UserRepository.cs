@@ -122,6 +122,22 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         return await context.Users.Where(user => user.Id == userId).Select(user => user.ResumeJsonString).FirstOrDefaultAsync();
     }
 
+    public async Task<AddressCoordinatesDto> GetCoordinatesAsync(Guid userId) {
+        return await context.Users.Where(user => user.Id == userId).Include(user => user.Address).Select(user => new AddressCoordinatesDto() {
+            Latitude = user.Address.Latitude,
+            Longitude = user.Address.Longitude,
+        }).FirstOrDefaultAsync();
+    }
+    
+    public async Task<ApplicantDetailsDto> GetApplicantDetailsAsync(Guid userId) {
+        return await context.Users.Where(user => user.Id == userId).Select(user => new ApplicantDetailsDto() {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber,
+            // Skills = user.TechnicalKeywords.Split(',').ToList(),
+        }).FirstOrDefaultAsync();
+    }
+
     public async Task<ResumeTemplateAndStringDto> GetResumeAndTemplateNumberAsync(Guid userId) {
         return await context.Users.Where(user => user.Id == userId).Select(user => new ResumeTemplateAndStringDto() {
             ResumeString = user.ResumeJsonString,
@@ -154,6 +170,7 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         return technologiesList;
     }
     
+    
     // Section - Updating the metric fields
     public async Task IncrementSuccessCountAsync(Guid userId) {
         try {
@@ -179,6 +196,16 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
     }
     
     // Section - Profile Related
+    public async Task<UserProfileDetailsDto> GetProfileDetailsAsync(Guid userId) {
+        UserProfileDetailsDto dto = new UserProfileDetailsDto();
+        dto.BasicDetails =  await GetBasicDetailsAsync(userId);
+        dto.EducationDetails =  await GetEducationDetailsAsync(userId);
+        dto.ProjectDetails =  await GetProjectsAsync(userId);
+        dto.VocalLanguage =  await GetVocalLanguagesAsync(userId);
+        dto.WorkExperienceDetails = await GetWorkExperienceDetailsAsync(userId);
+        dto.ContactDetails = await GetContactDetailsAsync(userId);
+        return dto;
+    }
     public async Task<BasicDetailsDto?> GetBasicDetailsAsync(Guid userId) {
         var details = await (from user in context.Users
             join address in context.Addresses on user.AddressId equals address.Id 
@@ -241,12 +268,14 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
     }
 
     public async Task<List<EducationDetailsDto>> GetEducationDetailsAsync(Guid userId) {
-        var educationDetails = await (from education in context.Educations where education.UserId == userId select new EducationDetailsDto(education.Study, education.InstituteName, education.State, education.Country, education.StartDate, education.EndDate)).ToListAsync();  
+        // var educationDetails = await (from education in context.Educations where education.UserId == userId select new EducationDetailsDto(education.Study, education.InstituteName, education.State, education.Country, education.StartDate, education.EndDate)).ToListAsync();  
+        var educationDetails = await context.Educations.Where(education => education.UserId == userId).OrderByDescending(we => we.StartDate).Select(e => new EducationDetailsDto(e.Study, e.InstituteName, e.State, e.Country, e.StartDate, e.EndDate)).ToListAsync();
         return educationDetails;
     }
 
     public async Task<List<WorkExperienceDetailsDto>> GetWorkExperienceDetailsAsync(Guid userId) {
-        var workExperienceDetails = await (from workExperience in context.WorkExperiences where workExperience.UserId == userId select new WorkExperienceDetailsDto(workExperience.Role, workExperience.Description, workExperience.CompanyName, workExperience.StartDate, workExperience.EndDate)).ToListAsync();  
+        var workExperienceDetails = await context.WorkExperiences.Where(workExperience => workExperience.UserId == userId).OrderByDescending(we => we.StartDate).Select(we => new WorkExperienceDetailsDto(we.Role, we.Description, we.CompanyName, we.StartDate, we.EndDate)).ToListAsync();
+        // var workExperienceDetails = await (from workExperience in context.WorkExperiences where workExperience.UserId == userId select new WorkExperienceDetailsDto(workExperience.Role, workExperience.Description, workExperience.CompanyName, workExperience.StartDate, workExperience.EndDate)).ToListAsync();  
         return workExperienceDetails;
     }
 }

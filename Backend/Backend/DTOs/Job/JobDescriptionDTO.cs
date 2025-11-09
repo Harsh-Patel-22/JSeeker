@@ -11,7 +11,7 @@ public class JobDescriptionDto {
     
     public string Description { get; set; }
     public string TermsAndConditions { get; set; }
-    public string Responsibilites { get; set; }
+    public string Responsibilities { get; set; }
     public int RequiredWorkExperience { get; set; }
     
     public decimal MinSalary { get; set; }
