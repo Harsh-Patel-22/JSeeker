@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Backend.DTOs;
 using Backend.DTOs.Job;
 using Backend.Extensions;
+using Backend.Models;
 using Backend.Models.Users;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,11 +14,11 @@ namespace Backend.Controllers;
 [Route("api/interview")]
 [Authorize(Roles = "Hirer,Seeker")]
 public class InterviewController (JobService jobService) : ControllerBase {
-    [HttpGet("get/scheduled={scheduled}")]
-    public async Task<IActionResult> GetInterviewsAsync([FromRoute] bool scheduled) {
+    [HttpGet("get/state={state}")]
+    public async Task<IActionResult> GetInterviewsAsync([FromRoute] InterviewState state) {
         Guid userId = User.GetNameIdentifier();
         Roles role = User.GetRole();
-        var interviews = await jobService.GetInterviewsByIdByScheduleStatusAsync(userId, role, scheduled);
+        var interviews = await jobService.GetInterviewsByIdByScheduleStatusAsync(userId, role, state);
         return Ok(interviews);
     }
 
@@ -46,6 +47,7 @@ public class InterviewController (JobService jobService) : ControllerBase {
     public async Task<IActionResult> CreateInterviewAsync([FromBody] CreateInterviewDto interviewDto) {
         if (await jobService.CreateInterviewAsync(interviewDto)) {
             return Ok();
+            
         }
         return BadRequest("Failed to create interview");
     }

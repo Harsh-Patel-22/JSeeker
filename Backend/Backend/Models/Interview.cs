@@ -9,6 +9,12 @@ public enum InterviewMode {
     InPerson
 }
 
+public enum InterviewState {
+    Scheduled,
+    Taken,
+    Updates
+}
+
 public class Interview {
     [Key]
     public int ApplicationId { get; set; }
