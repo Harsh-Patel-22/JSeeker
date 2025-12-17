@@ -21,6 +21,9 @@ public class PdfService {
         
         var files = System.IO.Directory.EnumerateFiles("./../Backend/PdfHtmlTemplates").ToArray();
         var templateContent = await File.ReadAllTextAsync(files[templateNumber ?? 0]);
+        if (resumeJsonString.Equals("")) {
+          throw new Exception("Resume JSON string is empty");
+        }
         JsonElement resumeContent = JsonSerializer.Deserialize<JsonElement>(resumeJsonString);
         
         JsonElement BasicDetails = resumeContent.GetProperty("BasicDetails");
@@ -34,74 +37,96 @@ public class PdfService {
         // string htmlContent = templateContent.Replace("{{FirstName}}", BasicDetials.GetProperty("FirstName").GetString()).Replace("{{LastName}}",  BasicDetials.GetProperty("LastName").GetString()).Replace("{{State}}",  BasicDetials.GetProperty("State").GetString()).Replace("{{Country}}", BasicDetials.GetProperty("Country").GetString()).Replace("{{AboutLine}}", BasicDetials.GetProperty("AboutLine").GetString()).Replace("{{Email}}", ContactDetials.GetProperty("Email").GetString()).Replace("PhoneNumber", ContactDetials.GetProperty("PhoneNumber").GetString()).Replace();
 
         // Adding the projects in the template
-        string projectTemplate = @"
-        <div class='mb-3'>
-          <h5>{{ProjectName}}</h5>
-          <p>{{ProjectDescription}}</p>
-          <p><strong>Technologies:</strong> {{Technologies}}</p>
-          <p><small>{{StartDate}} – {{LastUpdatedDate}}</small></p>
-          <a href='{{GithubRepoLink}}'>GitHub Repo</a>
-        </div>";
 
         var projectsStringBuilder = new StringBuilder();
-        foreach (var projectProperty in ProjectDetails.EnumerateObject()) {
-          var project =  projectProperty.Value;
-          var projectHtml = projectTemplate.Replace("{{ProjectName}}", project.GetProperty("Name").GetString())
-            .Replace("{{ProjectDescription}}", project.GetProperty("Description").GetString()).Replace("{{StartDate}}", project.GetProperty("StartDate").GetString()).Replace("{{LastUpdateDate}}",  project.GetProperty("LastUpdatedDate").GetString()).Replace("{{GithubRepoLink}}", project.GetProperty("GithubRepoLink").GetString());
-          
-          var technologyUsages = project.GetProperty("TechnologiesUsages").EnumerateArray()
-            .Select(element => element.GetProperty("Name")).ToArray();
-          string technologyUsagesString = string.Join(", ", technologyUsages);
-          projectHtml = projectHtml.Replace("{{TechnologyUsages}}", technologyUsagesString);
-          
-          projectsStringBuilder.AppendLine(projectHtml);
+        if (ProjectDetails.GetArrayLength() > 0) {
+          string projectTemplate = @"
+          <div class='mb-3'>
+            <h5>{{ProjectName}}</h5>
+            <p>{{ProjectDescription}}</p>
+            <p><strong>Technologies:</strong> {{Technologies}}</p>
+            <p><small>{{StartDate}} – {{LastUpdatedDate}}</small></p>
+            <a href='{{GithubRepoLink}}'>GitHub Repo</a>
+          </div>";
+          foreach (var project in ProjectDetails.EnumerateArray()) {
+            var projectHtml = projectTemplate.Replace("{{ProjectName}}", project.GetProperty("Name").GetString())
+              .Replace("{{ProjectDescription}}", project.GetProperty("Description").GetString()).Replace("{{StartDate}}", project.GetProperty("StartDate").GetString()).Replace("{{LastUpdatedDate}}",  project.GetProperty("LastUpdatedDate").GetString()).Replace("{{GithubRepoLink}}", project.GetProperty("GithubRepoLink").GetString());
+            
+            var technologyUsages = project.GetProperty("TechnologiesUsages").EnumerateArray()
+              .Select(element => element.GetProperty("Name")).ToArray();
+            string technologyUsagesString = string.Join(", ", technologyUsages);
+            projectHtml = projectHtml.Replace("{{Technologies}}", technologyUsagesString);
+            
+            projectsStringBuilder.AppendLine(projectHtml);
+          }
+        }
+        else {
+          projectsStringBuilder.AppendLine("-");
         }
         
         // Adding the Work Experiences in the template
-        string workExperienceTemplate = @"
-        <div class=""mb-3"">
-            <h5>{{Role}} @ {{CompanyName}}</h5>
-            <p>{{Description}}</p>
-            <p><small>{{StartDate}} – {{EndDate}}</small></p>
-        </div>";
-
         var workExperienceStringBuilder = new StringBuilder();
-        foreach (var workExperience in WorkExperienceDetails.EnumerateArray()) {
-          var workExperienceHtml = workExperienceTemplate.Replace("{{Role}}", workExperience.GetProperty("Role").GetString())
-            .Replace("{{CompanyName}}", workExperience.GetProperty("CompanyName").GetString()).Replace("{{StartDate}}", workExperience.GetProperty("StartDate").GetString()).Replace("{{EndDate}}",  workExperience.GetProperty("EndDate").GetString()).Replace("{{Description}}", workExperience.GetProperty("Description").GetString());
-          
-          workExperienceStringBuilder.AppendLine(workExperienceHtml);
+        if (WorkExperienceDetails.GetArrayLength() > 0) {
+          string workExperienceTemplate = @"
+          <div class=""mb-3"">
+              <h5>{{Role}} @ {{CompanyName}}</h5>
+              <p>{{Description}}</p>
+              <p><small>{{StartDate}} – {{EndDate}}</small></p>
+          </div>";
+
+          foreach (var workExperience in WorkExperienceDetails.EnumerateArray()) {
+            var workExperienceHtml = workExperienceTemplate.Replace("{{Role}}", workExperience.GetProperty("Role").GetString())
+              .Replace("{{CompanyName}}", workExperience.GetProperty("CompanyName").GetString()).Replace("{{StartDate}}", workExperience.GetProperty("StartDate").GetString()).Replace("{{EndDate}}",  workExperience.GetProperty("EndDate").GetString()).Replace("{{Description}}", workExperience.GetProperty("Description").GetString());
+            
+            workExperienceStringBuilder.AppendLine(workExperienceHtml);
+          }
+        }
+        else {
+          workExperienceStringBuilder.AppendLine("-");
         }
         
         // Adding the Education Details in the template
-        string educationTemplate = @"
-        <div class=""mb-3"">
-            <h5>{{Study}}</h5>
-            <p>{{InstituteName}}, {{State}}, {{Country}}</p>
-            <p><small>{{StartDate}} – {{EndDate}}</small></p>
-        </div>";
-
         var educationStringBuilder = new StringBuilder();
-        foreach (var education in EducationDetails.EnumerateArray()) {
-          var educationHtml = educationTemplate.Replace("{{Study}}", education.GetProperty("Study").GetString())
-            .Replace("{{InstituteName}}", education.GetProperty("InstituteName").GetString()).Replace("{{StartDate}}", education.GetProperty("StartDate").GetString()).Replace("{{EndDate}}",  education.GetProperty("EndDate").GetString()).Replace("{{State}}", education.GetProperty("State").GetString()).Replace("{{Country}}", education.GetProperty("Country").GetString());
-          
-          educationStringBuilder.AppendLine(educationHtml);
+        if (EducationDetails.GetArrayLength() > 0) {
+            
+          string educationTemplate = @"
+          <div class=""mb-3"">
+              <h5>{{Study}}</h5>
+              <p>{{InstituteName}}, {{State}}, {{Country}}</p>
+              <p><small>{{StartDate}} – {{EndDate}}</small></p>
+          </div>";
+
+          foreach (var education in EducationDetails.EnumerateArray()) {
+            var educationHtml = educationTemplate.Replace("{{Study}}", education.GetProperty("Study").GetString())
+              .Replace("{{InstituteName}}", education.GetProperty("InstituteName").GetString()).Replace("{{StartDate}}", education.GetProperty("StartDate").GetString()).Replace("{{EndDate}}",  education.GetProperty("EndDate").GetString()).Replace("{{State}}", education.GetProperty("State").GetString()).Replace("{{Country}}", education.GetProperty("Country").GetString());
+            
+            educationStringBuilder.AppendLine(educationHtml);
+          }
+        }
+        else {
+          educationStringBuilder.AppendLine("-");
         }
         // Adding the Education Details in the template
-        string languageTemplate = @"
-        <li>{{LanguageName}} – {{LanguageLevel}}</li>";
-
         var languageStringBuilder = new StringBuilder();
-        foreach (var language in LanguageDetails.EnumerateArray()) {
-          Enum.TryParse(language.GetProperty("Level").GetInt16().ToString(), out LanguageLevel level);
-          var languageHtml = languageTemplate.Replace("{{LanguageName}}", language.GetProperty("Name").GetString())
-            .Replace("{{LanguageLevel}}", level.ToString());
-          
-          languageStringBuilder.AppendLine(languageHtml);
+        if (LanguageDetails.GetArrayLength() > 0) {
+          string languageTemplate = @"
+          <li>{{LanguageName}} – {{LanguageLevel}}</li>";
+
+          foreach (var language in LanguageDetails.EnumerateArray()) {
+            Enum.TryParse(language.GetProperty("Level").GetInt16().ToString(), out LanguageLevel level);
+            var languageHtml = languageTemplate.Replace("{{LanguageName}}", language.GetProperty("Name").GetString())
+              .Replace("{{LanguageLevel}}", level.ToString());
+            
+            languageStringBuilder.AppendLine(languageHtml);
+          }
+        }
+        else {
+          languageStringBuilder.AppendLine("-");
         }
         
         // TODO - Make it nullable, if work experiences are not there then what? Have a check on that and handle that possible case.
+
+       
         
         Dictionary<string, string?> replacement = new Dictionary<string, string?> {
           {"FirstName", BasicDetails.GetProperty("FirstName").GetString()}, 
