@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Backend.DTOs;
 using Backend.DTOs.Job;
 using Backend.Extensions;
+using Backend.Models;
 using Backend.Models.Users;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +28,7 @@ public class JobController (JobService jobService) : ControllerBase {
         return Ok(await jobService.GetNearbyJobs(userId, role, searchRadius, searchFilter));
     }
     
-    [HttpGet("get/")]
+    [HttpPost("get/")]
     public async Task<IActionResult> GetRelevantJobsAsync([FromBody] JobSearchFilterDto searchFilter) {
         var roleStr = User.FindFirstValue(ClaimTypes.Role);
         Guid userId = User.GetNameIdentifier();
@@ -39,6 +40,16 @@ public class JobController (JobService jobService) : ControllerBase {
             return NotFound("No jobs found");
         };
         return Ok(jobs);
+    }
+
+    [HttpGet("get/applied")]
+    public async Task<IActionResult> GetAppliedJobsAsync() {
+        var userId = User.GetNameIdentifier();
+        var jobs = await jobService.GetAppliedJobsAsync(userId);
+        if (jobs != null && jobs.Count > 0) {
+            return Ok(jobs);
+        }
+        return NotFound("No jobs found");
     }
     
     [HttpPost("new")]
@@ -57,6 +68,15 @@ public class JobController (JobService jobService) : ControllerBase {
         if (isUpdated) return Ok();
         return BadRequest("Could not update the job");
     }
+
+    [HttpPost("update/status/{jobId}")]
+    public async Task<IActionResult> UpdateJobStatus([FromRoute] int jobId, [FromBody] JobStatus jobStatus) {
+        Guid userid = User.GetNameIdentifier();
+        var isUpdated = await jobService.UpdateJobStatusAsync(userid, jobId, jobStatus);
+        if (isUpdated) return Ok();
+        return BadRequest("Could not update the job");
+    }
+    
     
     [HttpGet("description/{id}")]
     public async Task<IActionResult> GetJobDescriptionById([FromRoute] int id) {

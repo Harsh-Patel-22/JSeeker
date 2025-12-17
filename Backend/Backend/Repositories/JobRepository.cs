@@ -3,19 +3,21 @@ using Backend.DTOs;
 using Backend.DTOs.Job;
 using Backend.Models;
 using Backend.Models.Users;
+using Backend.Services.Query;
 using Backend.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Repositories;
 
-public class JobRepository (ApplicationDbContext context) {
+public class JobRepository (ApplicationDbContext context, JobsAggregateQueryService aggregateQueryService) {
     
-    public async Task<List<JobCardDto>?> GetRelevantJobsBySearchFilterAsync(Guid clientId, Roles role, JobSearchFilterDto searchFilter) {
+    public async Task<List<JobCardDto>?> GetRelevantJobsBySearchFilterAsync(Guid clientId, Roles role, JobSearchFilterDto searchFilter, string? state) {
         List<JobCardDto>? relevantJobCards = new List<JobCardDto>();
         switch (role) {
             case Roles.Hirer:
                 // TODO - What if for each parameter there's more filters
                 relevantJobCards = await context.Jobs.Include(j => j.Address).Where(j => j.HirerId == clientId  && j.Type == searchFilter.type && j.Status == searchFilter.status && j.WorkMode == searchFilter.mode).Select(job => new JobCardDto() {
+                    Id = job.Id,
                     Title = job.Title,
                     Status = job.Status,
                     Type = job.Type,
@@ -25,21 +27,30 @@ public class JobRepository (ApplicationDbContext context) {
                     MinSalary = job.MinSalary,
                     MaxSalary = job.MaxSalary,
                     NumberOfApplications = job.NumberOfApplications,
-                    PostDate = job.PostDate
+                    PostDate = job.PostDate,
+                    HirerId = job.HirerId
                 }).ToListAsync();
                 break;
             
             case Roles.Seeker:
                 // TODO - Reduce the confidence of the AI Generated Keywords. Give prio to the proper keywords...
-                string[]? keywordsRecord = await context.Users.Where(user => user.Id == clientId).Select(user => new string[]{user.TechnicalKeywords, user.AIGeneratedTechnicalKeywords}).FirstOrDefaultAsync();
+                var keywordsRecord = await context.Users.Where(user => user.Id == clientId).Select(user => new string[]{user.TechnicalKeywords, user.AIGeneratedTechnicalKeywords}).FirstOrDefaultAsync();
                 if (keywordsRecord == null) {
                     throw new Exception("User or keywords not found");
                 };
-                string keywordsCSV = keywordsRecord[0] + keywordsRecord[1];
-                List<string> keywords = keywordsCSV.Split(",").ToList();
-                // relevantJobs = new List<Job>();
+                var keywordsCSV = keywordsRecord[0] + keywordsRecord[1];
+                
+                var keywords = keywordsCSV.Split(",");
+                var nonDuplicateKeywords = new List<string>();
                 foreach (var keyword in keywords) {
-                    var jobsPerKeyword = await context.Jobs.Include(j => j.Address).Where(j => j.Description.Contains(keyword)).Select(job => new JobCardDto() {
+                    if (!nonDuplicateKeywords.Contains(keyword)) {
+                        nonDuplicateKeywords.Add(keyword);
+                    }
+                }
+                // relevantJobs = new List<Job>();
+                foreach (var keyword in nonDuplicateKeywords) {
+                    var jobsPerKeyword = await context.Jobs.Include(j => j.Address).Where(j => j.Description.Contains(keyword)).Where(j => j.Address.State == state).Where(j => j.Type == searchFilter.type && j.Status == searchFilter.status && j.WorkMode == searchFilter.mode).Select(job => new JobCardDto() {
+                        Id = job.Id,
                         Title = job.Title,
                         Status = job.Status,
                         Type = job.Type,
@@ -49,17 +60,49 @@ public class JobRepository (ApplicationDbContext context) {
                         MinSalary = job.MinSalary,
                         MaxSalary = job.MaxSalary,
                         NumberOfApplications = job.NumberOfApplications,
-                        PostDate = job.PostDate
+                        PostDate = job.PostDate,
+                        HirerId = job.HirerId
                     }).ToListAsync();
 
                     relevantJobCards.AddRange(jobsPerKeyword);
                 }
                 break;
         }
-        return relevantJobCards;
-    }
-    
 
+        List<JobCardDto> relevantNonDuplicateJobCards = new List<JobCardDto>();
+        foreach (var relevantJobCard in relevantJobCards) {
+            bool toAdd = true;
+            foreach (var nonDuplicateJobCard in relevantNonDuplicateJobCards) {
+                if (nonDuplicateJobCard.Id == relevantJobCard.Id) {
+                    toAdd = false;
+                    break;
+                }
+            }
+
+            if (toAdd) {
+                relevantNonDuplicateJobCards.Add(relevantJobCard);
+            }
+        }
+        return relevantNonDuplicateJobCards;
+    }
+
+    public async Task<List<JobCardDto>?> GetAppliedJobsAsync(Guid userId) {
+        var appliedJobCards = await context.Applications.Where(appl => appl.SeekerId == userId).Include(appl => appl.Job).Select(appl => new JobCardDto() {
+            Id = appl.Job.Id,
+            Title = appl.Job.Title,
+            Type = appl.Job.Type,
+            Status = appl.Job.Status,
+            WorkMode = appl.Job.WorkMode,
+            CompanyName = appl.Job.CompanyName,
+            Address = appl.Job.Address,
+            MinSalary = appl.Job.MinSalary,
+            MaxSalary = appl.Job.MaxSalary,
+            NumberOfApplications = appl.Job.NumberOfApplications,
+            PostDate = appl.Job.PostDate,
+            HirerId = appl.HirerId
+        }).ToListAsync();
+        return appliedJobCards;
+    }
     public async Task<bool> CreateJobAsync(Guid hirerId, CreateJobDto newJob) {
         try {
             // TODO - Make a custom class/dto for company to avoid unnecessary fields..
@@ -103,7 +146,11 @@ public class JobRepository (ApplicationDbContext context) {
 
     public async Task<List<JobForMapMarkerDto>?> GetNearbyJobsAsync(Guid clientId, Roles role, Decimal searchDistance, JobSearchFilterDto searchFilter) {
         LocationDto? targetLocation = await context.Users.Where(u => u.Id == clientId).Include(u => u.Address).Select(u => new LocationDto(u.Address.Latitude, u.Address.Longitude)).FirstOrDefaultAsync();
-        List<JobCardDto>? relevantJobCards = await GetRelevantJobsBySearchFilterAsync(clientId, role, searchFilter);
+        var state = await aggregateQueryService.GetUserStateFromAddressAsync(clientId);
+        if (string.IsNullOrEmpty(state)) {
+            state = "";
+        }
+        List<JobCardDto>? relevantJobCards = await GetRelevantJobsBySearchFilterAsync(clientId, role, searchFilter, state);
         if (targetLocation == null) {
             throw new Exception("User doesn't exist!");
         }
@@ -140,7 +187,7 @@ public class JobRepository (ApplicationDbContext context) {
             Title = job.Title,
             Description = job.Description,
             TermsAndConditions = job.TermsAndConditions,
-            Responsibilites = job.Responsibilities,
+            Responsibilities = job.Responsibilities,
             RequiredWorkExperience = job.RequiredWorkExperience,
             CompanyName = job.CompanyName,
             MinSalary = job.MinSalary,
@@ -185,6 +232,17 @@ public class JobRepository (ApplicationDbContext context) {
             ApplicationsLimit = dto.ApplicationsLimit
         };
         return await DbUpdateHelper.UpdateAllFieldsExceptAsync(job, context, "Id","CompanyName", "PostDate", "NumberOfApplications", "AddressId", "HirerId");
+        // return true;
+    }
+    public async Task<bool> UpdateJobStatusAsync(int jobId, JobStatus jobStatus) {
+        try {
+            await context.Jobs.Where(job => job.Id == jobId).ExecuteUpdateAsync(setter => setter.SetProperty(job => job.Status, jobStatus));
+            return true;
+        }
+        catch (Exception ex) {
+            return false;
+            
+        }
         // return true;
     }
     
