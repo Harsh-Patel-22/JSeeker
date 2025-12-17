@@ -6,6 +6,7 @@ using Backend.Extensions;
 using Backend.Models.Users;
 using Backend.Repositories;
 using Backend.Services;
+using Backend.Services.Query;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +15,7 @@ namespace Backend.Controllers;
 [ApiController]
 [Route("api/user")]
 [Authorize(Roles = "Hirer,Seeker")]
-public class UserController (UserRepository repository, HirerService hirerService, UserService userService) : ControllerBase {
+public class UserController (UserRepository repository, HirerService hirerService, UserService userService, JobsAggregateQueryService jobsAggregateQueryService) : ControllerBase {
     // TODO - Add edit route for editing....
     
     // Section - Registering as a Hirer
@@ -27,6 +28,14 @@ public class UserController (UserRepository repository, HirerService hirerServic
         
         await hirerService.RegisterUserAsHirerAsync(userId, dto);
         return Ok();
+    }
+    
+    // Section - Dashboard Details
+    [HttpGet("get/dashboard")]
+    public async Task<IActionResult> GetDashboardDetailsAsync() {
+        Guid userId = User.GetNameIdentifier();
+        var dashboardMetrics = await jobsAggregateQueryService.GetHirerDashboardMetricsAsync(userId);
+        return Ok(dashboardMetrics);
     }
     
     // Section - Filling up details
