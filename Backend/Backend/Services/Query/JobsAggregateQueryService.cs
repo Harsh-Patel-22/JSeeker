@@ -1,5 +1,7 @@
 using Backend.Data;
 using Backend.DTOs.Job;
+using Backend.DTOs.Users.Hirer;
+using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.Query;
@@ -69,6 +71,34 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
             jobWiseInterviews.Add(jobId, interviews);
         }
         return jobWiseInterviews;
+    }
+
+    public async Task<HirerDashboardMetricsDto> GetHirerDashboardMetrics(Guid hirerId) {
+        var totalHires = await context.Interviews.Where(i => i.HirerId == hirerId && i.Outcome == InterviewOutcome.Hired)
+            .ToListAsync();
+        var numActiveJobOpenings = await context.Jobs
+            .Where(job => job.HirerId == hirerId && job.Status != JobStatus.Closed).ToListAsync();
+        var numNewApplicationsToday = await context.Applications
+            .Where(appl => appl.HirerId == hirerId && appl.AppliedOn == DateOnly.FromDateTime(DateTime.Today)).ToListAsync();
+        
+        // var numRejectedFromApplication = await context.Applications.Where(appl => appl.HirerId == hirerId && appl.State == ApplicationState.Rejected).ToListAsync();
+        // var numRejectedFromInteview = await context.Interviews.Where(appl => appl.HirerId == hirerId && appl.Outcome == InterviewOutcome.Rejected).ToListAsync();
+        var numTotalApplications = await context.Applications.Where(appl => appl.HirerId == hirerId).ToListAsync();
+        
+        var dto = new HirerDashboardMetricsDto() {
+            NumActiveJobOpenings = numActiveJobOpenings.Count,
+            NumNewApplicationsToday = numNewApplicationsToday.Count,
+            TotalHires = totalHires.Count,
+            HiringRate = (decimal) totalHires.Count / numTotalApplications.Count,
+            ScheduledInterviews = await context.Interviews.Where(i => i.HirerId == hirerId && i.ConfirmedByHirer && i.ConfirmedBySeeker && i.Date == DateOnly.FromDateTime(DateTime.Today)).Select(i => new InterviewBasicDetailsDto() {
+                FirstName = i.Seeker.FirstName,
+                LastName = i.Seeker.LastName,
+                Date = i.Date,
+                Time = i.Time,
+                Mode = i.Mode,
+            }).ToListAsync()
+        };
+        return dto;
     }
     
     public async Task<string?> GetUserStateFromAddressAsync(Guid userId) {
