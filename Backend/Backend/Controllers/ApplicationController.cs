@@ -38,8 +38,6 @@ public class ApplicationController (JobService jobService) : ControllerBase {
     public async Task<IActionResult> UpdateApplicationStatusAsync([FromBody] ApplicationStateUpdateDto dto) {
         Guid userId = User.GetNameIdentifier();
         await jobService.UpdateApplicationStateAsync(userId, dto);
-        // Never use redirecttoaction for an api and spa...
-        // return RedirectToAction("GetApplicationsByStatus", new { state = dto.State});
         return Ok();
     }
     
