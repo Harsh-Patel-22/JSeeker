@@ -73,7 +73,7 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
         return jobWiseInterviews;
     }
 
-    public async Task<HirerDashboardMetricsDto> GetHirerDashboardMetrics(Guid hirerId) {
+    public async Task<HirerDashboardMetricsDto> GetHirerDashboardMetricsAsync(Guid hirerId) {
         var totalHires = await context.Interviews.Where(i => i.HirerId == hirerId && i.Outcome == InterviewOutcome.Hired)
             .ToListAsync();
         var numActiveJobOpenings = await context.Jobs
