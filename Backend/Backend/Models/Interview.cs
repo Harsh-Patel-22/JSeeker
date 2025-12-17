@@ -15,6 +15,12 @@ public enum InterviewState {
     Updates
 }
 
+public enum InterviewOutcome {
+    Hired,
+    Rejected,
+    DidntAppear
+}
+
 public class Interview {
     [Key]
     public int ApplicationId { get; set; }
@@ -27,7 +33,7 @@ public class Interview {
     public bool ConfirmedByHirer { get; set; }
     public bool ConfirmedBySeeker { get; set; }
     
-    
+    public InterviewOutcome Outcome { get; set; }
     // Navigation Properties
     [ForeignKey("HirerId")]
     public User Hirer { get; set; }
