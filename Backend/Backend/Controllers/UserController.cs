@@ -46,9 +46,16 @@ public class UserController (UserRepository repository, HirerService hirerServic
     }
 
     [HttpPost("update/repoNames")]
-    public async Task<IActionResult> UpdateUserProjects([FromBody] List<string>? repoNames) {
+    public async Task<IActionResult> UpdateUserProjects([FromBody] string[] repoNames) {
         Guid userId = User.GetNameIdentifier();
-        await userService.UpdateProjectsUsingGithubReposAsync(userId, repoNames);
+        await userService.UpdateProjectsUsingGithubReposAsync(userId, repoNames.ToList());
+        return Ok();
+    }
+    
+    [HttpPost("generate/repoNames")]
+    public async Task<IActionResult> UpdateUserProjectsAutoGenerate() {
+        Guid userId = User.GetNameIdentifier();
+        await userService.UpdateProjectsUsingGithubReposAsync(userId, null);
         return Ok();
     }
 
@@ -71,6 +78,23 @@ public class UserController (UserRepository repository, HirerService hirerServic
         Guid userId = User.GetNameIdentifier();
         var pdf = await userService.GetResumePdfAsync(userId, targetUserId);
         return File(pdf, "application/pdf", "resume.pdf");
+    }
+
+    [HttpGet("get/coordinates")]
+    public async Task<IActionResult> GetCoordinatesAsync() {
+        Guid userId = User.GetNameIdentifier();
+        return Ok(await userService.GetCoordinatesAsync(userId));
+    }
+    
+    [HttpGet("get/applicant/{applicantId}")]
+    public async Task<IActionResult> GetApplicantAsync([FromRoute] Guid applicantId) {
+        return Ok(await userService.GetApplicantDetailsAsync(applicantId));
+    }
+
+    [HttpGet("profile/details")]
+    public async Task<IActionResult> GetProfileDetailsAsync() {
+        Guid userId = User.GetNameIdentifier();
+        return Ok(await userService.GetProfileDetailsAsync(userId));
     }
     
     // TODO - Make this one call. Dont fetch again and again!!

@@ -50,7 +50,7 @@ public class UserService (GithubService githubService, UserRepository userReposi
         }
         
         
-        Dictionary<string, ProjectDetailsDto> projectDetails = new Dictionary<string, ProjectDetailsDto>();
+        List<ProjectDetailsDto> projectDetails = new List<ProjectDetailsDto>();
         List<string> keywords = new List<string>();
         
         // An Array could be used rather than a List<JsonElement>
@@ -92,7 +92,7 @@ public class UserService (GithubService githubService, UserRepository userReposi
                 usage
                 ));
             
-            projectDetails.Add(repoName, new ProjectDetailsDto(p.Name, p.Description, usage, p.StartDate, p.LastUpdatedDate, p.GithubRepoLink));
+            projectDetails.Add(new ProjectDetailsDto(p.Name, p.Description, usage, p.StartDate, p.LastUpdatedDate, p.GithubRepoLink));
 
         }
 
@@ -140,6 +140,19 @@ public class UserService (GithubService githubService, UserRepository userReposi
         return await userRepository.GetResumeJsonStringAsync(userId);
     }
 
+    public async Task<AddressCoordinatesDto> GetCoordinatesAsync(Guid userId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        return await userRepository.GetCoordinatesAsync(userId);
+    }
+    public async Task<ApplicantDetailsDto> GetApplicantDetailsAsync(Guid userId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        return await userRepository.GetApplicantDetailsAsync(userId);
+    }
+    
     public async Task<Byte[]> GetResumePdfAsync(Guid accessorUserId, Guid accessedUserId) {
         if (!await validationService.UserExistsAsync(accessedUserId)) {
             throw new GlobalExceptions.Unauthorised();
@@ -148,11 +161,13 @@ public class UserService (GithubService githubService, UserRepository userReposi
         if (!await validationService.UserExistsAsync(accessorUserId)) {
             throw new GlobalExceptions.Unauthorised();
         }
-        
+
         // CHECK IF HE actually has an application for a post hosted by the accessor.
-        if (!await validationService.HasApplicationFor(accessedUserId, accessorUserId) &&
-            !await validationService.HasInterviewFor(accessedUserId, accessorUserId)) {
-            throw new GlobalExceptions.Unauthorised();
+        if (accessorUserId != accessedUserId) {
+            if (!await validationService.HasApplicationFor(accessedUserId, accessorUserId) &&
+                !await validationService.HasInterviewFor(accessedUserId, accessorUserId)) {
+                throw new GlobalExceptions.Unauthorised();
+            }
         }
         
         ResumeTemplateAndStringDto resumeDetails = await userRepository.GetResumeAndTemplateNumberAsync(accessedUserId);
@@ -168,5 +183,12 @@ public class UserService (GithubService githubService, UserRepository userReposi
         }
 
         return await userRepository.GetResumeAndTemplateNumberAsync(userId);
+    }
+
+    public async Task<UserProfileDetailsDto> GetProfileDetailsAsync(Guid userId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        return await userRepository.GetProfileDetailsAsync(userId);
     }
 }
