@@ -86,10 +86,13 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
         var numTotalApplications = await context.Applications.Where(appl => appl.HirerId == hirerId).ToListAsync();
         
         var dto = new HirerDashboardMetricsDto() {
-            NumActiveJobOpenings = numActiveJobOpenings.Count,
-            NumNewApplicationsToday = numNewApplicationsToday.Count,
-            TotalHires = totalHires.Count,
-            HiringRate = (decimal) totalHires.Count / numTotalApplications.Count,
+            MetricsDto = new MetricsDto() {
+                NumActiveJobOpenings = numActiveJobOpenings.Count,
+                NumNewApplicationsToday = numNewApplicationsToday.Count,
+                TotalHires = totalHires.Count,
+                HiringRate = (decimal) totalHires.Count / numTotalApplications.Count,
+            },
+            
             ScheduledInterviews = await context.Interviews.Where(i => i.HirerId == hirerId && i.ConfirmedByHirer && i.ConfirmedBySeeker && i.Date == DateOnly.FromDateTime(DateTime.Today)).Select(i => new InterviewBasicDetailsDto() {
                 FirstName = i.Seeker.FirstName,
                 LastName = i.Seeker.LastName,
