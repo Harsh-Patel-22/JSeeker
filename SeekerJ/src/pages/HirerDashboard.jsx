@@ -2,6 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Spinner, Button, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { userService } from "../services/apiServices";
+import { BarChart,Bar, XAxis, YAxis, LabelList, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+
+const funnelData = [
+  { stage: "Applied", value: 220 },
+  { stage: "Shortlisted", value: 60 },
+  { stage: "Interviewed", value: 25 },
+  { stage: "Hired", value: 5 },
+];
 
 const HirerDashboard = () => {
   const [metrics, setMetrics] = useState(null);
@@ -102,16 +110,24 @@ const HirerDashboard = () => {
                 ))}
               </Row>
 
-              {/* Placeholder for additional analytics */}
               <Card className="border-0 shadow-sm rounded-4 mt-4">
                 <Card.Body className="p-4">
-                  <h5 className="fw-semibold text-dark mb-3">
-                    Applications Overview
-                  </h5>
-                  <p className="text-muted">
-                    (Analytics chart can be added here — applications trend,
-                    top performing job posts, etc.)
-                  </p>
+                  <h5 className="fw-semibold text-dark mb-3">Application Funnel Overview</h5>
+                  <div style={{ width: "100%", height: 320 }}>
+                    <ResponsiveContainer>
+                      <BarChart data={funnelData} margin={{ top: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+
+                        <XAxis dataKey="stage" />
+                        <YAxis />
+                        <Tooltip />
+
+                        <Bar dataKey="value"  radius={[10, 10, 0, 0]}>
+                          <LabelList dataKey="value" position="top" />
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
