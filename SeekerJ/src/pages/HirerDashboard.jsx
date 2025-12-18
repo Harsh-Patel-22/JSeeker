@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Spinner, Button, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { userService } from "../services/apiServices";
 
 const HirerDashboard = () => {
   const [metrics, setMetrics] = useState(null);
@@ -8,32 +9,51 @@ const HirerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); 
   useEffect(() => {
-    // Simulate API call delay
-    setTimeout(() => {
-      const dummyMetrics = {
-        newApplicationsToday: 12,
-        activeJobs: 5,
-        totalHires: 42,
-        hiringRate: 26.7,
-      };
-
-      const dummyInterviews = [
-        { applicant: "Riya Sharma", date: "2025-10-29", time: "10:00 AM", mode: "Online" },
-        { applicant: "Kunal Mehta", date: "2025-10-29", time: "12:30 PM", mode: "In-Person" },
-        { applicant: "Ananya Patel", date: "2025-10-29", time: "3:00 PM", mode: "Online" },
-        { applicant: "Priya Desai", date: "2025-10-29", time: "4:15 PM", mode: "In-Person" },
-        { applicant: "Aarav Shah", date: "2025-10-29", time: "5:00 PM", mode: "Online" },
-        { applicant: "Sana Khan", date: "2025-10-29", time: "6:00 PM", mode: "Online" },
-        { applicant: "Devansh Patel", date: "2025-10-29", time: "7:00 PM", mode: "Online" },
-        { applicant: "Mihir Joshi", date: "2025-10-29", time: "8:00 PM", mode: "In-Person" },
-        { applicant: "Neha Singh", date: "2025-10-29", time: "9:00 PM", mode: "Online" },
-        { applicant: "Raj Mehta", date: "2025-10-29", time: "9:30 PM", mode: "In-Person" },
-      ];
-
-      setMetrics(dummyMetrics);
-      setInterviews(dummyInterviews);
+    const fetchDashboardDetails = async () => {
+      const response = await userService.getHirerDashboardDetails();
+      const dashboardDetails = response.data;
+      setMetrics({
+          newApplicationsToday: dashboardDetails.numNewApplicationsToday,
+          activeJobs: dashboardDetails.numActiveJobOpenings,
+          totalHires: dashboardDetails.totalHires,
+          hiringRate: dashboardDetails.hiringRate,
+        });
+        console.log(dashboardDetails);
+      setInterviews(dashboardDetails.scheduledInterviews);
       setLoading(false);
-    }, 900);
+    };
+
+    fetchDashboardDetails();
+
+    // Simulate API call delay
+    // setTimeout(() => {
+    //   const dummyMetrics = {
+    //     newApplicationsToday: 12,
+    //     activeJobs: 5,
+    //     totalHires: 42,
+    //     hiringRate: 26.7,
+    //   };
+
+    //   const dummyInterviews = [
+    //     { applicant: "Riya Sharma", date: "2025-10-29", time: "10:00 AM", mode: "Online" },
+    //     { applicant: "Kunal Mehta", date: "2025-10-29", time: "12:30 PM", mode: "In-Person" },
+    //     { applicant: "Ananya Patel", date: "2025-10-29", time: "3:00 PM", mode: "Online" },
+    //     { applicant: "Priya Desai", date: "2025-10-29", time: "4:15 PM", mode: "In-Person" },
+    //     { applicant: "Aarav Shah", date: "2025-10-29", time: "5:00 PM", mode: "Online" },
+    //     { applicant: "Sana Khan", date: "2025-10-29", time: "6:00 PM", mode: "Online" },
+    //     { applicant: "Devansh Patel", date: "2025-10-29", time: "7:00 PM", mode: "Online" },
+    //     { applicant: "Mihir Joshi", date: "2025-10-29", time: "8:00 PM", mode: "In-Person" },
+    //     { applicant: "Neha Singh", date: "2025-10-29", time: "9:00 PM", mode: "Online" },
+    //     { applicant: "Raj Mehta", date: "2025-10-29", time: "9:30 PM", mode: "In-Person" },
+    //   ];
+
+      
+
+    //   setMetrics(dummyMetrics);
+    //   setInterviews(dummyInterviews);
+    //   setLoading(false);
+    // }, 900);
+
   }, []);
 
   return (
