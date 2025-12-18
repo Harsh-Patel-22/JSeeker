@@ -18,6 +18,7 @@ export const userService = {
   getCoordinates: async () => await api.get('user/get/coordinates'),
   // TODO - TO add profile related details fetching calls 
   getProfileDetails: async () => await api.get('user/profile/details'),
+  getHirerDashboardDetails: async () => await api.get('user/get/dashboard'),
 };
 
 export const jobService = {
