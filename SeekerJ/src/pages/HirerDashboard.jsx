@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Spinner, Button, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { userService } from "../services/apiServices";
-import { BarChart,Bar, XAxis, YAxis, LabelList, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { BarChart,Bar, XAxis, YAxis, LabelList, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
 
 const funnelData = [
-  { stage: "Applied", value: 220 },
-  { stage: "Shortlisted", value: 60 },
-  { stage: "Interviewed", value: 25 },
-  { stage: "Hired", value: 5 },
+  { stage: "Applied", value: 220, fill: "#8884d8" },
+  { stage: "Shortlisted", value: 60, fill: "#82ca9d" },
+  { stage: "Interviewed", value: 25, fill: "#ffc658" },
+  { stage: "Hired", value: 5, fill: "#ff7300" },
 ];
 
 const HirerDashboard = () => {
@@ -123,7 +123,10 @@ const HirerDashboard = () => {
                         <Tooltip />
 
                         <Bar dataKey="value"  radius={[10, 10, 0, 0]}>
-                          <LabelList dataKey="value" position="top" />
+                          {funnelData.map((entry, index) => (
+                            <Cell key={index} fill={entry.fill} />
+                          ))}
+                          <LabelList fill={"#000000"} dataKey="value" position="top" />
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
