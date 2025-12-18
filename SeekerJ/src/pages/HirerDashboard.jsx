@@ -20,12 +20,7 @@ const HirerDashboard = () => {
     const fetchDashboardDetails = async () => {
       const response = await userService.getHirerDashboardDetails();
       const dashboardDetails = response.data;
-      setMetrics({
-          newApplicationsToday: dashboardDetails.numNewApplicationsToday,
-          activeJobs: dashboardDetails.numActiveJobOpenings,
-          totalHires: dashboardDetails.totalHires,
-          hiringRate: dashboardDetails.hiringRate,
-        });
+      setMetrics(dashboardDetails.metrics);
         console.log(dashboardDetails);
       setInterviews(dashboardDetails.scheduledInterviews);
       setLoading(false);
