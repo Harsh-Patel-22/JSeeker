@@ -31,8 +31,9 @@ public class UserController (UserRepository repository, HirerService hirerServic
     }
     
     // Section - Dashboard Details
+    [Authorize(Roles = "Hirer")]
     [HttpGet("get/dashboard")]
-    public async Task<IActionResult> GetDashboardDetailsAsync() {
+    public async Task<IActionResult> GetHirerDashboardDetailsAsync() {
         Guid userId = User.GetNameIdentifier();
         var dashboardMetrics = await jobsAggregateQueryService.GetHirerDashboardMetricsAsync(userId);
         return Ok(dashboardMetrics);
