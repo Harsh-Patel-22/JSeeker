@@ -77,11 +77,11 @@ const HirerDashboard = () => {
                 {[
                   {
                     title: "New Applications Today",
-                    value: metrics.newApplicationsToday,
+                    value: metrics.numNewApplicationsToday,
                   },
                   {
                     title: "Active Job Posts",
-                    value: metrics.activeJobs,
+                    value: metrics.numActiveJobOpenings,
                   },
                   {
                     title: "Total Hires Made",
