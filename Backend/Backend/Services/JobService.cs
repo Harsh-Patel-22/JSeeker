@@ -159,7 +159,7 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
         }
     }
     
-    public async Task UpdateSeekerSuccessFailureJobLandingAsync(Guid hirerId, int interviewId, bool successful) {
+    public async Task UpdateSeekerSuccessFailureJobLandingAsync(Guid hirerId, int interviewId, InterviewOutcome outcome) {
         if (!await validationService.InterviewExistsAsync(interviewId)) {
             throw new Exception("No such interview exists");
         }
@@ -169,11 +169,16 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
         }
         
         Guid userId = await interviewRepository.GetSeekerIdByInterviewId(interviewId);
-        if (successful) {
+        await interviewRepository.SetInterviewOutcomeAsync(interviewId, outcome);
+        if (outcome == InterviewOutcome.Hired) {
             await userRepository.IncrementSuccessCountAsync(userId);
         }
-        else {
+        else if (outcome == InterviewOutcome.Rejected) {
             await userRepository.IncrementRejectedCountAsync(userId);
+        }
+        else {
+            // Didn't appear for the interview.
+            // Nothing to do as of now.
         }
     }
     

@@ -53,9 +53,9 @@ public class InterviewController (JobService jobService) : ControllerBase {
     }
 
     [HttpPost("update/success/{id}")]
-    public async Task<IActionResult> UpdateSuccessStatusAsync([FromRoute] int id, [FromBody] bool success) {
+    public async Task<IActionResult> UpdateSuccessStatusAsync([FromRoute] int id, [FromBody] InterviewOutcome outcome) {
         Guid userId = User.GetNameIdentifier();
-        await jobService.UpdateSeekerSuccessFailureJobLandingAsync(userId, id, success);
+        await jobService.UpdateSeekerSuccessFailureJobLandingAsync(userId, id, outcome);
         return Ok();
     }
 

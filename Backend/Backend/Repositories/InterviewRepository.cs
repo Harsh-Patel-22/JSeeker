@@ -110,6 +110,10 @@ public class InterviewRepository (ApplicationDbContext context) {
 
         return true;
     }
+
+    public async Task SetInterviewOutcomeAsync(int interviewId, InterviewOutcome outcome) {
+        await context.Interviews.Where(i => i.ApplicationId == interviewId).ExecuteUpdateAsync(setter => setter.SetProperty(i => i.Outcome, outcome));
+    }
     
     public async Task<Guid> GetSeekerIdByInterviewId(int interviewId) {
         return await context.Interviews.Where(i => i.ApplicationId == interviewId).Select(i => i.SeekerId).FirstOrDefaultAsync();
