@@ -1,3 +1,4 @@
+using System.Drawing;
 using Backend.Data;
 using Backend.DTOs.Job;
 using Backend.DTOs.Users.Hirer;
@@ -106,12 +107,28 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
                 Mode = i.Mode,
             }).ToListAsync(),
             
-            funnelData = new ApplicationFunnelDto() {
-                Applied = totalApplications.Count,
-                Shortlisted = shortlistedApplications.Count,
-                Interviewed = interviewed.Count,
-                Hired = hired.Count,
-            }
+            funnelData = [
+                new ApplicationFunnelEntryDto() {
+                    Stage = Stages.Applied,
+                    Value = totalApplications.Count,
+                    Fill = Color.FromArgb(136, 132, 216)
+                },
+                new ApplicationFunnelEntryDto() {
+                    Stage = Stages.Shortlisted,
+                    Value = shortlistedApplications.Count,
+                    Fill = Color.FromArgb(130, 202, 157)
+                },
+                new ApplicationFunnelEntryDto() {
+                    Stage = Stages.Interviewed,
+                    Value = interviewed.Count,
+                    Fill = Color.FromArgb(255, 198, 88)
+                },
+                new ApplicationFunnelEntryDto() {
+                    Stage = Stages.Hired,
+                    Value = hired.Count,
+                    Fill = Color.FromArgb(255, 115, 0)
+                }
+            ]
         };
         
         return dto;
