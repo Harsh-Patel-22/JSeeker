@@ -128,15 +128,22 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
           <p className="mb-1"><strong>Phone:</strong> {interviewData.phoneNumber}</p>
         </div>
 
-        <div className="mb-3">
-          <ResumeButton targetClientId={interviewData.seekerId}>View Resume</ResumeButton>
-          <br />
-          <ResumeButton targetClientId={interviewData.seekerId} name={`${interviewData.firstName}_${interviewData.lastName}_Resume.pdf`} className="btn btn-primary p-1 px-2 mt-2" useCase="download">Download Resume (PDF)</ResumeButton>
+        <div className="mb-3 mt-3">
+          <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px" }}>View Resume</ResumeButton>
+          <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px"}} name={`${interviewData.firstName}_${interviewData.lastName}_Resume.pdf`} className="btn btn-primary p-1 px-2" useCase="download">Download Resume (PDF)</ResumeButton>
         </div>
         {selectedTab === Tabs.Updates && <div className="d-flex flex-column">
           <button className="btn btn-primary"  onClick={() => handleConfirm(Tasks.Accept)}>Accept</button>
-          <br />
           <button className="btn btn-danger" onClick={() => setShowInterviewModal(true)}>Re-Schedule</button>
+        </div>}
+        
+        {selectedTab === Tabs.Taken && <div className="mt-4 d-flex flex-column align-items-center">
+          <h5 className="card-title mb-1">Interview Outcome</h5>
+          <div className="d-flex mt-4">
+            <button className="btn btn-primary mx-1" style={{width: "150px"}}>Hired</button>
+            <button className="btn btn-danger mx-1" style={{width: "150px"}}>Rejected</button>
+            <button className="btn btn-secondary mx-1" style={{width: "150px"}}>Didn't Appear</button>
+          </div>
         </div>}
         
         <ConfirmModal loading={loading} show={showConfirm} onConfirm={execute} onCancel={() => setShowConfirm(false)} message={task}/>
