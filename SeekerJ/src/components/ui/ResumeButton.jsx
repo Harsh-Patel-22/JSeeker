@@ -2,7 +2,7 @@ import { useState } from "react";
 import SpinnerButton from "./SpinnerButton";
 import { downloadResumePDF, fetchResumePDF } from "../../services/Utils";
 
-const ResumeButton = ({ targetClientId, name="resume.pdf",useCase = "fetch", className ="btn btn-primary p-1 px-2", ...props }) => {
+const ResumeButton = ({ targetClientId, name="resume.pdf",useCase = "fetch", className ="btn btn-primary p-1 px-2", style={},  ...props }) => {
   const [loading, setLoading] = useState(false);
 
   const handleFetchPDF = async () => {
@@ -25,6 +25,7 @@ const ResumeButton = ({ targetClientId, name="resume.pdf",useCase = "fetch", cla
   return (
     <SpinnerButton
       loading={loading}
+      style={style}
       className={className}
       handleClick={handleFetchPDF}
       type="button"
