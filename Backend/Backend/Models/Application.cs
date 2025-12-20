@@ -14,7 +14,9 @@ public enum ApplicationState {
     // Set via the program
     InterviewScheduling,
     InterviewScheduled,
-    InterviewsFinished
+    InterviewsFinished,
+    
+    InterviewDiscarded
 }
 
 public class Application {

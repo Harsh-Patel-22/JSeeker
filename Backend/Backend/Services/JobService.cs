@@ -171,14 +171,16 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
         Guid userId = await interviewRepository.GetSeekerIdByInterviewId(interviewId);
         await interviewRepository.SetInterviewOutcomeAsync(interviewId, outcome);
         if (outcome == InterviewOutcome.Hired) {
+            await applicationRepository.UpdateApplicationStateAsync(interviewId, ApplicationState.InterviewsFinished);
             await userRepository.IncrementSuccessCountAsync(userId);
         }
         else if (outcome == InterviewOutcome.Rejected) {
+            await applicationRepository.UpdateApplicationStateAsync(interviewId, ApplicationState.InterviewsFinished);
             await userRepository.IncrementRejectedCountAsync(userId);
         }
         else {
             // Didn't appear for the interview.
-            // Nothing to do as of now.
+            await applicationRepository.UpdateApplicationStateAsync(interviewId, ApplicationState.InterviewDiscarded);
         }
     }
     
