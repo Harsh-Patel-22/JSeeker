@@ -85,8 +85,13 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
         // var numRejectedFromInteview = await context.Interviews.Where(appl => appl.HirerId == hirerId && appl.Outcome == InterviewOutcome.Rejected).ToListAsync();
         var numTotalApplications = await context.Applications.Where(appl => appl.HirerId == hirerId).ToListAsync();
         
+        
+        var totalApplications = await context.Applications.Where(appl => appl.HirerId == hirerId).ToListAsync();
+        var shortlistedApplications = await context.Applications.Where(appl => appl.HirerId == hirerId && appl.State != ApplicationState.Pending && appl.State != ApplicationState.Rejected).ToListAsync();
+        var interviewed = await context.Applications.Where(appl => appl.HirerId == hirerId && (appl.State == ApplicationState.InterviewScheduled || appl.State == ApplicationState.InterviewsFinished)).ToListAsync();
+        var hired = await context.Applications.Where(appl => appl.HirerId == hirerId && appl.State == ApplicationState.InterviewsFinished && appl.Interview.Outcome == InterviewOutcome.Hired).ToListAsync();
         var dto = new HirerDashboardMetricsDto() {
-            MetricsDto = new MetricsDto() {
+            Metrics = new MetricsDto() {
                 NumActiveJobOpenings = numActiveJobOpenings.Count,
                 NumNewApplicationsToday = numNewApplicationsToday.Count,
                 TotalHires = totalHires.Count,
@@ -99,8 +104,16 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
                 Date = i.Date,
                 Time = i.Time,
                 Mode = i.Mode,
-            }).ToListAsync()
+            }).ToListAsync(),
+            
+            funnelData = new ApplicationFunnelDto() {
+                Applied = totalApplications.Count,
+                Shortlisted = shortlistedApplications.Count,
+                Interviewed = interviewed.Count,
+                Hired = hired.Count,
+            }
         };
+        
         return dto;
     }
     
