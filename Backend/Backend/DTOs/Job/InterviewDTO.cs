@@ -28,4 +28,6 @@ public class InterviewDto {
     public InterviewMode Mode { get; set; }
     public bool ConfirmedByHirer { get; set; }
     public bool ConfirmedBySeeker { get; set; }
+
+    public InterviewOutcome Outcome { get; set; }
 }

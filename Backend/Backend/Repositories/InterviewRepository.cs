@@ -144,7 +144,9 @@ public class InterviewRepository (ApplicationDbContext context) {
             Time = interview.Time,
             Mode = interview.Mode,
             ConfirmedByHirer = interview.ConfirmedByHirer,
-            ConfirmedBySeeker = interview.ConfirmedBySeeker
+            ConfirmedBySeeker = interview.ConfirmedBySeeker,
+            
+            Outcome = interview.Outcome,
         }).FirstOrDefaultAsync())!;
     }
 }

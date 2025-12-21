@@ -16,6 +16,7 @@ public enum InterviewState {
 }
 
 public enum InterviewOutcome {
+    Pending,
     Hired,
     Rejected,
     DidntAppear
