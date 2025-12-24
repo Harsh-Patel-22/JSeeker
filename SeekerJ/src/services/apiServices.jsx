@@ -44,7 +44,7 @@ export const interviewService = {
   getById: async (interviewId) => await api.get('interview/get/' + interviewId),
   updateDateTime: async (interviewId, dateTimeDto) => await api.post('interview/update/DateTime/' + interviewId, dateTimeDto),
   setInterviewScheduled: async (interviewId) => await api.post('interview/scheduled/'+ interviewId),
-  updateSuccessStatus: async (interviewId, isSuccess) => await api.post('interview/update/success/' + interviewId, isSuccess),
+  updateSuccessStatus: async (interviewId, outcome) => await api.post('interview/update/success/' + interviewId, outcome),
 };
 
 export const miscApiService = {
