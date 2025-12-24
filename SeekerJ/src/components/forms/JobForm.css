@@ -1,0 +1,9 @@
+.job-form-card {
+  min-height: 650px; /* adjust once and forget */
+}
+
+.job-form-tabs {
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+}
