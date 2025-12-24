@@ -30,6 +30,7 @@ const JobForm = ({ mode = "create", jobData = null }) => {
         throw new Error("Unexpected response");
       }
     } catch (error) {
+      console.log("data to submit:", data);
       console.error(error);
       showToast(
         isEditMode ? "Job could not be updated!" : "Job could not be created!",
@@ -85,9 +86,31 @@ const JobForm = ({ mode = "create", jobData = null }) => {
         </ul>
 
         <form
+          noValidate
           onSubmit={async (e) => {
             e.preventDefault();
             const f = e.target;
+
+            const missingFields = [];
+
+            if (!f.jobTitle.value) missingFields.push("Job Title");
+            if (!f.description.value) missingFields.push("Description");
+            if (!f.responsibilities.value) missingFields.push("Responsibilities");
+            if (!f.termsandconditions.value) missingFields.push("Terms & Conditions");
+            if (!f.minimumSalary.value) missingFields.push("Minimum Salary");
+            if (!f.maximumSalary.value) missingFields.push("Maximum Salary");
+            if (!f.jobType.value) missingFields.push("Job Type");
+            if (!f.workMode.value) missingFields.push("Work Mode");
+            if (!f.applicationLimit.value) missingFields.push("Applications Limit");
+
+            if (missingFields.length > 0) {
+              showToast(
+                `Please fill: ${missingFields.join(", ")}`,
+                false
+              );
+              return;
+            }
+
 
             const payload = {
               title: f.jobTitle.value,
@@ -96,8 +119,9 @@ const JobForm = ({ mode = "create", jobData = null }) => {
               termsAndConditions: f.termsandconditions.value,
               minSalary: f.minimumSalary.value,
               maxSalary: f.maximumSalary.value,
-              jobType: f.jobType.value,
+              type: f.jobType.value,
               workMode: f.workMode.value,
+              status: jobData.status,
               applicationsLimit: f.applicationLimit.value,
               requiredWorkExperience: f.requiredWorkExperience.value,
             };
@@ -116,7 +140,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   name="jobTitle"
                   placeholder="e.g. Frontend Developer"
                   defaultValue={jobData?.title || ""}
-                  required
                 />
               </div>
 
@@ -128,7 +151,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   name="description"
                   placeholder="Describe the role, team, and expectations..."
                   defaultValue={jobData?.description || ""}
-                  required
                 />
               </div>
             </div>
@@ -143,7 +165,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   name="responsibilities"
                   placeholder="List the responsibilities, one per line"
                   defaultValue={jobData?.responsibilities || ""}
-                  required
                 />
               </div>
 
@@ -155,7 +176,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   name="termsandconditions"
                   placeholder="List the terms and conditions, one per line"
                   defaultValue={jobData?.termsAndConditions || ""}
-                  required
                 />
               </div>
             </div>
@@ -171,7 +191,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                     name="minimumSalary"
                     placeholder="e.g. 1250"
                     defaultValue={jobData?.minSalary || ""}
-                    required
                   />
                 </div>
 
@@ -183,7 +202,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                     name="maximumSalary"
                     placeholder="e.g. 25110"
                     defaultValue={jobData?.maxSalary || ""}
-                    required
                   />
                 </div>
               </div>
@@ -199,7 +217,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   name="requiredWorkExperience"
                   placeholder="e.g. 5"
                   defaultValue={jobData?.requiredWorkExperience || ""}
-                  required
                 />
               </div>
 
@@ -209,7 +226,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   className="form-select"
                   name="jobType"
                   defaultValue={jobData?.jobType || ""}
-                  required
                 >
                   <option value="">Select type</option>
                   <option value="FullTime">Full-time</option>
@@ -224,7 +240,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   className="form-select"
                   name="workMode"
                   defaultValue={jobData?.workMode || ""}
-                  required
                 >
                   <option value="">Select mode</option>
                   <option value="OnSite">On-site</option>
@@ -240,7 +255,6 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   name="applicationLimit"
                   placeholder="e.g. 200"
                   defaultValue={jobData?.applicationsLimit || ""}
-                  required
                 />
               </div>
             </div>
