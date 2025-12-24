@@ -14,6 +14,7 @@ const funnelData = [
 const HirerDashboard = () => {
   const [metrics, setMetrics] = useState(null);
   const [interviews, setInterviews] = useState(null);
+  const [funnelData, setFunnelData] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); 
   useEffect(() => {
@@ -23,6 +24,7 @@ const HirerDashboard = () => {
       setMetrics(dashboardDetails.metrics);
         console.log(dashboardDetails);
       setInterviews(dashboardDetails.scheduledInterviews);
+      setFunnelData(dashboardDetails.funnelData);
       setLoading(false);
     };
 
