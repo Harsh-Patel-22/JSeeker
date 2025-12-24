@@ -1,5 +1,6 @@
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Axios, AxiosError, HttpStatusCode } from "axios";
 import { useAuth } from "../contexts/AuthContext";
 // import { Apply } from "../components/Apply";
@@ -17,6 +18,7 @@ const JobDescription = () => {
 
     let {user} = useAuth();
     let type = user.role.toLowerCase();
+    let navigate = useNavigate();
     // console.log(job)
 
     async function apply(applicationData) {
@@ -59,10 +61,19 @@ const JobDescription = () => {
 
     return <>
 <div className="container mt-4 mb-5">
+  <div className="mb-3">
+    <button
+      type="button"
+      className="btn btn-link text-decoration-none p-0"
+      onClick={() => navigate('/jobs')}
+    >
+      <i className="bi bi-arrow-left me-1"></i>
+      Back
+    </button>
+  </div>
   <div className="card p-4 shadow-sm">
-    <div className="d-flex align-items-start justify-content-between flex-wrap">
-      <div className="d-flex align-items-start">
-        <img src="company-logo.png" alt="Company Logo" className="me-3 rounded" style={{width: "64px", height: "64px"}} />
+    <div className="d-flex justify-content-between flex-wrap">
+      <div className="d-flex align-items-start gap-3">
         <div>
           <h4 className="mb-1">{job.title}</h4>
           <p className="mb-0 text-muted">{job.companyName} · {job.type}</p>
