@@ -72,6 +72,7 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
       <div>
         <h5 className="card-title mb-1">{interviewData.jobTitle}</h5>
         {<p className="text-muted mb-1">@ {interviewData.companyName}</p>}
+        {interviewData.outcome !== "Pending" && <p className="mb-0"><strong>Outcome:</strong> <span className={`badge ${interviewData.outcome === "Hired" ? "bg-success" : interviewData.outcome == "Rejected" ? "bg-danger" : "bg-secondary"}`}>{interviewData.outcome}</span></p>}
         {/* <span className="badge bg-success">Open</span> */}
       </div>
       <div className="text-md-end mt-3 mt-md-0">
@@ -130,19 +131,21 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
 
         <div className="mb-3 mt-3">
           <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px" }}>View Resume</ResumeButton>
-          <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px"}} name={`${interviewData.firstName}_${interviewData.lastName}_Resume.pdf`} className="btn btn-primary p-1 px-2" useCase="download">Download Resume (PDF)</ResumeButton>
+          <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px"}} name={`${interviewData.firstName}_${interviewData.lastName}_Resume.pdf`} useCase="download">Download Resume (PDF)</ResumeButton>
         </div>
+
         {selectedTab === Tabs.Updates && <div className="d-flex flex-column">
           <button className="btn btn-primary"  onClick={() => handleConfirm(Tasks.Accept)}>Accept</button>
           <button className="btn btn-danger" onClick={() => setShowInterviewModal(true)}>Re-Schedule</button>
         </div>}
         
-        {selectedTab === Tabs.Taken && <div className="mt-4 d-flex flex-column align-items-center">
+        {console.log(interviewData.outcome)}
+        {selectedTab === Tabs.Taken && interviewData.outcome == "Pending" && <div className="mt-4 d-flex flex-column align-items-center">
           <h5 className="card-title mb-1">Interview Outcome</h5>
           <div className="d-flex mt-4">
-            <button className="btn btn-primary mx-1" style={{width: "150px"}}>Hired</button>
-            <button className="btn btn-danger mx-1" style={{width: "150px"}}>Rejected</button>
-            <button className="btn btn-secondary mx-1" style={{width: "150px"}}>Didn't Appear</button>
+            <button className="btn btn-primary mx-1" style={{width: "150px"}} onClick={() => interviewService.updateSuccessStatus(interviewData.id, "Hired")}>Hired</button>
+            <button className="btn btn-danger mx-1" style={{width: "150px"}} onClick={() => interviewService.updateSuccessStatus(interviewData.id, "Rejected")}>Rejected</button>
+            <button className="btn btn-secondary mx-1" style={{width: "150px"}} onClick={() => interviewService.updateSuccessStatus(interviewData.id, "DidntAppear")}>Didn't Appear</button>
           </div>
         </div>}
         

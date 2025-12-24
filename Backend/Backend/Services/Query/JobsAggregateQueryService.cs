@@ -67,6 +67,7 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
                 Mode = i.Mode,
                 ConfirmedByHirer = i.ConfirmedByHirer,
                 ConfirmedBySeeker = i.ConfirmedBySeeker,
+                Outcome = i.Outcome,
             }).ToListAsync();
             
             jobWiseInterviews.Add(jobId, interviews);
