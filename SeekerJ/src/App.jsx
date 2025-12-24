@@ -23,6 +23,7 @@ import GithubForm from './components/forms/GithubForm';
 import MetricsLandingPage from './pages/MetricsLandingPage';
 import UnauthNavbar from './components/UnauthNavbar';
 import ResumeBuilderPage from './pages/ResumeBuilderPage';
+import EditJob from './pages/EditJob';
 
 const App = () => {
   const authVar = useAuth();
@@ -48,6 +49,7 @@ const App = () => {
             <>
               <Route path="/dashboard" element={<HirerDashboard />} />
               <Route path="/job/new" element={<NewJob />} />
+              <Route path="/job/edit" element={<EditJob />} />
               <Route path="/applications" element={<ApplicationsPage />} />
 
               {/* Unauthorised */}
