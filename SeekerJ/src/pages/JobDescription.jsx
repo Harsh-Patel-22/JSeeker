@@ -11,7 +11,7 @@ import { postedDateToText } from "../services/Utils";
 
 const JobDescription = () => {
     let location = useLocation();
-    let {jobData} = location.state;
+    let {jobData, applied} = location.state;
     let [job, setJob] = useState({});
     let [showConfirm, setShowConfirm] = useState(false);
     let [loading, setLoading] = useState(false);
@@ -85,7 +85,7 @@ const JobDescription = () => {
         </div>
       </div>
       <div className="mt-3 mt-md-0">
-        {type == "seeker" && <button className="btn btn-primary" onClick={() => setShowConfirm(true)}>Apply</button>}
+        {type == "seeker" && !applied && <button className="btn btn-primary" onClick={() => setShowConfirm(true)}>Apply</button>}
         <ConfirmModal loading={loading} show={showConfirm} onConfirm={() => apply({"seekerId": user.clientId, "jobId": job.id, "hirerId": job.hirerId, "jobType": job.type})} onCancel={() => setShowConfirm(false)}  message={<>Confirm Application Creation</>}/>
       </div>
     </div>

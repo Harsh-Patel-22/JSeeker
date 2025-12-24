@@ -75,7 +75,7 @@ const JobCard = ({job, user, status, setRefetch}) => {
                 </div>
                 
                 <div className="mt-3">
-                    <Link to={"/job"} state={{jobData: job.id}} className="btn btn-primary">View Details</Link>
+                    <Link to={"/job"} state={{jobData: job.id, applied: status == Statuses.Applied}} className="btn btn-primary">View Details</Link>
                     {job.status != Statuses.Closed && (type == "hirer"  ? <a href="#" className="btn btn-danger" style={{float: 'right'}} onClick={() => setShowConfirm(true)}>Close Applications</a> : status != Statuses.Applied && status != Statuses.Closed && <a href="#" className="btn btn-primary" style={{float: 'right'}} onClick={() => setShowConfirm(true)}>Apply Now</a>)}
                     <ConfirmModal loading={loading} show={showConfirm} onConfirm={() => {type == "hirer" ? updateJobStatusToClose(job.id) : apply({"seekerId": userId, "jobId": job.id, "hirerId": job.hirerId, "jobType": job.type})}} onCancel={() => setShowConfirm(false)}  message={type == "hirer" ? <>You <strong>won't be able to reopen</strong> this job post again.</> : <>Confirm Application Creation</>}/>
                 </div>
