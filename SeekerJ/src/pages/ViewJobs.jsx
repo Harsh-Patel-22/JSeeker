@@ -1,7 +1,7 @@
 // import 'bootstrap/dist/css/bootstrap.css'
 import { useState, useEffect } from 'react';
 import './ViewJobs.css'
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import {applyToJob, postedDateToText} from '../services/Utils'
 import { AxiosError } from 'axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,6 +23,7 @@ const JobCard = ({job, user, status, setRefetch}) => {
     let type = user.role.toLowerCase() || "seeker";
     let userId = user?.clientId || null;
     let {showToast} = useToast();
+    let navigate = useNavigate();
 
     async function updateJobStatusToClose(jobId) {
         setLoading(true);
@@ -49,7 +50,20 @@ const JobCard = ({job, user, status, setRefetch}) => {
         <div className="card border-0 bg-light rounded shadow">
             <div className="card-body p-4">
                 <span className="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">{job.type}</span>
-                <h5>{job.title}</h5>
+                <h5>{job.title}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        className="bi bi-pencil"
+                        viewBox="0 0 16 16"
+                        onClick={() => {navigate('/job/edit', {state: {jobId: job.id}})}}
+                    >
+                        <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.793 9.793-3.182.795a.25.25 0 0 1-.303-.303l.795-3.182 9.793-9.793z"/>
+                        <path d="M11.207 2L3 10.207V13h2.793L14 4.793 11.207 2z"/>
+                    </svg>
+                </h5>
                 <span className="badge rounded-pill bg-secondary float-md-end mb-3 mb-sm-0">{job.status}</span>
                 <div className="mt-3">
                     <span className="text-muted d-block"><i className="fa fa-home" aria-hidden="true"></i> <a href="#" target="_blank" className="text-muted">{job.companyName}</a></span>
@@ -155,7 +169,7 @@ const ViewJobs = () => {
                 </div>
             {/* </div> */}
                 <div className="text-center text-md-end mb-4">
-                    {type == "hirer" && <Link to={"/job/new"} className="btn btn-secondary">{type == "seeker" ? "" : "Add New Job"} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-arrow-right fea icon-sm"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></Link>}
+                    {type == "hirer" && <Link to={"/job/new"} className="btn btn-outline-secondary">{type == "seeker" ? "" : "Add New Job"} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-arrow-right fea icon-sm"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></Link>}
                 </div>
 
                 <div className="btn-group rounded-pill shadow overflow-hidden" role="group" style={{background: "#f8f9fa;"}}>
