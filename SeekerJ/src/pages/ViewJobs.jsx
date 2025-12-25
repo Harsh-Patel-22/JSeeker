@@ -51,18 +51,20 @@ const JobCard = ({job, user, status, setRefetch}) => {
             <div className="card-body p-4">
                 <span className="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">{job.type}</span>
                 <h5>{job.title}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        className="bi bi-pencil"
-                        viewBox="0 0 16 16"
-                        onClick={() => {navigate('/job/edit', {state: {jobId: job.id}})}}
-                    >
-                        <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.793 9.793-3.182.795a.25.25 0 0 1-.303-.303l.795-3.182 9.793-9.793z"/>
-                        <path d="M11.207 2L3 10.207V13h2.793L14 4.793 11.207 2z"/>
-                    </svg>
+                    {type == "hirer" &&
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            className="bi bi-pencil"
+                            viewBox="0 0 16 16"
+                            onClick={() => {navigate('/job/edit', {state: {jobId: job.id}})}}
+                        >
+                            <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.793 9.793-3.182.795a.25.25 0 0 1-.303-.303l.795-3.182 9.793-9.793z"/>
+                            <path d="M11.207 2L3 10.207V13h2.793L14 4.793 11.207 2z"/>
+                        </svg>
+                    }
                 </h5>
                 <span className="badge rounded-pill bg-secondary float-md-end mb-3 mb-sm-0">{job.status}</span>
                 <div className="mt-3">
