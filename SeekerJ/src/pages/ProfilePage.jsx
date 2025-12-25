@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import './ProfilePage.css'
+
 import BasicDetailsSection from '../components/profile/BasicDetailsSection';
 import ResumeSection from '../components/profile/ResumeSection';
 import EducationSection from '../components/profile/EducationSection';
@@ -8,64 +9,121 @@ import TechnologiesSection from './TechnologiesSection';
 import ProjectsSection from '../components/profile/ProjectsSection';
 import ContactSection from '../components/profile/ContactSection';
 import LanguagesSection from '../components/profile/LanguagesSection';
-import HobbiesSection from '../components/profile/HobbiesSection';
-import CollapsibleSection from '../components/CollapsibleSection';
+
 import { useEffect, useState } from 'react';
 import { userService } from '../services/apiServices';
 
 const ProfilePage = () => {
-    const [userDetails, setUserDetails] = useState(null); 
-    const [technologiesList, setTechnologiesList] = useState([]);
+  const [userDetails, setUserDetails] = useState(null);
+  const [technologiesList, setTechnologiesList] = useState([]);
 
-    useEffect(() => {
-        async function fetchProfile() {
-          let response = await userService.getProfileDetails();
-          console.log("Profile details fetched:", response.data);
+  useEffect(() => {
+    async function fetchProfile() {
+      const response = await userService.getProfileDetails();
 
-          const allTechs = [];
-          response.data?.projectDetails.map((project) => {
-            project.technologiesUsages.map((tech) => {
-             if (!allTechs.includes(tech.name)) {
-                allTechs.push(tech.name);
-              }
-            });
-          });
-          setTechnologiesList(allTechs);
-          setUserDetails(response.data);
-        }
+      const allTechs = [];
+      response.data?.projectDetails?.forEach(project => {
+        project.technologiesUsages?.forEach(tech => {
+          if (!allTechs.includes(tech.name)) {
+            allTechs.push(tech.name);
+          }
+        });
+      });
 
-        fetchProfile();
-    }, []);
+      setTechnologiesList(allTechs);
+      setUserDetails(response.data);
+    }
 
-    return (
+    fetchProfile();
+  }, []);
+
+  return (
     <div className="container mt-5 mb-5">
-        <BasicDetailsSection details = {userDetails?.basicDetails}/>
-        <ResumeSection/>
 
-        <CollapsibleSection title={"Education"}>
-          <EducationSection details={userDetails?.educationDetails} />
-        </CollapsibleSection>
-        <CollapsibleSection title={"Experience"}>
-          <ExperienceSection details={userDetails?.workExperienceDetails} />
-        </CollapsibleSection>
-        
-        {console.log(technologiesList)}
-        <CollapsibleSection title={"Technologies"}>
-          <TechnologiesSection technologies={technologiesList} />
-        </CollapsibleSection>
-        <CollapsibleSection title={"Projects"}>
-          {console.log("Projects Details:", userDetails?.projectDetails)}
-          <ProjectsSection details={userDetails?.projectDetails} />
-        </CollapsibleSection>
-        <CollapsibleSection title={"Contact"}>
-          <ContactSection details={userDetails?.contactDetails}/>
-        </CollapsibleSection>
-        <CollapsibleSection title={"Languages"}>
-          <LanguagesSection details={userDetails?.vocalLanguage} />
-        </CollapsibleSection>
+      {/* ===== HEADER ===== */}
+      <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div className="row align-items-center">
 
+          {/* LEFT: Profile info */}
+          <div className="col-md-8">
+            <BasicDetailsSection details={userDetails?.basicDetails} />
+          </div>
+
+          {/* RIGHT: Resume actions */}
+          <div className="col-md-4 text-md-end mt-3 mt-md-0">
+            <ResumeSection />
+          </div>
+
+        </div>
+      </div>
+
+
+      {/* ===== TABS ===== */}
+      <div className="card border-0 shadow-sm rounded-4 p-4">
+        <ul className="nav nav-tabs mb-4" role="tablist">
+          <li className="nav-item">
+            <button className="nav-link active" data-bs-toggle="tab" data-bs-target="#education">
+              Education
+            </button>
+          </li>
+          <li className="nav-item">
+            <button className="nav-link" data-bs-toggle="tab" data-bs-target="#experience">
+              Experience
+            </button>
+          </li>
+          <li className="nav-item">
+            <button className="nav-link" data-bs-toggle="tab" data-bs-target="#technologies">
+              Technologies
+            </button>
+          </li>
+          <li className="nav-item">
+            <button className="nav-link" data-bs-toggle="tab" data-bs-target="#projects">
+              Projects
+            </button>
+          </li>
+          <li className="nav-item">
+            <button className="nav-link" data-bs-toggle="tab" data-bs-target="#contact">
+              Contact
+            </button>
+          </li>
+          <li className="nav-item">
+            <button className="nav-link" data-bs-toggle="tab" data-bs-target="#languages">
+              Languages
+            </button>
+          </li>
+        </ul>
+
+        {/* ===== TAB CONTENT ===== */}
+        <div className="tab-content">
+
+          <div className="tab-pane fade show active" id="education">
+            <EducationSection details={userDetails?.educationDetails} />
+          </div>
+
+          <div className="tab-pane fade" id="experience">
+            <ExperienceSection details={userDetails?.workExperienceDetails} />
+          </div>
+
+          <div className="tab-pane fade" id="technologies">
+            <TechnologiesSection technologies={technologiesList} />
+          </div>
+
+          <div className="tab-pane fade" id="projects">
+            <ProjectsSection details={userDetails?.projectDetails} />
+          </div>
+
+          <div className="tab-pane fade" id="contact">
+            <ContactSection details={userDetails?.contactDetails} />
+          </div>
+
+          <div className="tab-pane fade" id="languages">
+            <LanguagesSection details={userDetails?.vocalLanguage} />
+          </div>
+
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default ProfilePage;
