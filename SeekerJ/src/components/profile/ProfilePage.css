@@ -1,0 +1,33 @@
+.icon-action {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  color: #6c757d; /* Bootstrap secondary */
+  transition: 
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.icon-action:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #212529; /* Bootstrap dark */
+  transform: translateY(-1px);
+}
+
+.icon-action:active {
+  transform: scale(0.95);
+}
+
+.icon-action.view:hover {
+  color: #0d6efd; /* Bootstrap primary */
+}
+
+.icon-action.edit:hover {
+  color: #198754; /* Bootstrap success */
+}
+
+.icon-action.create:hover {
+  color: #0d6efd;
+}

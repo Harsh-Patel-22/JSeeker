@@ -9,6 +9,8 @@ import TechnologiesSection from './TechnologiesSection';
 import ProjectsSection from '../components/profile/ProjectsSection';
 import ContactSection from '../components/profile/ContactSection';
 import LanguagesSection from '../components/profile/LanguagesSection';
+import CompanyDetailsSection from '../components/profile/CompanyDetailsSection';
+import { useAuth } from '../contexts/AuthContext';
 
 import { useEffect, useState } from 'react';
 import { userService } from '../services/apiServices';
@@ -16,6 +18,8 @@ import { userService } from '../services/apiServices';
 const ProfilePage = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [technologiesList, setTechnologiesList] = useState([]);
+
+  const {user} = useAuth();
 
   useEffect(() => {
     async function fetchProfile() {
@@ -59,8 +63,17 @@ const ProfilePage = () => {
 
 
       {/* ===== TABS ===== */}
+      
       <div className="card border-0 shadow-sm rounded-4 p-4">
         <ul className="nav nav-tabs mb-4" role="tablist">
+          {user.role === "Hirer" ? (
+            <li className="nav-item">
+              <button className="nav-link" data-bs-toggle="tab" data-bs-target="#company-details">
+                Company Details
+              </button>
+            </li>
+          ) : (<>
+          
           <li className="nav-item">
             <button className="nav-link active" data-bs-toggle="tab" data-bs-target="#education">
               Education
@@ -91,11 +104,18 @@ const ProfilePage = () => {
               Languages
             </button>
           </li>
+          </>
+          )}
         </ul>
 
         {/* ===== TAB CONTENT ===== */}
         <div className="tab-content">
 
+          {user.role === "Hirer" ? (
+            <div className="tab-pane fade show active" id="company-details">
+              <CompanyDetailsSection details={userDetails?.companyDetails} />
+            </div>
+          ) : (<>
           <div className="tab-pane fade show active" id="education">
             <EducationSection details={userDetails?.educationDetails} />
           </div>
@@ -119,7 +139,7 @@ const ProfilePage = () => {
           <div className="tab-pane fade" id="languages">
             <LanguagesSection details={userDetails?.vocalLanguage} />
           </div>
-
+          </>)}
         </div>
       </div>
     </div>
