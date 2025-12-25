@@ -2,7 +2,7 @@ using Backend.Models.Users.Cocurricular;
 
 namespace Backend.DTOs.Users;
 
-public class UserProfileDetailsDto {
+public class SeekerProfileDetailsDto {
     public BasicDetailsDto? BasicDetails { get; set; }
     public List<EducationDetailsDto> EducationDetails { get; set; }
     public List<WorkExperienceDetailsDto> WorkExperienceDetails { get; set; }

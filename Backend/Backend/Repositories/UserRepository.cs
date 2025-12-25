@@ -196,8 +196,8 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
     }
     
     // Section - Profile Related
-    public async Task<UserProfileDetailsDto> GetProfileDetailsAsync(Guid userId) {
-        UserProfileDetailsDto dto = new UserProfileDetailsDto();
+    public async Task<SeekerProfileDetailsDto> GetSeekerProfileDetailsAsync(Guid userId) {
+        SeekerProfileDetailsDto dto = new SeekerProfileDetailsDto();
         dto.BasicDetails =  await GetBasicDetailsAsync(userId);
         dto.EducationDetails =  await GetEducationDetailsAsync(userId);
         dto.ProjectDetails =  await GetProjectsAsync(userId);
@@ -205,6 +205,11 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         dto.WorkExperienceDetails = await GetWorkExperienceDetailsAsync(userId);
         dto.ContactDetails = await GetContactDetailsAsync(userId);
         return dto;
+    }
+    public async Task<HirerProfileDetailsDto> GetHirerProfileDetailsAsync(Guid userId) {
+        var companyDetails = await context.Hirers.Where(h => h.Id == userId).Select(h => new { h.CompanyName, h.Designation, h.WebsiteLink }).FirstOrDefaultAsync();
+        var dto = await context.Users.Where(u => u.Id == userId).Include(u => u.Address).Select(u => new HirerProfileDetailsDto(u.FirstName, u.LastName, u.PhoneNumber, u.Gender, u.Address, companyDetails!.CompanyName, companyDetails.Designation, companyDetails.WebsiteLink)).FirstOrDefaultAsync();
+        return dto!;
     }
     public async Task<BasicDetailsDto?> GetBasicDetailsAsync(Guid userId) {
         var details = await (from user in context.Users

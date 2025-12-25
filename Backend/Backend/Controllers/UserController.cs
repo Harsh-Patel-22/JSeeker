@@ -101,10 +101,16 @@ public class UserController (UserRepository repository, HirerService hirerServic
         return Ok(await userService.GetApplicantDetailsAsync(applicantId));
     }
 
-    [HttpGet("profile/details")]
-    public async Task<IActionResult> GetProfileDetailsAsync() {
+    [HttpGet("profile/details/seeker")]
+    public async Task<IActionResult> GetSeekerProfileDetailsAsync() {
         Guid userId = User.GetNameIdentifier();
-        return Ok(await userService.GetProfileDetailsAsync(userId));
+        return Ok(await userService.GetSeekerProfileDetailsAsync(userId));
+    }
+    
+    [HttpGet("profile/details/hirer")]
+    public async Task<IActionResult> GetHirerProfileDetailsAsync() {
+        Guid userId = User.GetNameIdentifier();
+        return Ok(await userService.GetHirerProfileDetailsAsync(userId));
     }
     
     // TODO - Make this one call. Dont fetch again and again!!

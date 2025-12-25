@@ -185,10 +185,17 @@ public class UserService (GithubService githubService, UserRepository userReposi
         return await userRepository.GetResumeAndTemplateNumberAsync(userId);
     }
 
-    public async Task<UserProfileDetailsDto> GetProfileDetailsAsync(Guid userId) {
+    public async Task<SeekerProfileDetailsDto> GetSeekerProfileDetailsAsync(Guid userId) {
         if (!await validationService.UserExistsAsync(userId)) {
             throw new GlobalExceptions.Unauthorised();
         }
-        return await userRepository.GetProfileDetailsAsync(userId);
+        return await userRepository.GetSeekerProfileDetailsAsync(userId);
+    }
+
+    public async Task<HirerProfileDetailsDto> GetHirerProfileDetailsAsync(Guid userId) {
+        if (!await validationService.UserExistsAsync(userId)) {
+            throw new GlobalExceptions.Unauthorised();
+        }
+        return await userRepository.GetHirerProfileDetailsAsync(userId);
     }
 }
