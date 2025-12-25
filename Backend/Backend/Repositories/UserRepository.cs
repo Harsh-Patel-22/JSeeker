@@ -208,8 +208,17 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
     }
     public async Task<HirerProfileDetailsDto> GetHirerProfileDetailsAsync(Guid userId) {
         var companyDetails = await context.Hirers.Where(h => h.Id == userId).Select(h => new { h.CompanyName, h.Designation, h.WebsiteLink }).FirstOrDefaultAsync();
-        var dto = await context.Users.Where(u => u.Id == userId).Include(u => u.Address).Select(u => new HirerProfileDetailsDto(u.FirstName, u.LastName, u.PhoneNumber, u.Gender, u.Address, companyDetails!.CompanyName, companyDetails.Designation, companyDetails.WebsiteLink)).FirstOrDefaultAsync();
-        return dto!;
+        var dto = await context.Users.Where(u => u.Id == userId).Include(u => u.Address).Select(u => new HirerProfileDetailsDto() {
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            PhoneNumber = u.PhoneNumber,
+            CompanyName =  companyDetails.CompanyName,
+            Designation =  companyDetails.Designation,
+            CompanyAddress = u.Address,
+            Gender =  u.Gender,
+            WebsiteLink = companyDetails.WebsiteLink,
+        }).FirstOrDefaultAsync();
+        return dto;
     }
     public async Task<BasicDetailsDto?> GetBasicDetailsAsync(Guid userId) {
         var details = await (from user in context.Users
