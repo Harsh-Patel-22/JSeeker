@@ -23,8 +23,8 @@ const ProfilePage = () => {
 
   useEffect(() => {
     async function fetchProfile() {
-      const response = await userService.getProfileDetails();
-
+      const response = (user.role == "Hirer" ? await userService.getHirerProfileDetails() : await userService.getSeekerProfileDetails());
+      
       const allTechs = [];
       response.data?.projectDetails?.forEach(project => {
         project.technologiesUsages?.forEach(tech => {
@@ -50,14 +50,15 @@ const ProfilePage = () => {
 
           {/* LEFT: Profile info */}
           <div className="col-md-8">
-            <BasicDetailsSection details={userDetails?.basicDetails} />
+            <BasicDetailsSection details={user.role == "Hirer" ? userDetails : userDetails?.basicDetails} />
           </div>
 
           {/* RIGHT: Resume actions */}
+          {user.role == "Seeker" && (
           <div className="col-md-4 text-md-end mt-3 mt-md-0">
             <ResumeSection />
           </div>
-
+          )}
         </div>
       </div>
 
@@ -113,7 +114,7 @@ const ProfilePage = () => {
 
           {user.role === "Hirer" ? (
             <div className="tab-pane fade show active" id="company-details">
-              <CompanyDetailsSection details={userDetails?.companyDetails} />
+              <CompanyDetailsSection details={userDetails} />
             </div>
           ) : (<>
           <div className="tab-pane fade show active" id="education">

@@ -17,7 +17,8 @@ export const userService = {
   getResumePdf: async (targetGuid) => await api.post('user/get/resume/pdf', targetGuid),
   getCoordinates: async () => await api.get('user/get/coordinates'),
   // TODO - TO add profile related details fetching calls 
-  getProfileDetails: async () => await api.get('user/profile/details'),
+  getSeekerProfileDetails: async () => await api.get('user/profile/details/seeker'),
+  getHirerProfileDetails: async () => await api.get('user/profile/details/hirer'),
   getHirerDashboardDetails: async () => await api.get('user/get/dashboard'),
 };
 
