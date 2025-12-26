@@ -13,7 +13,7 @@ export const userService = {
   updateRepoNames: async (data) => await api.post('user/update/repoNames', data),
   updateAutoPickRepoNames: async () => await api.post('user/generate/repoNames'),
   updateResume: async (data) => await api.post('user/update/resume', data),
-  getResume: async (data) => await api.get('get/resume', data),
+  getResume: async () => await api.get('user/get/resume'),
   getResumePdf: async (targetGuid) => await api.post('user/get/resume/pdf', targetGuid),
   getCoordinates: async () => await api.get('user/get/coordinates'),
   // TODO - TO add profile related details fetching calls 

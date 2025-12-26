@@ -1,15 +1,14 @@
- import React from "react";
 import BaseForm from "./BaseForm";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { useState } from "react";
 
-export const StepBasicDetails = ({ onNext, defaultData }) => {
+export const StepBasicDetails = ({ onNext, initialData = null }) => {
   const fields = [
-    { name: "firstName", label: "First Name", type: "text", required: true, showRequired: true, twoColumn: true },
-    { name: "lastName", label: "Last Name", type: "text", required: true, showRequired: true, twoColumn: true },
-    { name: "state", label: "State", type: "text", twoColumn: true },
-    { name: "country", label: "Country", type: "text", twoColumn: true },
-    { name: "aboutLine", label: "About You", type: "textarea", required: true, showRequired: true },
+    { name: "FirstName", label: "First Name", type: "text", required: true, showRequired: true, twoColumn: true },
+    { name: "LastName", label: "Last Name", type: "text", required: true, showRequired: true, twoColumn: true },
+    { name: "State", label: "State", type: "text", twoColumn: true },
+    { name: "Country", label: "Country", type: "text", twoColumn: true },
+    { name: "AboutLine", label: "About You", type: "textarea", required: true, showRequired: true },
   ];
 
   const validate = (data) => {
@@ -25,22 +24,26 @@ export const StepBasicDetails = ({ onNext, defaultData }) => {
   };
 
   return (
+    <>
+    {console.log("Initial Data in Basic Details:", initialData)}
     <BaseForm
     //   title="Basic Details"
-      fields={fields}
-      onSubmit={handleSubmit}
-      validate={validate}
-      loading={false}
+    fields={fields}
+    onSubmit={handleSubmit}
+    initialData={initialData}
+    validate={validate}
+    loading={false}
     />
+    </>
   );
 };
 
-export const StepContactDetails = ({ onNext, defaultData }) => {
+export const StepContactDetails = ({ onNext, initialData = null }) => {
   const fields = [
-    { name: "email", label: "Email", type: "email", required: true, showRequired: true },
-    { name: "githubProfileLink", label: "GitHub Profile", type: "text" },
-    { name: "linkedInProfileLink", label: "LinkedIn Profile", type: "text" },
-    { name: "phoneNumber", label: "Phone Number", type: "text", required: true, showRequired: true },
+    { name: "Email", label: "Email", type: "email", required: true, showRequired: true },
+    { name: "GithubProfileLink", label: "GitHub Profile", type: "text" },
+    { name: "LinkedInProfileLink", label: "LinkedIn Profile", type: "text" },
+    { name: "PhoneNumber", label: "Phone Number", type: "text", required: true, showRequired: true },
   ];
 
   const validate = (data) => {
@@ -59,6 +62,7 @@ export const StepContactDetails = ({ onNext, defaultData }) => {
     //   title="Contact Details"
       fields={fields}
       onSubmit={handleSubmit}
+      initialData={initialData}
       validate={validate}
       loading={false}
     />
@@ -66,7 +70,7 @@ export const StepContactDetails = ({ onNext, defaultData }) => {
 };
 
 
-export const StepProjects = ({ onNext, onBack, initialData = [] }) => {
+export const StepProjects = ({ onNext, onBack, initialData = null }) => {
   const [technologiesUsages, setTechnologiesUsages] = useState([
     { name: "", usage: "" },
   ]);
@@ -114,7 +118,7 @@ export const StepProjects = ({ onNext, onBack, initialData = [] }) => {
 
   return (
     <div>
-      <BaseForm fields={fields} onSubmit={handleSubmit} />
+      <BaseForm fields={fields} initialData={initialData} onSubmit={handleSubmit} />
 
       {/* --- Technologies Section --- */}
       <div className="mt-4 p-3 border rounded-3 bg-light">
@@ -168,7 +172,7 @@ export const StepProjects = ({ onNext, onBack, initialData = [] }) => {
   );
 };
 
-export const StepExperience = ({ onNext, onBack, initialData }) => {
+export const StepExperience = ({ onNext, onBack, initialData = null }) => {
   const fields = [
     { name: "role", label: "Role", type: "text", required: true, twoColumn: true },
     { name: "companyName", label: "Company Name", type: "text", required: true, twoColumn: true },
@@ -182,12 +186,13 @@ export const StepExperience = ({ onNext, onBack, initialData }) => {
     //   title="Work Experience"
     //   subtitle="List your professional experience."
       fields={fields}
+      initialData={initialData}
       onSubmit={(data) => onNext({ workExperienceDetails: [data] })}
     />
   );
 };
 
-export const StepEducation = ({ onNext, onBack, initialData }) => {
+export const StepEducation = ({ onNext, onBack, initialData = null }) => {
   const fields = [
     { name: "study", label: "Degree / Study", type: "text", required: true, twoColumn: true },
     { name: "instituteName", label: "Institute Name", type: "text", required: true, twoColumn: true },
@@ -202,12 +207,13 @@ export const StepEducation = ({ onNext, onBack, initialData }) => {
     //   title="Education Details"
     //   subtitle="Tell us about your academic background."
       fields={fields}
+      initialData={initialData}
       onSubmit={(data) => onNext({ educationDetails: [data] })}
     />
   );
 };
 
-export const StepLanguages = ({ onNext, onBack }) => {
+export const StepLanguages = ({ onNext, onBack, initialData = null }) => {
   const fields = [
     { name: "name", label: "Language Name", type: "text", required: true, twoColumn: true },
     {
@@ -229,6 +235,7 @@ export const StepLanguages = ({ onNext, onBack }) => {
     //   title="Language Proficiency"
     //   subtitle="List the languages you speak."
       fields={fields}
+      initialData={initialData}
       onSubmit={(data) => onNext({ languageDetails: [data] })}
     />
   );

@@ -176,14 +176,16 @@ const BaseForm = ({
   title,
   subtitle,
   fields,
+  initialData = null,
   onSubmit,
   validate,
   loading,
   redirectProgress,
 }) => {
-  const [formData, setFormData] = useState(
+  
+  const [formData, setFormData] = (initialData != null ? useState(initialData) : useState(
     fields.reduce((acc, f) => ({ ...acc, [f.name]: f.default || "" }), {})
-  );
+  ));
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -211,7 +213,7 @@ const BaseForm = ({
         </>
         ) : <h3 className="text-center mb-4">{title}</h3>}
         
-      
+      {console.log("BaseForm rendering with initialData:", initialData, "and formData:", formData)}
       
 
       <form onSubmit={handleSubmit}>
