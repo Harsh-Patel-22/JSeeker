@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { AxiosError, HttpStatusCode } from "axios";
 import ConfirmModal from '../components/forms/ConfirmModal'
 import {useToast} from '../contexts/ToastContext'
+import { useAuth } from "../contexts/AuthContext";
 import { InterviewSchedulingModal } from "../components/forms/FormModals";
 import ResumeButton from "../components/ui/ResumeButton";
 
 const Tabs = {
   Updates: "Updates",
   Scheduled: "Scheduled",
-  Taken: "Taken"
+  Finished: "Finished"
 };
 
 const Tasks = {
@@ -26,6 +27,7 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
   const [interviewDateTime, setInterviewDateTime] = useState({});
 
   const {showToast} = useToast();
+  const {user} = useAuth();
 
   async function execute(){
     setLoading(true);
@@ -130,17 +132,21 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
         </div>
 
         <div className="mb-3 mt-3">
-          <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px" }}>View Resume</ResumeButton>
-          <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px"}} name={`${interviewData.firstName}_${interviewData.lastName}_Resume.pdf`} useCase="download">Download Resume (PDF)</ResumeButton>
+          {user.role == "Hirer" && <>
+            <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px" }}>View Resume</ResumeButton>
+            <ResumeButton targetClientId={interviewData.seekerId} className="btn btn-primary p-1 px-2 mx-1" style={{width: "220px"}} name={`${interviewData.firstName}_${interviewData.lastName}_Resume.pdf`} useCase="download">Download Resume (PDF)</ResumeButton>
+          </>}
         </div>
 
         {selectedTab === Tabs.Updates && <div className="d-flex flex-column">
-          <button className="btn btn-primary"  onClick={() => handleConfirm(Tasks.Accept)}>Accept</button>
-          <button className="btn btn-danger" onClick={() => setShowInterviewModal(true)}>Re-Schedule</button>
+          <div className="d-flex mt-4">
+            <button className="btn btn-primary mx-1" style={{width: "150px"}}  onClick={() => handleConfirm(Tasks.Accept)}>Accept</button>
+            <button className="btn btn-danger mx-1" style={{width: "150px"}} onClick={() => setShowInterviewModal(true)}>Re-Schedule</button>
+          </div>
         </div>}
         
         {console.log(interviewData.outcome)}
-        {selectedTab === Tabs.Taken && interviewData.outcome == "Pending" && <div className="mt-4 d-flex flex-column align-items-center">
+        {user.role == "Hirer" && selectedTab === Tabs.Finished && interviewData.outcome == "Pending" && <div className="mt-4 d-flex flex-column align-items-center">
           <h5 className="card-title mb-1">Interview Outcome</h5>
           <div className="d-flex mt-4">
             <button className="btn btn-primary mx-1" style={{width: "150px"}} onClick={() => interviewService.updateSuccessStatus(interviewData.id, "Hired")}>Hired</button>
@@ -183,7 +189,13 @@ const InterviewSchedule = () => {
     useEffect(() => {
         async function fetchInterviews(){
           try {
-            let response = await interviewService.getInterviews(selectedTab)
+            let response;
+            if(selectedTab === Tabs.Finished){
+              response = await interviewService.getInterviews("Taken");
+            }
+            else{
+              response = await interviewService.getInterviews(selectedTab);
+            }
             setInterviews(response.data);
           } catch (error) {
               if(error == AxiosError)
@@ -202,7 +214,7 @@ const InterviewSchedule = () => {
         <div className="mb-4 d-flex gap-2 flex-wrap align-items-center justify-content-center">
              <button className={`btn btn-outline-warning ${selectedTab === Tabs.Updates ? "active" : "text-dark"}`} data-status="updates" onClick={() => updateSelectedTab(Tabs.Updates)}>Need Action</button>
             <button className={`btn btn-outline-success ${selectedTab === Tabs.Scheduled ? "active" : ""}`} data-status="schedule" onClick={() => updateSelectedTab(Tabs.Scheduled)}>Scheduled</button>
-            <button className={`btn btn-outline-secondary ${selectedTab === Tabs.Taken ? "active" : ""}`} data-status="taken" onClick={() => updateSelectedTab(Tabs.Taken)}>Taken</button>
+            <button className={`btn btn-outline-secondary ${selectedTab === Tabs.Finished ? "active" : ""}`} data-status="finished" onClick={() => updateSelectedTab(Tabs.Finished)}>Finished</button>
             {/* <button className={`btn btn-outline-danger ${status === Statuses.Rejected && "active"}`} data-status="rejected" onClick={() => fetchApplicationsBasedOnStatus(Statuses.Rejected)}>Rejected</button> */}
         </div>
     {interviews.length > 0 ? 
