@@ -102,6 +102,11 @@ export const StepProjects = forwardRef(({ initialData = [] }, ref) => {
   const [projects, setProjects] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
 
+  const [versions, setVersions] = useState(
+    () => projects.map(() => 0)
+  );
+
+
   useEffect(() => {
     if (Array.isArray(initialData) && initialData.length > 0) {
       setProjects(initialData);
@@ -110,10 +115,51 @@ export const StepProjects = forwardRef(({ initialData = [] }, ref) => {
     }
   }, [initialData]);
 
+  useEffect(() => {
+    setVersions(
+      (Array.isArray(initialData) && initialData.length
+        ? initialData
+        : [{}]
+      ).map(() => 0)
+    );
+  }, [initialData]);
+
+
   const addProject = () => {
     setProjects(prev => {
       setActiveIndex(prev.length);
       return [...prev, {}];
+    });
+  };
+
+  const clearProject = (index) => {
+    setProjects(prev => {
+      const updated = [...prev];
+      updated[index] = {};
+      return updated;
+    });
+
+    setVersions(prev => {
+      const updated = [...prev];
+      updated[index] += 1;
+      return updated;
+    });
+  };
+
+
+  const deleteProject = (index) => {
+    setProjects(prev => {
+      if (prev.length === 1) return prev;
+
+      const updated = prev.filter((_, i) => i !== index);
+
+      setActiveIndex(prevIndex => {
+        if (prevIndex === index) return null;
+        if (prevIndex > index) return prevIndex - 1;
+        return prevIndex;
+      });
+
+      return updated;
     });
   };
 
@@ -147,12 +193,40 @@ export const StepProjects = forwardRef(({ initialData = [] }, ref) => {
               Project {index + 1}
               {project.Name && ` — ${project.Name}`}
             </span>
-            <span>{activeIndex === index ? "▲" : "▼"}</span>
+            <div className="d-flex align-items-center gap-2">
+                {activeIndex === index && (
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearProject(index);
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={projects.length === 1}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteProject(index);
+                  }}
+                >
+                  🗑️
+                </Button>
+
+                <span className="ms-2">{activeIndex === index ? "▲" : "▼"}</span>
+              </div>
           </Card.Header>
 
           <Collapse in={activeIndex === index}>
             <div className="p-3">
               <BaseForm
+                key={`project-${index}-${versions[index]}`}
                 formId={`form-step-2-${index}`}
                 fields={fields}
                 initialData={project}
@@ -183,12 +257,25 @@ export const StepExperience = forwardRef(({ initialData = [] }, ref) => {
   const [experiences, setExperiences] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
 
+  const [versions, setVersions] = useState(
+    () => experiences.map(() => 0)
+  );
+
   useEffect(() => {
     if (Array.isArray(initialData) && initialData.length > 0) {
       setExperiences(initialData);
     } else {
       setExperiences([{}]);
     }
+  }, [initialData]);
+
+  useEffect(() => {
+    setVersions(
+      (Array.isArray(initialData) && initialData.length
+        ? initialData
+        : [{}]
+      ).map(() => 0)
+    );
   }, [initialData]);
 
   useImperativeHandle(ref, () => ({
@@ -199,6 +286,37 @@ export const StepExperience = forwardRef(({ initialData = [] }, ref) => {
     setExperiences(prev => {
       setActiveIndex(prev.length);
       return [...prev, {}];
+    });
+  };
+
+  const clearExperience = (index) => {
+    setExperiences(prev => {
+      const updated = [...prev];
+      updated[index] = {};
+      return updated;
+    });
+
+    setVersions(prev => {
+      const updated = [...prev];
+      updated[index] += 1;
+      return updated;
+    });
+  };
+
+
+  const deleteExperience = (index) => {
+    setExperiences(prev => {
+      if (prev.length === 1) return prev;
+
+      const updated = prev.filter((_, i) => i !== index);
+
+      setActiveIndex(prevIndex => {
+        if (prevIndex === index) return null;
+        if (prevIndex > index) return prevIndex - 1;
+        return prevIndex;
+      });
+
+      return updated;
     });
   };
 
@@ -225,12 +343,40 @@ export const StepExperience = forwardRef(({ initialData = [] }, ref) => {
               Experience {index + 1}
               {exp.Role && ` — ${exp.Role}`}
             </span>
-            <span>{activeIndex === index ? "▲" : "▼"}</span>
+            <div className="d-flex align-items-center gap-2">
+                {activeIndex === index && (
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearExperience(index);
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={experiences.length === 1}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteExperience(index);
+                  }}
+                >
+                  🗑️
+                </Button>
+
+                <span className="ms-2">{activeIndex === index ? "▲" : "▼"}</span>
+              </div>
           </Card.Header>
 
           <Collapse in={activeIndex === index}>
             <div className="p-3">
               <BaseForm
+              key={`experience-${index}-${versions[index]}`}
                 fields={fields}
                 initialData={exp}
                 onChange={(data) => updateExperience(index, data)}
@@ -261,12 +407,25 @@ export const StepEducation = forwardRef(({ initialData = [] }, ref) => {
   const [educationList, setEducationList] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
 
+  const [versions, setVersions] = useState(
+    () => educationList.map(() => 0)
+  );
+
   useEffect(() => {
     if (Array.isArray(initialData) && initialData.length > 0) {
       setEducationList(initialData);
     } else {
       setEducationList([{}]);
     }
+  }, [initialData]);
+
+  useEffect(() => {
+    setVersions(
+      (Array.isArray(initialData) && initialData.length
+        ? initialData
+        : [{}]
+      ).map(() => 0)
+    );
   }, [initialData]);
 
   useImperativeHandle(ref, () => ({
@@ -277,6 +436,37 @@ export const StepEducation = forwardRef(({ initialData = [] }, ref) => {
     setEducationList(prev => {
       setActiveIndex(prev.length);
       return [...prev, {}];
+    });
+  };
+
+  const clearEducation = (index) => {
+    setEducationList(prev => {
+      const updated = [...prev];
+      updated[index] = {};
+      return updated;
+    });
+
+    setVersions(prev => {
+      const updated = [...prev];
+      updated[index] += 1;
+      return updated;
+    });
+  };
+
+
+  const deleteEducation = (index) => {
+    setEducationList(prev => {
+      if (prev.length === 1) return prev;
+
+      const updated = prev.filter((_, i) => i !== index);
+
+      setActiveIndex(prevIndex => {
+        if (prevIndex === index) return null;
+        if (prevIndex > index) return prevIndex - 1;
+        return prevIndex;
+      });
+
+      return updated;
     });
   };
 
@@ -303,12 +493,40 @@ export const StepEducation = forwardRef(({ initialData = [] }, ref) => {
               Education {index + 1}
               {edu.Study && ` — ${edu.Study}`}
             </span>
-            <span>{activeIndex === index ? "▲" : "▼"}</span>
+              <div className="d-flex align-items-center gap-2">
+                {activeIndex === index && (
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearEducation(index);
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={educationList.length === 1}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteEducation(index);
+                  }}
+                >
+                  🗑️
+                </Button>
+
+                <span className="ms-2">{activeIndex === index ? "▲" : "▼"}</span>
+              </div>
           </Card.Header>
 
           <Collapse in={activeIndex === index}>
             <div className="p-3">
               <BaseForm
+              key={`education-${index}-${versions[index]}`}
                 fields={fields}
                 initialData={edu}
                 onChange={(data) => updateEducation(index, data)}
@@ -345,6 +563,9 @@ export const StepLanguages = forwardRef(({ initialData = [] }, ref) => {
 
   const [languages, setLanguages] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
+  const [versions, setVersions] = useState(
+    () => languages.map(() => 0)
+  );
 
   useEffect(() => {
     console.log("Initial Data in Languages:", initialData);
@@ -355,6 +576,15 @@ export const StepLanguages = forwardRef(({ initialData = [] }, ref) => {
     }
   }, [initialData]);
 
+  useEffect(() => {
+    setVersions(
+      (Array.isArray(initialData) && initialData.length
+        ? initialData
+        : [{}]
+      ).map(() => 0)
+    );
+  }, [initialData]);
+
   useImperativeHandle(ref, () => ({
     getData: () => languages,
   }));
@@ -363,6 +593,37 @@ export const StepLanguages = forwardRef(({ initialData = [] }, ref) => {
     setLanguages(prev => {
       setActiveIndex(prev.length);
       return [...prev, {}];
+    });
+  };
+
+  const clearLanguage = (index) => {
+    setLanguages(prev => {
+      const updated = [...prev];
+      updated[index] = {};
+      return updated;
+    });
+
+    setVersions(prev => {
+      const updated = [...prev];
+      updated[index] += 1;
+      return updated;
+    });
+  };
+
+
+  const deleteLanguage = (index) => {
+    setLanguages(prev => {
+      if (prev.length === 1) return prev;
+
+      const updated = prev.filter((_, i) => i !== index);
+
+      setActiveIndex(prevIndex => {
+        if (prevIndex === index) return null;
+        if (prevIndex > index) return prevIndex - 1;
+        return prevIndex;
+      });
+
+      return updated;
     });
   };
 
@@ -389,7 +650,34 @@ export const StepLanguages = forwardRef(({ initialData = [] }, ref) => {
               Language {index + 1}
               {lang.Name && ` — ${lang.Name}`}
             </span>
-            <span>{activeIndex === index ? "▲" : "▼"}</span>
+            <div className="d-flex align-items-center gap-2">
+                {activeIndex === index && (
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearLanguage(index);
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={languages.length === 1}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteLanguage(index);
+                  }}
+                >
+                  🗑️
+                </Button>
+
+                <span className="ms-2">{activeIndex === index ? "▲" : "▼"}</span>
+              </div>
           </Card.Header>
 
           <Collapse in={activeIndex === index}>
