@@ -1,8 +1,19 @@
 import BaseForm from "./BaseForm";
-import { Form, Button, Row, Col } from "react-bootstrap";
-import { useState } from "react";
+import { Form, Button, Row, Col, Collapse, Card } from "react-bootstrap";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 
-export const StepBasicDetails = ({ onNext, initialData = null }) => {
+export const StepBasicDetails = forwardRef(({ initialData = {} }, ref) => {
+  const [draft, setDraft] = useState(initialData);
+
+  useEffect(() => {
+    setDraft(initialData || {});
+  }, [initialData]);
+
+  useImperativeHandle(ref, () => ({
+    getData: () => draft,
+  }));
+
+
   const fields = [
     { name: "FirstName", label: "First Name", type: "text", required: true, showRequired: true, twoColumn: true },
     { name: "LastName", label: "Last Name", type: "text", required: true, showRequired: true, twoColumn: true },
@@ -19,225 +30,384 @@ export const StepBasicDetails = ({ onNext, initialData = null }) => {
     return errors;
   };
 
-  const handleSubmit = async (data) => {
-    onNext(data);
-  };
-
   return (
     <>
     {console.log("Initial Data in Basic Details:", initialData)}
     <BaseForm
     //   title="Basic Details"
     fields={fields}
-    onSubmit={handleSubmit}
+    onChange={setDraft}
     initialData={initialData}
     validate={validate}
     loading={false}
+    showSubmit={false}
     />
     </>
   );
-};
+});
 
-export const StepContactDetails = ({ onNext, initialData = null }) => {
+export const StepContactDetails = forwardRef(
+  ({ initialData = {} }, ref) => {
+
+    const [draft, setDraft] = useState(initialData);
+
+    useEffect(() => {
+      setDraft(initialData || {});
+    }, [initialData]);
+
+
+    const fields = [
+      { name: "Email", label: "Email", type: "email", required: true, showRequired: true },
+      { name: "GithubProfileLink", label: "GitHub Profile", type: "text" },
+      { name: "LinkedInProfileLink", label: "LinkedIn Profile", type: "text" },
+      { name: "PhoneNumber", label: "Phone Number", type: "text", required: true, showRequired: true },
+    ];
+
+    const validate = (data) => {
+      const errors = {};
+      if (!data.Email) errors.Email = "Email is required";
+      if (!data.PhoneNumber) errors.PhoneNumber = "Phone number is required";
+      return errors;
+    };
+
+    useImperativeHandle(ref, () => ({
+      getData: () => draft,
+    }));
+
+    return (
+      <BaseForm
+        fields={fields}
+        initialData={initialData}
+        validate={validate}
+        showSubmit={false}
+        loading={false}
+        onChange={setDraft} // updates local draft only
+      />
+    );
+  }
+);
+
+
+export const StepProjects = forwardRef(({ initialData = [] }, ref) => {
+
   const fields = [
-    { name: "Email", label: "Email", type: "email", required: true, showRequired: true },
-    { name: "GithubProfileLink", label: "GitHub Profile", type: "text" },
-    { name: "LinkedInProfileLink", label: "LinkedIn Profile", type: "text" },
-    { name: "PhoneNumber", label: "Phone Number", type: "text", required: true, showRequired: true },
+    { name: "Name", label: "Project Name", type: "text", required: true },
+    { name: "Description", label: "Description", type: "textarea", required: true },
+    { name: "StartDate", label: "Start Date", type: "date", twoColumn: true },
+    { name: "LastUpdatedDate", label: "Last Updated", type: "date", twoColumn: true },
+    { name: "GithubRepoLink", label: "GitHub Repo Link", type: "text" },
   ];
 
-  const validate = (data) => {
-    const errors = {};
-    if (!data.email) errors.email = "Email is required";
-    if (!data.phoneNumber) errors.phoneNumber = "Phone number is required";
-    return errors;
-  };
+  
+  const [projects, setProjects] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(null);
 
-  const handleSubmit = async (data) => {
-    onNext(data);
-  };
+  useEffect(() => {
+    if (Array.isArray(initialData) && initialData.length > 0) {
+      setProjects(initialData);
+    } else {
+      setProjects([{}]);
+    }
+  }, [initialData]);
 
-  return (
-    <BaseForm
-    //   title="Contact Details"
-      fields={fields}
-      onSubmit={handleSubmit}
-      initialData={initialData}
-      validate={validate}
-      loading={false}
-    />
-  );
-};
-
-
-export const StepProjects = ({ onNext, onBack, initialData = null }) => {
-  const [technologiesUsages, setTechnologiesUsages] = useState([
-    { name: "", usage: "" },
-  ]);
-
-  const fields = [
-    { name: "name", label: "Project Name", type: "text", required: true },
-    { name: "description", label: "Description", type: "textarea", required: true },
-    { name: "startDate", label: "Start Date", type: "date", required: true, twoColumn: true },
-    { name: "lastUpdatedDate", label: "Last Updated", type: "date", required: true, twoColumn: true },
-    { name: "githubRepoLink", label: "GitHub Repo Link", type: "text", required: false },
-  ];
-
-  const handleTechChange = (index, field, value) => {
-    const updated = [...technologiesUsages];
-    updated[index][field] = value;
-    console.log("Updated Technologies Usages:", updated);
-    setTechnologiesUsages(updated);
-  };
-
-  const addTech = () => {
-    setTechnologiesUsages((prev) => [...prev, { name: "", usage: "" }]);
-  };
-
-  const removeTech = (index) => {
-    setTechnologiesUsages((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = (data) => {
-    const cleanedTechs = technologiesUsages
-      .filter((t) => t.name.trim() !== "")
-      .map((t) => ({
-        name: t.name,
-        usage: parseFloat(t.usage || 0),
-      }));
-
-    onNext({
-      projectDetails: [
-        {
-          ...data,
-          technologiesUsages: cleanedTechs,
-        },
-      ],
+  const addProject = () => {
+    setProjects(prev => {
+      setActiveIndex(prev.length);
+      return [...prev, {}];
     });
   };
 
+  const toggleAccordion = (index) => {
+    setActiveIndex((prev) => (prev === index ? null : index));
+  };
+
+
+  const updateProject = (index, data) => {
+    setProjects((prev) => {
+      const updated = [...prev];
+      updated[index] = data;
+      return updated;
+    });
+  };
+
+  useImperativeHandle(ref, () => ({
+    getData: () => projects,
+  }));
+
   return (
-    <div>
-      <BaseForm fields={fields} initialData={initialData} onSubmit={handleSubmit} />
+    <>
+      {projects.map((project, index) => (
+        <Card key={index} className="mb-3">
+          <Card.Header
+            className="d-flex justify-content-between align-items-center"
+            onClick={() => toggleAccordion(index)}
+            style={{ cursor: "pointer" }}
+          >
+            <span>
+              Project {index + 1}
+              {project.Name && ` — ${project.Name}`}
+            </span>
+            <span>{activeIndex === index ? "▲" : "▼"}</span>
+          </Card.Header>
 
-      {/* --- Technologies Section --- */}
-      <div className="mt-4 p-3 border rounded-3 bg-light">
-        <h5 className="mb-3 text-primary">Technologies Used</h5>
-
-        {technologiesUsages.map((tech, index) => (
-          <Row key={index} className="align-items-center mb-2">
-            <Col md={6}>
-              <Form.Control
-                type="text"
-                placeholder="Technology Name"
-                value={tech.name}
-                onChange={(e) =>
-                  handleTechChange(index, "name", e.target.value)
-                }
+          <Collapse in={activeIndex === index}>
+            <div className="p-3">
+              <BaseForm
+                formId={`form-step-2-${index}`}
+                fields={fields}
+                initialData={project}
+                onChange={(data) => updateProject(index, data)}
+                showSubmit={false}
               />
-            </Col>
-            <Col md={4}>
-              <Form.Control
-                type="number"
-                placeholder="Usage %"
-                value={tech.usage}
-                onChange={(e) =>
-                  handleTechChange(index, "usage", e.target.value)
-                }
-              />
-            </Col>
-            <Col md={2}>
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={() => removeTech(index)}
-                disabled={technologiesUsages.length === 1}
-              >
-                ✕
-              </Button>
-            </Col>
-          </Row>
-        ))}
+            </div>
+          </Collapse>
+        </Card>
+      ))}
 
-        <Button
-          variant="outline-primary"
-          size="sm"
-          className="mt-2"
-          onClick={addTech}
-        >
-          + Add Technology
+        <Button variant="outline-primary" onClick={addProject}>
+          ➕ Add Project
         </Button>
-      </div>
-    </div>
-  );
-};
+    </>
+  ); 
+});
 
-export const StepExperience = ({ onNext, onBack, initialData = null }) => {
+export const StepExperience = forwardRef(({ initialData = [] }, ref) => {
   const fields = [
-    { name: "role", label: "Role", type: "text", required: true, twoColumn: true },
-    { name: "companyName", label: "Company Name", type: "text", required: true, twoColumn: true },
-    { name: "description", label: "Description", type: "textarea", required: true },
-    { name: "startDate", label: "Start Date", type: "date", required: true, twoColumn: true },
-    { name: "endDate", label: "End Date", type: "date", required: true, twoColumn: true },
+    { name: "Role", label: "Role", type: "text", required: true, twoColumn: true },
+    { name: "CompanyName", label: "Company Name", type: "text", required: true, twoColumn: true },
+    { name: "Description", label: "Description", type: "textarea", required: true },
+    { name: "StartDate", label: "Start Date", type: "date", required: true, twoColumn: true },
+    { name: "EndDate", label: "End Date", type: "date", required: true, twoColumn: true },
   ];
 
-  return (
-    <BaseForm
-    //   title="Work Experience"
-    //   subtitle="List your professional experience."
-      fields={fields}
-      initialData={initialData}
-      onSubmit={(data) => onNext({ workExperienceDetails: [data] })}
-    />
-  );
-};
+  const [experiences, setExperiences] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(null);
 
-export const StepEducation = ({ onNext, onBack, initialData = null }) => {
+  useEffect(() => {
+    if (Array.isArray(initialData) && initialData.length > 0) {
+      setExperiences(initialData);
+    } else {
+      setExperiences([{}]);
+    }
+  }, [initialData]);
+
+  useImperativeHandle(ref, () => ({
+    getData: () => experiences,
+  }));
+
+  const addExperience = () => {
+    setExperiences(prev => {
+      setActiveIndex(prev.length);
+      return [...prev, {}];
+    });
+  };
+
+  const toggleAccordion = (index) => {
+    setActiveIndex(prev => (prev === index ? null : index));
+  };
+
+  const updateExperience = (index, data) => {
+    const updated = [...experiences];
+    updated[index] = data;
+    setExperiences(updated);
+  };
+
+  return (
+    <>
+      {experiences.map((exp, index) => (
+        <Card key={index} className="mb-3">
+          <Card.Header
+            onClick={() => toggleAccordion(index)}
+            className="d-flex justify-content-between align-items-center"
+            style={{ cursor: "pointer" }}
+          >
+            <span>
+              Experience {index + 1}
+              {exp.Role && ` — ${exp.Role}`}
+            </span>
+            <span>{activeIndex === index ? "▲" : "▼"}</span>
+          </Card.Header>
+
+          <Collapse in={activeIndex === index}>
+            <div className="p-3">
+              <BaseForm
+                fields={fields}
+                initialData={exp}
+                onChange={(data) => updateExperience(index, data)}
+                showSubmit={false}
+              />
+            </div>
+          </Collapse>
+        </Card>
+      ))}
+
+      <Button variant="outline-primary" onClick={addExperience}>
+        ➕ Add Experience
+      </Button>
+    </>
+  );
+});
+
+export const StepEducation = forwardRef(({ initialData = [] }, ref) => {
   const fields = [
-    { name: "study", label: "Degree / Study", type: "text", required: true, twoColumn: true },
-    { name: "instituteName", label: "Institute Name", type: "text", required: true, twoColumn: true },
-    { name: "state", label: "State", type: "text", required: true, twoColumn: true },
-    { name: "country", label: "Country", type: "text", required: true, twoColumn: true },
-    { name: "startDate", label: "Start Date", type: "date", required: true, twoColumn: true },
-    { name: "endDate", label: "End Date", type: "date", required: true, twoColumn: true },
+    { name: "Study", label: "Degree / Study", type: "text", required: true, twoColumn: true },
+    { name: "InstituteName", label: "Institute Name", type: "text", required: true, twoColumn: true },
+    { name: "State", label: "State", type: "text", required: true, twoColumn: true },
+    { name: "Country", label: "Country", type: "text", required: true, twoColumn: true },
+    { name: "StartDate", label: "Start Date", type: "date", required: true, twoColumn: true },
+    { name: "EndDate", label: "End Date", type: "date", required: true, twoColumn: true },
   ];
 
-  return (
-    <BaseForm
-    //   title="Education Details"
-    //   subtitle="Tell us about your academic background."
-      fields={fields}
-      initialData={initialData}
-      onSubmit={(data) => onNext({ educationDetails: [data] })}
-    />
-  );
-};
+  const [educationList, setEducationList] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(null);
 
-export const StepLanguages = ({ onNext, onBack, initialData = null }) => {
+  useEffect(() => {
+    if (Array.isArray(initialData) && initialData.length > 0) {
+      setEducationList(initialData);
+    } else {
+      setEducationList([{}]);
+    }
+  }, [initialData]);
+
+  useImperativeHandle(ref, () => ({
+    getData: () => educationList,
+  }));
+
+  const addEducation = () => {
+    setEducationList(prev => {
+      setActiveIndex(prev.length);
+      return [...prev, {}];
+    });
+  };
+
+  const toggleAccordion = (index) => {
+    setActiveIndex(prev => (prev === index ? null : index));
+  };
+
+  const updateEducation = (index, data) => {
+    const updated = [...educationList];
+    updated[index] = data;
+    setEducationList(updated);
+  };
+
+  return (
+    <>
+      {educationList.map((edu, index) => (
+        <Card key={index} className="mb-3">
+          <Card.Header
+            onClick={() => toggleAccordion(index)}
+            className="d-flex justify-content-between align-items-center"
+            style={{ cursor: "pointer" }}
+          >
+            <span>
+              Education {index + 1}
+              {edu.Study && ` — ${edu.Study}`}
+            </span>
+            <span>{activeIndex === index ? "▲" : "▼"}</span>
+          </Card.Header>
+
+          <Collapse in={activeIndex === index}>
+            <div className="p-3">
+              <BaseForm
+                fields={fields}
+                initialData={edu}
+                onChange={(data) => updateEducation(index, data)}
+                showSubmit={false}
+              />
+            </div>
+          </Collapse>
+        </Card>
+      ))}
+
+      <Button variant="outline-primary" onClick={addEducation}>
+        ➕ Add Education
+      </Button>
+    </>
+  );
+});
+
+export const StepLanguages = forwardRef(({ initialData = [] }, ref) => {
   const fields = [
-    { name: "name", label: "Language Name", type: "text", required: true, twoColumn: true },
+    { name: "Name", label: "Language Name", type: "text", required: true, twoColumn: true },
     {
-      name: "level",
+      name: "Level",
       label: "Proficiency Level",
       type: "select",
+      required: true,
+      twoColumn: true,
       options: [
         { label: "Learning", value: "Learning" },
         { label: "Fluent", value: "Fluent" },
         { label: "Native", value: "Native" },
       ],
-      required: true,
-      twoColumn: true,
     },
   ];
 
-  return (
-    <BaseForm
-    //   title="Language Proficiency"
-    //   subtitle="List the languages you speak."
-      fields={fields}
-      initialData={initialData}
-      onSubmit={(data) => onNext({ languageDetails: [data] })}
-    />
-  );
-};
+  const [languages, setLanguages] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(null);
 
+  useEffect(() => {
+    console.log("Initial Data in Languages:", initialData);
+    if (Array.isArray(initialData) && initialData.length > 0) {
+      setLanguages(initialData);
+    } else {
+      setLanguages([{}]);
+    }
+  }, [initialData]);
+
+  useImperativeHandle(ref, () => ({
+    getData: () => languages,
+  }));
+
+  const addLanguage = () => {
+    setLanguages(prev => {
+      setActiveIndex(prev.length);
+      return [...prev, {}];
+    });
+  };
+
+  const toggleAccordion = (index) => {
+    setActiveIndex(prev => (prev === index ? null : index));
+  };
+
+  const updateLanguage = (index, data) => {
+    const updated = [...languages];
+    updated[index] = data;
+    setLanguages(updated);
+  };
+
+  return (
+    <>
+      {languages.map((lang, index) => (
+        <Card key={index} className="mb-3">
+          <Card.Header
+            onClick={() => toggleAccordion(index)}
+            className="d-flex justify-content-between align-items-center"
+            style={{ cursor: "pointer" }}
+          >
+            <span>
+              Language {index + 1}
+              {lang.Name && ` — ${lang.Name}`}
+            </span>
+            <span>{activeIndex === index ? "▲" : "▼"}</span>
+          </Card.Header>
+
+          <Collapse in={activeIndex === index}>
+            <div className="p-3">
+              <BaseForm
+                fields={fields}
+                initialData={lang}
+                onChange={(data) => updateLanguage(index, data)}
+                showSubmit={false}
+              />
+            </div>
+          </Collapse>
+        </Card>
+      ))}
+
+      <Button variant="outline-primary" onClick={addLanguage}>
+        ➕ Add Language
+      </Button>
+    </>
+  );
+});

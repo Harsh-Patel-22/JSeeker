@@ -9,18 +9,19 @@ export const renderField = (field, handleChange, loading, formData) => {
         return (<select
                   name={field.name}
                   className="form-control"
-                  value={formData[field.name]}
                   onChange={handleChange}
+                  value={field.options?.[formData[field.name]].value}
                   disabled={loading}
                   required={field.required}
-                >
+                  >
                   <option value="">Select...</option>
                   {field.options?.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
-                </select>);
+                </select>
+                );
 
       case "radio":
         return (
@@ -178,20 +179,41 @@ const BaseForm = ({
   fields,
   initialData = null,
   onSubmit,
+  onChange,  
   validate,
   loading,
   redirectProgress,
+  showSubmit = true
 }) => {
   
-  const [formData, setFormData] = (initialData != null ? useState(initialData) : useState(
-    fields.reduce((acc, f) => ({ ...acc, [f.name]: f.default || "" }), {})
-  ));
+  const [formData, setFormData] = useState(() => {
+    if (initialData) return initialData;
+
+    return fields.reduce((acc, f) => {
+      if (!f.name) return acc;
+      acc[f.name] = f.default || "";
+      return acc;
+    }, {});
+  });
+
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (onChange) {
+      onChange({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
+
 
   const handleSubmit = async (e) => {
     console.log("BaseForm handleSubmit called with data:", formData);
@@ -212,14 +234,12 @@ const BaseForm = ({
           <p className="text-center mb-4">{subtitle}</p>
         </>
         ) : <h3 className="text-center mb-4">{title}</h3>}
-        
-      {console.log("BaseForm rendering with initialData:", initialData, "and formData:", formData)}
       
 
       <form onSubmit={handleSubmit}>
         {renderFields(fields, errors, handleChange, loading, formData)}
         {/* <button type="submit">Submit</button> */}
-        <SpinnerButton loading={loading} type="submit">Submit</SpinnerButton>
+        {showSubmit && <SpinnerButton loading={loading} type="submit">Submit</SpinnerButton>}
       </form>
 
       {redirectProgress !== null && redirectProgress < 100 && (

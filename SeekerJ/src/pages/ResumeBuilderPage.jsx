@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Card, ProgressBar, Button } from "react-bootstrap";
+import { Container, Card, ProgressBar, Button, Spinner } from "react-bootstrap";
 import { StepBasicDetails, StepContactDetails, StepEducation, StepLanguages, StepExperience, StepProjects } from "../components/forms/ResumeForms";
 import { useToast } from "../contexts/ToastContext";
 import { userService } from "../services/apiServices";
@@ -32,8 +32,8 @@ const ResumeBuilderPage = () => {
   const progress = ((step + 1) / steps.length) * 100;
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const stepRef = useRef();
 
-  // 🔹 Fetch resume once
   useEffect(() => {
     const fetchResume = async () => {
       try {
@@ -58,44 +58,71 @@ const ResumeBuilderPage = () => {
     fetchResume();
   }, []);
 
-  const handleNext = async (data) => {
-    const keys = [
-      "basicDetails",
-      "contactDetails",
-      "projectDetails",
-      "workExperienceDetails",
-      "educationDetails",
-      "languageDetails",
-    ];
+  // const handleNext = async (data) => {
+  //   const keys = [
+  //     "basicDetails",
+  //     "contactDetails",
+  //     "projectDetails",
+  //     "workExperienceDetails",
+  //     "educationDetails",
+  //     "languageDetails",
+  //   ];
 
-    let valueToSet = data;
+  //   let valueToSet = data;
 
-    if (
-      ["projectDetails", "workExperienceDetails", "educationDetails", "languageDetails"]
-        .includes(keys[step])
-    ) {
-      valueToSet = data[keys[step]] || [];
-    }
+  //   if (
+  //     ["projectDetails", "workExperienceDetails", "educationDetails", "languageDetails"]
+  //       .includes(keys[step])
+  //   ) {
+  //     valueToSet = data[keys[step]] || [];
+  //   }
 
-    const updated = { ...formData, [keys[step]]: valueToSet };
-    setFormData(updated);
+  //   const updated = { ...formData, [keys[step]]: valueToSet };
+  //   setFormData(updated);
 
-    if (step < steps.length - 1) {
-      setStep(step + 1);
-    } else {
-      showToast("Saving resume...", true);
-      const response = await userService.updateResumeContents(updated);
+  //   if (step < steps.length - 1) {
+  //     setStep(step + 1);
+  //   } else {
+  //     // showToast("Saving resume...", true);
+  //     const response = await userService.updateResumeContents(updated);
 
-      if (response.status !== HttpStatusCode.Ok) {
-        showToast("Resume save failed", false);
-      } else {
-        showToast("Resume saved successfully!", true);
-        navigate("/dashboard");
-      }
-    }
+  //     if (response.status !== HttpStatusCode.Ok) {
+  //       showToast("Resume save failed", false);
+  //     } else {
+  //       showToast("Resume saved successfully!", true);
+  //       navigate("/dashboard");
+  //     }
+  //   }
+  // };
+
+  // const handleBack = () => step > 0 && setStep(step - 1);
+
+
+  const handleNext = () => {
+    const data = stepRef?.current?.getData();
+    console.log("Data from step ", step, data);
+    // if(data === null || data === undefined) {
+    //   showToast("Please fill in the required fields.", false);
+    //   return;
+    // }
+    setFormData(prev => ({
+      ...prev,
+      [steps[step].formName]: data
+    }));
+
+    setStep(prev => prev + 1);
   };
 
-  const handleBack = () => step > 0 && setStep(step - 1);
+  const handleBack = () => {
+    const data = stepRef?.current?.getData();
+
+    setFormData(prev => ({
+      ...prev,
+      [steps[step].formName]: data
+    }));
+
+    setStep(prev => prev - 1);
+  };
 
   if (loading) {
     return (
@@ -104,6 +131,18 @@ const ResumeBuilderPage = () => {
       </div>
     );
   }
+
+  // const saveCurrentStep = () => {
+  //   if (!stepRef.current) return;
+
+  //   const data = stepRef.current.getData();
+
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     [steps[step].key]: data,
+  //   }));
+  // };
+
 
   return (
     <Container className="py-5">
@@ -114,8 +153,7 @@ const ResumeBuilderPage = () => {
         </div>
 
         <CurrentStep
-          onBack={handleBack}
-          onNext={handleNext}
+          ref={stepRef}
           initialData={formData[steps[step].formName]}
         />
 
@@ -125,10 +163,8 @@ const ResumeBuilderPage = () => {
           </Button>
           <Button
             variant="primary"
-            type="submit"
             onClick={handleNext}
-            form={`form-step-${step}`}
-          >
+            >
             {step === steps.length - 1 ? "Finish" : "Next →"}
           </Button>
         </div>
