@@ -58,59 +58,25 @@ const ResumeBuilderPage = () => {
     fetchResume();
   }, []);
 
-  // const handleNext = async (data) => {
-  //   const keys = [
-  //     "basicDetails",
-  //     "contactDetails",
-  //     "projectDetails",
-  //     "workExperienceDetails",
-  //     "educationDetails",
-  //     "languageDetails",
-  //   ];
-
-  //   let valueToSet = data;
-
-  //   if (
-  //     ["projectDetails", "workExperienceDetails", "educationDetails", "languageDetails"]
-  //       .includes(keys[step])
-  //   ) {
-  //     valueToSet = data[keys[step]] || [];
-  //   }
-
-  //   const updated = { ...formData, [keys[step]]: valueToSet };
-  //   setFormData(updated);
-
-  //   if (step < steps.length - 1) {
-  //     setStep(step + 1);
-  //   } else {
-  //     // showToast("Saving resume...", true);
-  //     const response = await userService.updateResumeContents(updated);
-
-  //     if (response.status !== HttpStatusCode.Ok) {
-  //       showToast("Resume save failed", false);
-  //     } else {
-  //       showToast("Resume saved successfully!", true);
-  //       navigate("/dashboard");
-  //     }
-  //   }
-  // };
-
-  // const handleBack = () => step > 0 && setStep(step - 1);
-
-
-  const handleNext = () => {
+  const handleNext = async () => {
     const data = stepRef?.current?.getData();
     console.log("Data from step ", step, data);
-    // if(data === null || data === undefined) {
-    //   showToast("Please fill in the required fields.", false);
-    //   return;
-    // }
     setFormData(prev => ({
       ...prev,
       [steps[step].formName]: data
     }));
 
-    setStep(prev => prev + 1);
+    if (step === steps.length - 1) {
+      const response = await userService.updateResumeContents(formData);
+      if (response.status !== HttpStatusCode.Ok) {
+        showToast("Resume save failed", false);
+      } else {
+        showToast("Resume saved successfully!", true);
+        navigate("/profile");
+      }
+    } else {
+      setStep(prev => prev + 1);
+    }
   };
 
   const handleBack = () => {
@@ -131,18 +97,6 @@ const ResumeBuilderPage = () => {
       </div>
     );
   }
-
-  // const saveCurrentStep = () => {
-  //   if (!stepRef.current) return;
-
-  //   const data = stepRef.current.getData();
-
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     [steps[step].key]: data,
-  //   }));
-  // };
-
 
   return (
     <Container className="py-5">
