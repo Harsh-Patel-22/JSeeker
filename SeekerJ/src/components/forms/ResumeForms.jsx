@@ -526,7 +526,7 @@ export const StepEducation = forwardRef(({ initialData = [] }, ref) => {
           <Collapse in={activeIndex === index}>
             <div className="p-3">
               <BaseForm
-              key={`education-${index}-${versions[index]}`}
+                key={`education-${index}-${versions[index]}`}
                 fields={fields}
                 initialData={edu}
                 onChange={(data) => updateEducation(index, data)}
@@ -683,6 +683,7 @@ export const StepLanguages = forwardRef(({ initialData = [] }, ref) => {
           <Collapse in={activeIndex === index}>
             <div className="p-3">
               <BaseForm
+                key={`language-${index}-${versions[index]}`}
                 fields={fields}
                 initialData={lang}
                 onChange={(data) => updateLanguage(index, data)}

@@ -10,7 +10,7 @@ export const renderField = (field, handleChange, loading, formData) => {
                   name={field.name}
                   className="form-control"
                   onChange={handleChange}
-                  value={field.options?.[formData[field.name]].value}
+                  value={field.options?.[formData[field.name]]?.value}
                   disabled={loading}
                   required={field.required}
                   >
