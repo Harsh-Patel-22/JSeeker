@@ -29,7 +29,81 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         await context.Users.Where(user => user.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(user => user.IsHirer, true));
     }
 
-    public async Task UpdateUserDetailsAsync(Guid userId, UserSecondaryDetailsDto dto) {
+    public async Task UpdateUserDetailsWithResumeDtoAsync(Guid userId, UpdatedResumeContentsDto dto) {
+        foreach (var projectDetails in dto.ProjectDetails) {
+
+            if (projectDetails.Id == -1) {
+                // Add new project but cant add from here. Need to cater that in the service layer
+                
+            }
+            else {
+                await context.Projects.Where(proj => proj.Id == projectDetails.Id).ExecuteUpdateAsync(setter => setter.SetProperty(p => p.Name, projectDetails.Name).SetProperty(p => p.Description, projectDetails.Description).SetProperty(p => p.GithubRepoLink, projectDetails.GithubRepoLink).SetProperty(p => p.LastUpdatedDate, projectDetails.LastUpdatedDate));
+            }
+        }
+        foreach (var experienceDetails in dto.WorkExperienceDetails) {
+
+            if (experienceDetails.Id == -1) {
+                // Add new work experience
+                await context.WorkExperiences.AddAsync(new WorkExperience() {
+                    Role = experienceDetails.Role,
+                    Description = experienceDetails.Description,
+                    CompanyName = experienceDetails.CompanyName,
+                    StartDate = experienceDetails.StartDate,
+                    EndDate = experienceDetails.EndDate,
+                });
+                await context.SaveChangesAsync();
+            }
+            else {
+                await context.WorkExperiences.Where(we => we.Id == experienceDetails.Id).ExecuteUpdateAsync(setter => setter.SetProperty(we => we.CompanyName, experienceDetails.CompanyName).SetProperty(we => we.Description, experienceDetails.Description).SetProperty(we => we.Role, experienceDetails.Role).SetProperty(we => we.EndDate, experienceDetails.EndDate).SetProperty(we => we.StartDate, experienceDetails.StartDate));
+            }
+        }
+        foreach (var educationDetails in dto.EducationDetails) {
+
+            if (educationDetails.Id == -1) {
+                // Add new education
+                await context.Educations.AddAsync(new Education() {
+                    Study = educationDetails.Study,
+                    InstituteName = educationDetails.InstituteName,
+                    State = educationDetails.State,
+                    Country = educationDetails.Country,
+                    EndDate = educationDetails.EndDate,
+                    StartDate = educationDetails.StartDate
+                });
+                await context.SaveChangesAsync();
+            }
+            else {
+                await context.Educations.Where(e => e.Id == educationDetails.Id).ExecuteUpdateAsync(setter => setter.SetProperty(e => e.Country, educationDetails.Country).SetProperty(e => e.InstituteName, educationDetails.InstituteName).SetProperty(e => e.Study, educationDetails.Study).SetProperty(e => e.State, educationDetails.State).SetProperty(e => e.EndDate, educationDetails.EndDate).SetProperty(e => e.StartDate, educationDetails.StartDate));
+            }
+        }
+
+        foreach (var languageDetails in dto.LanguageDetails) {
+            var languageId = await GetLanguageIdByNameAsync(languageDetails.Name);
+            int recordsUpdated = await context.UserVocalLanguages.Where(uvl => uvl.UserId == userId && uvl.VocalLanguageId == languageId).ExecuteUpdateAsync(setter => setter.SetProperty(uvl => uvl.Level, languageDetails.Level));
+
+            if (recordsUpdated == 0) {
+                // A new entry to the linking table
+                await context.UserVocalLanguages.AddAsync(new UserVocalLanguage() {
+                    UserId = userId,
+                    VocalLanguageId = languageId,
+                    Level = languageDetails.Level
+                });
+
+            }
+        }
+
+
+        foreach (var deletedProject in dto.DeletedProjectDetails) {
+            await context.Projects.Where(p => p.Id == deletedProject.Id).ExecuteDeleteAsync();
+        }
+        foreach (var deletedEducation in dto.DeletedEducationDetails) {
+            await context.Educations.Where(e => e.Id == deletedEducation.Id).ExecuteDeleteAsync();
+        }
+        foreach (var deletedWorkExperience in dto.DeletedWorkExperienceDetails) {
+            await context.WorkExperiences.Where(we => we.Id == deletedWorkExperience.Id).ExecuteDeleteAsync();
+        }
+    }
+    
+    public async Task UpdateUserSecondaryDetailsAsync(Guid userId, UserSecondaryDetailsDto dto) {
         int addressId = await addressRepository.CreateAddressAsync(dto.Address);
         
         User u = new User() {
@@ -75,8 +149,6 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         }
         // The below function executes and SaveChangesAsync() therefore no need to call it anywhere else here
         await DbUpdateHelper.UpdateAllFieldsExceptAsync(u, context, "Id", "PhoneNumber", "Email", "FirstName", "LastName", "GithubUsername", "NumberOfSuccessfulEmployments", "NumberOfRejections", "TechnicalKeywords", "AIGeneratedTechnicalKeywords", "ResumeJsonString", "ResumeTemplateNumber");
-        
-        // TODO - Take the below code to else when the project details are added from github!
        }
 
     public async Task UpdateGithubUsernameFieldAsync(Guid userId, string githubUsername) {
@@ -161,7 +233,7 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         List<Project> projects = await context.Projects.Where(project => project.UserId == userId).ToListAsync();
         foreach (var project in projects) {
             List<TechnologyUsageDto> usage = await context.ProjectTechnologies.Where(pt => pt.ProjectId == project.Id).Select(pt => new TechnologyUsageDto(pt.Technology.Name, pt.PercentUsage)).ToListAsync();
-            projectDetails.Add(project.Name, new ProjectDetailsDto(project.Name, project.Description, usage, project.StartDate, project.LastUpdatedDate, project.GithubRepoLink));
+            projectDetails.Add(project.Name, new ProjectDetailsDto(project.Id, project.Name, project.Description, usage, project.StartDate, project.LastUpdatedDate, project.GithubRepoLink));
         }
         return projectDetails;
     }
@@ -275,7 +347,7 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         
         List<ProjectDetailsDto> projectDetails = new List<ProjectDetailsDto>();
         foreach (var userProject in userProjectModels) {
-            projectDetails.Add(new ProjectDetailsDto(userProject.Name, userProject.Description, technologiesDictionary[userProject.Id], userProject.StartDate, userProject.LastUpdatedDate, userProject.GithubRepoLink));
+            projectDetails.Add(new ProjectDetailsDto( userProject.Id, userProject.Name, userProject.Description, technologiesDictionary[userProject.Id], userProject.StartDate, userProject.LastUpdatedDate, userProject.GithubRepoLink));
         }
         
         return projectDetails;
@@ -283,12 +355,12 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
 
     public async Task<List<EducationDetailsDto>> GetEducationDetailsAsync(Guid userId) {
         // var educationDetails = await (from education in context.Educations where education.UserId == userId select new EducationDetailsDto(education.Study, education.InstituteName, education.State, education.Country, education.StartDate, education.EndDate)).ToListAsync();  
-        var educationDetails = await context.Educations.Where(education => education.UserId == userId).OrderByDescending(we => we.StartDate).Select(e => new EducationDetailsDto(e.Study, e.InstituteName, e.State, e.Country, e.StartDate, e.EndDate)).ToListAsync();
+        var educationDetails = await context.Educations.Where(education => education.UserId == userId).OrderByDescending(we => we.StartDate).Select(e => new EducationDetailsDto(e.Id, e.Study, e.InstituteName, e.State, e.Country, e.StartDate, e.EndDate)).ToListAsync();
         return educationDetails;
     }
 
     public async Task<List<WorkExperienceDetailsDto>> GetWorkExperienceDetailsAsync(Guid userId) {
-        var workExperienceDetails = await context.WorkExperiences.Where(workExperience => workExperience.UserId == userId).OrderByDescending(we => we.StartDate).Select(we => new WorkExperienceDetailsDto(we.Role, we.Description, we.CompanyName, we.StartDate, we.EndDate)).ToListAsync();
+        var workExperienceDetails = await context.WorkExperiences.Where(workExperience => workExperience.UserId == userId).OrderByDescending(we => we.StartDate).Select(we => new WorkExperienceDetailsDto(we.Id, we.Role, we.Description, we.CompanyName, we.StartDate, we.EndDate)).ToListAsync();
         // var workExperienceDetails = await (from workExperience in context.WorkExperiences where workExperience.UserId == userId select new WorkExperienceDetailsDto(workExperience.Role, workExperience.Description, workExperience.CompanyName, workExperience.StartDate, workExperience.EndDate)).ToListAsync();  
         return workExperienceDetails;
     }

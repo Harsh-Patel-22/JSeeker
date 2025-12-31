@@ -26,8 +26,8 @@ public class UserService (GithubService githubService, UserRepository userReposi
     //     };
     // }
 
-    public async Task UpdateUserDetailsAsync(Guid userId, UserSecondaryDetailsDto dto) {
-        await userRepository.UpdateUserDetailsAsync(userId, dto);
+    public async Task UpdateUserSecondaryDetailsAsync(Guid userId, UserSecondaryDetailsDto dto) {
+        await userRepository.UpdateUserSecondaryDetailsAsync(userId, dto);
     }
 
     public async Task UpdateGithubUsernameAsync(Guid userId,  string githubUsername) {
@@ -92,7 +92,7 @@ public class UserService (GithubService githubService, UserRepository userReposi
                 usage
                 ));
             
-            projectDetails.Add(new ProjectDetailsDto(p.Name, p.Description, usage, p.StartDate, p.LastUpdatedDate, p.GithubRepoLink));
+            projectDetails.Add(new ProjectDetailsDto(p.Id, p.Name, p.Description, usage, p.StartDate, p.LastUpdatedDate, p.GithubRepoLink));
 
         }
 
@@ -112,11 +112,19 @@ public class UserService (GithubService githubService, UserRepository userReposi
         
     }
 
-    public async Task UpdateResumeAsync(Guid userId, ResumeContentsDto resumeDto) {
+    public async Task UpdateResumeAsync(Guid userId, UpdatedResumeContentsDto resumeDto) {
         // TODO - Limit the adding/remove projects. Could only update the existing ones... Frontend handling.
-        string resumeString = await resumeBuilder.GetGeneratedResumeAsync(resumeDto);
+        string resumeString = await resumeBuilder.GetGeneratedResumeAsync(new ResumeContentsDto() {
+            ProjectDetails = resumeDto.ProjectDetails,
+            BasicDetails = resumeDto.BasicDetails,
+            ContactDetails = resumeDto.ContactDetails,
+            WorkExperienceDetails = resumeDto.WorkExperienceDetails,
+            EducationDetails = resumeDto.EducationDetails,
+            LanguageDetails = resumeDto.LanguageDetails,
+        });
 
         await userRepository.SetResumeJsonStringAsync(userId ,resumeString);
+        await userRepository.UpdateUserDetailsWithResumeDtoAsync(userId, resumeDto);
     }
     
     public async Task SetResumeJsonStringAsync(Guid userId, string resumeJsonString) {

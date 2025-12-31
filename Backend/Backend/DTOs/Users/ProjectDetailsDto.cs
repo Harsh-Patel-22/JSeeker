@@ -1,6 +1,7 @@
 namespace Backend.DTOs.Users;
 
 public record ProjectDetailsDto(
+    int Id,
     string Name,
     string Description,
     List<TechnologyUsageDto> TechnologiesUsages, 

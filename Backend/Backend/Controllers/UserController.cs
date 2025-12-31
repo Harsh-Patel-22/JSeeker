@@ -43,7 +43,7 @@ public class UserController (UserRepository repository, HirerService hirerServic
     [HttpPost("update/")]
     public async Task<IActionResult> UpdateUserSecondaryDetails([FromBody] UserSecondaryDetailsDto dto) {
         Guid userId = User.GetNameIdentifier();
-        await userService.UpdateUserDetailsAsync(userId, dto);
+        await userService.UpdateUserSecondaryDetailsAsync(userId, dto);
         return Ok();
     }
 
@@ -70,7 +70,7 @@ public class UserController (UserRepository repository, HirerService hirerServic
     }
 
     [HttpPost("update/resume")]
-    public async Task<IActionResult> RegenerateAndUpdateResumeAsync([FromBody] ResumeContentsDto resumeContents) {
+    public async Task<IActionResult> RegenerateAndUpdateResumeAsync([FromBody] UpdatedResumeContentsDto resumeContents) {
         Guid userId = User.GetNameIdentifier();
         await userService.UpdateResumeAsync(userId, resumeContents);
         return Ok();
