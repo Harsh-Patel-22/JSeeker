@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import './ViewJobs.css'
 import { Link, useNavigate } from 'react-router';
 import {applyToJob, postedDateToText} from '../services/Utils'
-import { AxiosError } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import {jobService} from '../services/apiServices';
 import ConfirmModal from '../components/forms/ConfirmModal'
@@ -35,12 +35,21 @@ const JobCard = ({job, user, status, setRefetch}) => {
 
     async function apply(applicationData) {
         setLoading(true);
-        let response = await applyToJob(applicationData);
-        if(response.status == 200){
-            showToast("Application Created Successfully!", true);
+        try
+        {
+            let response = await applyToJob(applicationData);
+            if(response.status == 200){
+                showToast("Application Created Successfully!", true);
+            }
+            else{
+                showToast("Error in Creating Application!", false);
+            }
         }
-        else{
-            showToast("Error in Creating Application!", false);
+        catch(error){
+            if(error.status == HttpStatusCode.InternalServerError){
+                console.log("Internal Server Error");
+                showToast("Application Already Exist!", false);
+            }
         }
         setRefetch(true);
         setShowConfirm(false);

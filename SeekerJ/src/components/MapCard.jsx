@@ -16,7 +16,6 @@ const JobCard = ({job}) => {
     async function apply(applicationData) {
             setLoading(true);
             try{
-    
               let response = await applyToJob(applicationData);
               if(response.status == 200){
                 showToast("Application Created Successfully!", true);
@@ -26,7 +25,7 @@ const JobCard = ({job}) => {
               }
             }
             catch(error){
-              if(error == HttpStatusCode.InternalServerError){
+              if(error.status == HttpStatusCode.InternalServerError){
                 console.log("Internal Server Error");
                 showToast("Application Already Exist!", false);
             }

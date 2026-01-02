@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 // import { Apply } from "../components/Apply";
 import { applyToJob } from "../services/Utils";
 import ConfirmModal from "../components/forms/ConfirmModal";
+import { useToast } from "../contexts/ToastContext";
 import { jobService } from "../services/apiServices";
 import { postedDateToText } from "../services/Utils";
 
@@ -19,6 +20,7 @@ const JobDescription = () => {
     let {user} = useAuth();
     let type = user.role.toLowerCase();
     let navigate = useNavigate();
+    let {showToast} = useToast();
     // console.log(job)
 
     async function apply(applicationData) {
@@ -34,7 +36,7 @@ const JobDescription = () => {
           }
         }
         catch(error){
-          if(error == HttpStatusCode.InternalServerError){
+          if(error.status == HttpStatusCode.InternalServerError){
             console.log("Internal Server Error");
             showToast("Application Already Exist!", false);
         }
