@@ -14,7 +14,7 @@ public class AIService {
         _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Backend", "1.0"));
         
         string? apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
-        _chatEndpoint = $"v1beta/models/gemini-2.0-flash-lite:generateContent?key={apiKey}";
+        _chatEndpoint = $"v1beta/models/gemini-2.5-flash-lite:generateContent?key={apiKey}";
         // _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _ApiKey);
     }
 
