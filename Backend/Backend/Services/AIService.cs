@@ -37,8 +37,26 @@ public class AIService {
         return stringResponse;
     }   
 
-    public JsonElement GetCleanedJson(string rawJsonString) {
-        rawJsonString = rawJsonString.Substring(rawJsonString.IndexOf("{", StringComparison.Ordinal), rawJsonString.IndexOf("}", StringComparison.Ordinal) - rawJsonString.IndexOf("{", StringComparison.Ordinal) + 1);
-        return JsonSerializer.Deserialize<JsonElement>(rawJsonString);
+    public JsonElement GetCleanedJson(string rawJsonString)
+    {
+        int start = rawJsonString.IndexOf('{');
+        if (start == -1)
+            throw new InvalidOperationException("No JSON object found.");
+
+        int depth = 0;
+        for (int i = start; i < rawJsonString.Length; i++)
+        {
+            if (rawJsonString[i] == '{') depth++;
+            else if (rawJsonString[i] == '}') depth--;
+
+            if (depth == 0)
+            {
+                string json = rawJsonString.Substring(start, i - start + 1);
+                return JsonSerializer.Deserialize<JsonElement>(json);
+            }
+        }
+
+        throw new InvalidOperationException("Incomplete JSON object.");
     }
+
 }
