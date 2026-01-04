@@ -16,7 +16,7 @@ const HirerRegistrationForm = () => {
   const [startRedirect, setStartRedirect] = useState(false);
 
   const onComplete = useCallback(() => {
-    navigate("/dashboard/hirer");
+    navigate("/dashboard");
   }, [navigate]);
 
   const progress = useProgressRedirect(onComplete, startRedirect ? 50 : null);

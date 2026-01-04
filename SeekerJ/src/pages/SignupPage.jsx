@@ -10,7 +10,7 @@ const SignupPage = () => {
           <AuthForm mode="signup" />
         </ToastProvider>
         <p className="text-center mt-3">
-          Already have an account? <Link to="/">Log in</Link>
+          Already have an account? <Link to="/login">Log in</Link>
         </p>
       </div>
     </div>

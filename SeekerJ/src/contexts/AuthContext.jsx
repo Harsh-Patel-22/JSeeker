@@ -2,7 +2,7 @@ import { createContext, useEffect, useContext, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
 // Utility to decode a JWT and extract user data
-function parseJwt(token) {
+export function parseJwt(token) {
   if (!token) return null;
   try {
     const decoded = jwtDecode(token);

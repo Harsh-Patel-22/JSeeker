@@ -21,7 +21,7 @@ const GithubForm = () => {
     const [fillingState, setFillingState] = useState(States.GithubUsernameInput);
 
     const onComplete = useCallback(() => {
-        navigate("/dashboard/hirer");
+        
     }, [navigate]);
 
     const progress = useProgressRedirect(onComplete, startRedirect ? 50 : null);

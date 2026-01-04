@@ -36,7 +36,7 @@ const SeekerBasicDetailsForm = () => {
   const [showAddLanguageButton, setShowAddLanguageButton] = useState(true);
 
   const onComplete = useCallback(() => {
-    navigate("/dashboard/hirer");
+    
   }, [jwt, navigate]);
 
   const progress = useProgressRedirect(onComplete, startRedirect ? 50 : null);

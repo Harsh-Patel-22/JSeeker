@@ -1,31 +1,31 @@
 import { useState, useCallback } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth, parseJwt } from "../../contexts/AuthContext";
 import { useToast } from "../../contexts/ToastContext";
 import { useProgressRedirect } from "../../hooks/useProgressRedirect";
 import { authService } from "../../services/apiServices";
 import BaseForm from "./BaseForm";
 
 const AuthForm = ({ mode = "login" }) => {
-  const { login, jwt } = useAuth();
+  const { login, user } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [startRedirect, setStartRedirect] = useState(false);
 
-  const onComplete = useCallback(() => {
-  const token = localStorage.getItem("token") || jwt;
-  if (!token) {
-    console.error("No token found during redirect");
-    return;
-  }
-  const decoded = jwtDecode(token);
-  const role = decoded.role?.toLowerCase();
-  console.log("Redirecting based on role:", role);
-  navigate("/dashboard");
-}, [navigate]);
+  // const onComplete = useCallback(() => {
+  //   const token = localStorage.getItem("token") || jwt;
+  //   if (!token) {
+  //     console.error("No token found during redirect");
+  //     return;
+  //   }
+  //   const decoded = jwtDecode(token);
+  //   const role = decoded.role?.toLowerCase();
+  //   console.log("Redirecting based on role:", role);
+  //   navigate("/dashboard");
+  // }, [navigate]);
 
 
   // const progress = useProgressRedirect(onComplete, startRedirect ? 50 : null);
@@ -82,20 +82,24 @@ const AuthForm = ({ mode = "login" }) => {
       if(mode === "login"){
         let response = await authService.login(formData);
         login(response.data);
+        showToast(`Authentication Successful!`, true);
         navigate("/dashboard");
       }
       else if (mode === "signup") {
-        let response = await authService.register(formData)
+        let response = await authService.register(formData);
+        
         login(response.data);
-        navigate(res.data.role.toLowerCase() === "hirer" ? "/hirerReg" : "/seekerReg");
+        const role = parseJwt(response.data).role;
+        console.log("Registration successful, role: ", role);
+        showToast(`Authentication Successful!`, true);
+        navigate(role.toLowerCase() === "hirer" ? "/hirerReg" : "/seekerReg");
 
       }
-      console.log(res);
-      showToast(`Authentication Successful!`, true);
       console.log("Authentication successful, preparing to redirect...");
 
 
     } catch (err) {
+      console.log("Authentication error:", err);
       showToast(err.response?.data?.message || "Authentication Failed", false);
     } finally {
       setLoading(false);
