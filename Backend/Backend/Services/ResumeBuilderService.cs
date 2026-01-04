@@ -31,7 +31,8 @@ public class ResumeBuilderService (AIService aiService, UserRepository userRepos
     }
 
     public async Task<string> GetAIGeneratedKeywordsAsync(List<JsonElement> projectInsights) {
-        var response = await aiService.GetChatResponseAsync($"{KeywordsGenerationPrompt}. {projectInsights}");
+        // var response = await aiService.GetChatResponseAsync($"{KeywordsGenerationPrompt}. {projectInsights}");
+        var response = "";
         // May need to clean it...   
         // var cleanedJson = StringCleaner.GetCleanCSVString(response);
         return response;
