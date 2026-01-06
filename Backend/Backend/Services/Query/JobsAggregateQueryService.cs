@@ -97,7 +97,7 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
                 NumActiveJobOpenings = numActiveJobOpenings.Count,
                 NumNewApplicationsToday = numNewApplicationsToday.Count,
                 TotalHires = totalHires.Count,
-                HiringRate = (decimal) totalHires.Count / numTotalApplications.Count,
+                HiringRate = numTotalApplications.Count == 0 ? 0 : (decimal) totalHires.Count / numTotalApplications.Count,
             },
             
             ScheduledInterviews = await context.Interviews.Where(i => i.HirerId == hirerId && i.ConfirmedByHirer && i.ConfirmedBySeeker && i.Date == DateOnly.FromDateTime(DateTime.Today)).Select(i => new InterviewBasicDetailsDto() {
