@@ -111,20 +111,39 @@ const JobForm = ({ mode = "create", jobData = null }) => {
               return;
             }
 
+            let payload = {};
 
-            const payload = {
-              title: f.jobTitle.value,
-              description: f.description.value,
-              responsibilities: f.responsibilities.value,
-              termsAndConditions: f.termsandconditions.value,
-              minSalary: f.minimumSalary.value,
-              maxSalary: f.maximumSalary.value,
-              type: f.jobType.value,
-              workMode: f.workMode.value,
-              status: jobData.status,
-              applicationsLimit: f.applicationLimit.value,
-              requiredWorkExperience: f.requiredWorkExperience.value,
-            };
+            if(jobData) {
+              // Edit mode
+              payload = {
+                title: f.jobTitle.value,
+                description: f.description.value,
+                responsibilities: f.responsibilities.value,
+                termsAndConditions: f.termsandconditions.value,
+                minSalary: f.minimumSalary.value,
+                maxSalary: f.maximumSalary.value,
+                type: f.jobType.value,
+                workMode: f.workMode.value,
+                status: jobData.status,
+                applicationsLimit: f.applicationLimit.value,
+                requiredWorkExperience: f.requiredWorkExperience.value,
+              };
+            }
+            else{
+              // Create mode
+              payload = {
+                title: f.jobTitle.value,
+                description: f.description.value,
+                responsibilities: f.responsibilities.value,
+                termsAndConditions: f.termsandconditions.value,
+                minSalary: f.minimumSalary.value,
+                maxSalary: f.maximumSalary.value,
+                type: f.jobType.value,
+                workMode: f.workMode.value,
+                applicationsLimit: f.applicationLimit.value,
+                requiredWorkExperience: f.requiredWorkExperience.value,
+              };
+            }
 
             await submitJob(payload);
           }}
@@ -225,7 +244,7 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                 <select
                   className="form-select"
                   name="jobType"
-                  defaultValue={jobData?.jobType || ""}
+                  defaultValue={jobData?.type || ""}
                 >
                   <option value="">Select type</option>
                   <option value="FullTime">Full-time</option>
