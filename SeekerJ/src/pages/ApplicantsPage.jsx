@@ -54,8 +54,6 @@ const ApplicationCard = ({applicationData, statusFilter, setStatus, role}) => {
     async function execute(){
         // alert("Action confirmed!");
         setLoading(true);
-        // Dummy API Call
-        await new Promise(resolve => setTimeout(resolve, 100));
         
             if (taskToPerform === Tasks.scheduleinterview) {
                 console.log("Scheduling");
@@ -72,6 +70,7 @@ const ApplicationCard = ({applicationData, statusFilter, setStatus, role}) => {
                 let response = await applicationService.scheduleInterview(data);
                 if(response.status === HttpStatusCode.Ok){
                     Toast.showToast("Interview Created Successfully. Waiting for seeker confirmation.", true);
+                    setStatus(Statuses.InterviewScheduling);
                 }
                 else{
                     Toast.showToast("Error Scheduling Interview!", false);
