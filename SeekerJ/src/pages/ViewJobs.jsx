@@ -27,7 +27,13 @@ const JobCard = ({job, user, status, setRefetch}) => {
 
     async function updateJobStatusToClose(jobId) {
         setLoading(true);
-        await jobService.updateJobStatus(jobId,Statuses.Closed);
+        let response = await jobService.updateJobStatus(jobId,Statuses.Closed);
+        if(response.status == HttpStatusCode.Ok){
+            showToast("Job Closed Successfully!", true);
+        }
+        else{
+            showToast("Error in Closing Job!", false);
+        }
         setRefetch(true);
         setShowConfirm(false);
         setLoading(false)
@@ -38,7 +44,7 @@ const JobCard = ({job, user, status, setRefetch}) => {
         try
         {
             let response = await applyToJob(applicationData);
-            if(response.status == 200){
+            if(response.status == HttpStatusCode.Ok){
                 showToast("Application Created Successfully!", true);
             }
             else{

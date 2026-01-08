@@ -54,5 +54,6 @@ export async function downloadResumePDF(targetClientId, fileName) {
 }
 
 export async function applyToJob(applicationData) {
-    await applicationService.apply(applicationData);
+    const response = await applicationService.apply(applicationData);
+    return response;
 }

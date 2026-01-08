@@ -28,8 +28,9 @@ const JobDescription = () => {
         try{
 
           let response = await applyToJob(applicationData);
-          if(response.status == 200){
+          if(response.status == HttpStatusCode.Ok){
             showToast("Application Created Successfully!", true);
+            navigate('/jobs');
           }
           else{
             showToast("Error in Creating Application!", false);
@@ -39,7 +40,10 @@ const JobDescription = () => {
           if(error.status == HttpStatusCode.InternalServerError){
             console.log("Internal Server Error");
             showToast("Application Already Exist!", false);
-        }
+          }
+          else if(error.status == HttpStatusCode.BadRequest){
+            showToast("Bad Request!", false);
+          }
       }
         setShowConfirm(false);
         setLoading(false)

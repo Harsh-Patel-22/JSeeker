@@ -56,8 +56,8 @@ const ApplicationCard = ({applicationData, statusFilter, setStatus, role}) => {
         setLoading(true);
         // Dummy API Call
         await new Promise(resolve => setTimeout(resolve, 100));
-        switch(taskToPerform){
-            case Tasks.scheduleinterview:
+        
+            if (taskToPerform === Tasks.scheduleinterview) {
                 console.log("Scheduling");
                 let data = {
                     "applicationId": applicationData.applicationId,
@@ -77,9 +77,10 @@ const ApplicationCard = ({applicationData, statusFilter, setStatus, role}) => {
                     Toast.showToast("Error Scheduling Interview!", false);
                 }
                 setScheduleInterviewModalToggle(false);
-                break;
-            case Tasks.shortlist:
-                response = await applicationService.updateStatus({"applicationId": applicationData.applicationId, "state": Statuses.Shortlisted});
+            }
+            else if(taskToPerform === Tasks.shortlist){
+                let response = await applicationService.updateStatus({"applicationId": applicationData.applicationId, "state": Statuses.Shortlisted});
+                console.log(response);
                 if(response.status === HttpStatusCode.Ok){
                     Toast.showToast("Application Shortlisted", true);
                     setStatus(Statuses.Shortlisted);
@@ -87,9 +88,10 @@ const ApplicationCard = ({applicationData, statusFilter, setStatus, role}) => {
                 else{
                     Toast.showToast("Error Shortlisting!", false);
                 }
-                break;
-            case Tasks.reject:
-                response = await applicationService.updateStatus({"applicationId": applicationData.applicationId, "state": Statuses.Rejected});
+            }
+            else if(taskToPerform === Tasks.reject){    
+                let response = await applicationService.updateStatus({"applicationId": applicationData.applicationId, "state": Statuses.Rejected});
+                console.log(response);
                 if(response.status === HttpStatusCode.Ok){
                     Toast.showToast("Application Rejected", true);
                     setStatus(Statuses.Rejected);
@@ -97,8 +99,7 @@ const ApplicationCard = ({applicationData, statusFilter, setStatus, role}) => {
                 else{
                     Toast.showToast("Error Rejecting!", false);
                 }
-                break;
-        }
+            }
         setTaskToPerform(null);
         setLoading(false);
         setShowConfirm(false);
@@ -174,7 +175,7 @@ const ApplicationCard = ({applicationData, statusFilter, setStatus, role}) => {
                         <li>Collaborate with backend developers and designers</li>
                         <li>Ensure performance and accessibility</li>
                     </ul> */}
-                    <p>{job?.respoonsibilities}</p>
+                    <p>{job?.responsibilities}</p>
 
                     <h6>Terms & Conditions</h6>
                     {/* <ul>

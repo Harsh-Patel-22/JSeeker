@@ -17,7 +17,7 @@ const JobCard = ({job}) => {
             setLoading(true);
             try{
               let response = await applyToJob(applicationData);
-              if(response.status == 200){
+              if(response.status == HttpStatusCode.Ok){
                 showToast("Application Created Successfully!", true);
               }
               else{
