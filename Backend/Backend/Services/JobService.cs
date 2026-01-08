@@ -269,7 +269,7 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
         if (job.ApplicationsLimit - applicationsCount < _remainingApplicationsThresholdForClosingSoon * job.ApplicationsLimit / 100f) {
             await jobRepository.SetJobStatusAsync(newApplicationDto.JobId, JobStatus.ClosingSoon);
         }
-        if (job.ApplicationsLimit <= applicationsCount) {
+        if (job.ApplicationsLimit < applicationsCount) {
             await jobRepository.SetJobStatusAsync(newApplicationDto.JobId, JobStatus.Closed);
             return false;
         }
