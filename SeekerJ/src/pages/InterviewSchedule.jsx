@@ -41,6 +41,7 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
         }
         else{
           showToast("Failed to update the status.", false);
+          setShowConfirm(false);
         }
       }
       else if(task === Tasks.Reschedule){
@@ -56,6 +57,7 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
         }
       }
     } catch (error) {
+      console.log(error);
       showToast("Error occurred while processing the request.", false);
     }
     finally{
