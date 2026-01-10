@@ -63,6 +63,21 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
     }
   }
 
+  async function handleStatusUpdate(status){
+    try{
+      let response = await interviewService.updateSuccessStatus(interviewData.id, status);
+      if(response.status === HttpStatusCode.Ok){
+        showToast("Interview outcome updated successfully.", true);
+        setSelectedTab(Tabs.Updates);
+      }
+      else{
+        showToast("Failed to update the outcome.", false);
+      }
+    } catch (error) {
+      showToast("Error occurred while updating the outcome.", false);
+    }
+  }
+
   function handleConfirm(task){
     setShowConfirm(true);
     setTask(task);
@@ -149,9 +164,9 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
         {user.role == "Hirer" && selectedTab === Tabs.Finished && interviewData.outcome == "Pending" && <div className="mt-4 d-flex flex-column align-items-center">
           <h5 className="card-title mb-1">Interview Outcome</h5>
           <div className="d-flex mt-4">
-            <button className="btn btn-primary mx-1" style={{width: "150px"}} onClick={() => interviewService.updateSuccessStatus(interviewData.id, "Hired")}>Hired</button>
-            <button className="btn btn-danger mx-1" style={{width: "150px"}} onClick={() => interviewService.updateSuccessStatus(interviewData.id, "Rejected")}>Rejected</button>
-            <button className="btn btn-secondary mx-1" style={{width: "150px"}} onClick={() => interviewService.updateSuccessStatus(interviewData.id, "DidntAppear")}>Didn't Appear</button>
+            <button className="btn btn-primary mx-1" style={{width: "150px"}} onClick={() => handleStatusUpdate("Hired")}>Hired</button>
+            <button className="btn btn-danger mx-1" style={{width: "150px"}} onClick={() => handleStatusUpdate("Rejected")}>Rejected</button>
+            <button className="btn btn-secondary mx-1" style={{width: "150px"}} onClick={() => handleStatusUpdate("DidntAppear")}>Didn't Appear</button>
           </div>
         </div>}
         
