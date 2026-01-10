@@ -91,7 +91,7 @@ const HirerDashboard = () => {
                   },
                   {
                     title: "Hiring Conversion Rate",
-                    value: `${metrics.hiringRate}%`,
+                    value: `${metrics.hiringRate.toFixed(2)}%`,
                   },
                 ].map((stat, idx) => (
                   <Col key={idx} md={6}>
