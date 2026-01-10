@@ -70,7 +70,7 @@ const InterviewCard = ({interviewData, selectedTab, setSelectedTab}) => {
       let response = await interviewService.updateSuccessStatus(interviewData.id, status);
       if(response.status === HttpStatusCode.Ok){
         showToast("Interview outcome updated successfully.", true);
-        setSelectedTab(Tabs.Updates);
+        setSelectedTab(Tabs.Scheduled);
       }
       else{
         showToast("Failed to update the outcome.", false);
