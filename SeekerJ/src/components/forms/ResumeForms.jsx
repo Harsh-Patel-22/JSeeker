@@ -128,7 +128,7 @@ export const StepProjects = forwardRef(({ initialData = [] }, ref) => {
   const addProject = () => {
     setProjects(prev => {
       setActiveIndex(prev.length);
-      return [...prev, {}];
+      return [...prev, {id: -1}];
     });
   };
 
@@ -147,34 +147,13 @@ export const StepProjects = forwardRef(({ initialData = [] }, ref) => {
   };
 
 
-  const deleteProject = (index) => {
-    setProjects(prev => {
-      if (prev.length === 1) return prev;
-
-      const updated = prev.filter((_, i) => i !== index);
-
-      setActiveIndex(prevIndex => {
-        if (prevIndex === index) return null;
-        if (prevIndex > index) return prevIndex - 1;
-        return prevIndex;
-      });
-
-      return updated;
-    });
-  };
+  
 
   const toggleAccordion = (index) => {
     setActiveIndex((prev) => (prev === index ? null : index));
   };
 
 
-  const updateProject = (index, data) => {
-    setProjects((prev) => {
-      const updated = [...prev];
-      updated[index] = data;
-      return updated;
-    });
-  };
 
   useImperativeHandle(ref, () => ({
     getData: () => projects,
@@ -193,34 +172,7 @@ export const StepProjects = forwardRef(({ initialData = [] }, ref) => {
               Project {index + 1}
               {project.Name && ` — ${project.Name}`}
             </span>
-            <div className="d-flex align-items-center gap-2">
-                {activeIndex === index && (
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      clearProject(index);
-                    }}
-                  >
-                    Clear
-                  </Button>
-                )}
-
-                <Button
-                  variant="danger"
-                  size="sm"
-                  disabled={projects.length === 1}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteProject(index);
-                  }}
-                >
-                  🗑️
-                </Button>
-
-                <span className="ms-2">{activeIndex === index ? "▲" : "▼"}</span>
-              </div>
+            <span className="ms-2">{activeIndex === index ? "▲" : "▼"}</span>
           </Card.Header>
 
           <Collapse in={activeIndex === index}>
@@ -232,15 +184,14 @@ export const StepProjects = forwardRef(({ initialData = [] }, ref) => {
                 initialData={project}
                 onChange={(data) => updateProject(index, data)}
                 showSubmit={false}
+                readOnly={true}
+                disabled={true}
               />
             </div>
           </Collapse>
         </Card>
       ))}
 
-        <Button variant="outline-primary" onClick={addProject}>
-          ➕ Add Project
-        </Button>
     </>
   ); 
 });
@@ -255,6 +206,7 @@ export const StepExperience = forwardRef(({ initialData = [] }, ref) => {
   ];
 
   const [experiences, setExperiences] = useState([]);
+  const [deletedExperiences, setDeletedExperiences] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
 
   const [versions, setVersions] = useState(
@@ -280,12 +232,13 @@ export const StepExperience = forwardRef(({ initialData = [] }, ref) => {
 
   useImperativeHandle(ref, () => ({
     getData: () => experiences,
+    getDeletedData: () => deletedExperiences,
   }));
 
   const addExperience = () => {
     setExperiences(prev => {
       setActiveIndex(prev.length);
-      return [...prev, {}];
+      return [...prev, {id: -1}];
     });
   };
 
@@ -405,6 +358,7 @@ export const StepEducation = forwardRef(({ initialData = [] }, ref) => {
   ];
 
   const [educationList, setEducationList] = useState([]);
+  const [deletedEducationList, setDeletedEducationList] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
 
   const [versions, setVersions] = useState(
@@ -430,12 +384,13 @@ export const StepEducation = forwardRef(({ initialData = [] }, ref) => {
 
   useImperativeHandle(ref, () => ({
     getData: () => educationList,
+    getDeletedData: () => deletedEducationList,
   }));
 
   const addEducation = () => {
     setEducationList(prev => {
       setActiveIndex(prev.length);
-      return [...prev, {}];
+      return [...prev, {id: -1}];
     });
   };
 
@@ -562,6 +517,7 @@ export const StepLanguages = forwardRef(({ initialData = [] }, ref) => {
   ];
 
   const [languages, setLanguages] = useState([]);
+  const [deletedLanguages, setDeletedLanguages] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
   const [versions, setVersions] = useState(
     () => languages.map(() => 0)
@@ -587,12 +543,13 @@ export const StepLanguages = forwardRef(({ initialData = [] }, ref) => {
 
   useImperativeHandle(ref, () => ({
     getData: () => languages,
+    getDeletedData: () => deletedLanguages,
   }));
 
   const addLanguage = () => {
     setLanguages(prev => {
       setActiveIndex(prev.length);
-      return [...prev, {}];
+      return [...prev, {id: -1}];
     });
   };
 

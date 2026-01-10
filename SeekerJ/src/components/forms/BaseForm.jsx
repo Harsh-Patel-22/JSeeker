@@ -3,7 +3,7 @@ import SpinnerButton from "../ui/SpinnerButton";
 
 // TODO - Add a showRequired bool in the fields...
 
-export const renderField = (field, handleChange, loading, formData) => {
+export const renderField = (field, handleChange, loading, formData, readOnly, disable) => {
     switch (field.type) {
       case "select":
         return (<select
@@ -11,7 +11,7 @@ export const renderField = (field, handleChange, loading, formData) => {
                   className="form-control"
                   onChange={handleChange}
                   value={field.options?.[formData[field.name]]?.value}
-                  disabled={loading}
+                  disabled={readOnly || disable || loading}
                   required={field.required}
                   >
                   <option value="">Select...</option>
@@ -28,7 +28,7 @@ export const renderField = (field, handleChange, loading, formData) => {
           <div className="space-x-6">
             {field.options?.map((opt) => (
               <label key={opt.value} className="inline-flex items-center gap-2">
-                <input type="radio" value={opt.value} name={field.name} onChange={handleChange}/>
+                <input type="radio" value={opt.value} name={field.name} onChange={handleChange} disabled={readOnly || disable || loading}/>
                 {opt.label}
               </label>
             ))}
@@ -50,7 +50,7 @@ export const renderField = (field, handleChange, loading, formData) => {
             className="form-control"
             value={formData[field.name]}
             onChange={handleChange}
-            disabled={loading}
+            disabled={readOnly || disable || loading}
             required={field.required}
           />
         );
@@ -62,7 +62,7 @@ export const renderField = (field, handleChange, loading, formData) => {
             className="form-control"
             value={formData[field.name]}
             onChange={handleChange}
-            disabled={loading}
+            disabled={readOnly || disable || loading}
             required={field.required}
           />
         );
@@ -74,7 +74,7 @@ export const renderField = (field, handleChange, loading, formData) => {
             className="form-control"
             value={formData[field.name]}
             onChange={handleChange}
-            disabled={loading}
+            disabled={readOnly || disable || loading}
             required={field.required}
             rows={4}
           />
@@ -89,7 +89,7 @@ export const renderField = (field, handleChange, loading, formData) => {
             className="form-control"
             value={formData[field.name]}
             onChange={handleChange}
-            disabled={loading}
+            disabled={readOnly || disable || loading}
             required={field.required}
           />
         ); 
@@ -108,7 +108,7 @@ export const renderField = (field, handleChange, loading, formData) => {
     }
   };
 
-export const renderFields = (fields, errors, onChange, loading, formData) => {
+export const renderFields = (fields, errors, onChange, loading, formData, readOnly, disabled) => {
   const rendered = [];
     for (let i = 0; i < fields.length; i++) {
       const field = fields[i];
@@ -123,7 +123,7 @@ export const renderFields = (fields, errors, onChange, loading, formData) => {
                   {f.required && f.showRequired && "* "}
                 </span>
                 <label className="form-label">{f.label}</label>
-                {renderField(f, onChange, loading, formData)}
+                {renderField(f, onChange, loading, formData, readOnly, disabled)}
                 {errors && errors[f.name] && (
                   <div className="text-danger small">{errors[f.name]}</div>
                 )}
@@ -147,7 +147,7 @@ export const renderFields = (fields, errors, onChange, loading, formData) => {
           if(field.type === "modal"){
             rendered.push(
               <>
-                {renderField(field, onChange, loading, formData)}
+                {renderField(field, onChange, loading, formData, readOnly, disabled)}
               </>
             );
           }
@@ -160,7 +160,7 @@ export const renderFields = (fields, errors, onChange, loading, formData) => {
                 </span>
                 <label className="form-label">{field.label}</label>
                 
-                {renderField(field, onChange, loading, formData)}
+                {renderField(field, onChange, loading, formData, readOnly, disabled)}
                 {errors && errors[field.name] && (
                   <div className="text-danger small">{errors[field.name]}</div>
                 )}
@@ -183,7 +183,9 @@ const BaseForm = ({
   validate,
   loading,
   redirectProgress,
-  showSubmit = true
+  showSubmit = true,
+  readOnly = false,
+  disabled = false,
 }) => {
   
   const [formData, setFormData] = useState(() => {
@@ -237,7 +239,7 @@ const BaseForm = ({
       
 
       <form onSubmit={handleSubmit}>
-        {renderFields(fields, errors, handleChange, loading, formData)}
+        {renderFields(fields, errors, handleChange, loading, formData, readOnly, disabled)}
         {/* <button type="submit">Submit</button> */}
         {showSubmit && <SpinnerButton loading={loading} type="submit">Submit</SpinnerButton>}
       </form>

@@ -23,9 +23,9 @@ const ResumeBuilderPage = () => {
     { title: "Basic Details", formName: "basicDetails", component: StepBasicDetails },
     { title: "Contact Details", formName: "contactDetails", component: StepContactDetails },
     { title: "Projects", formName: "projectDetails", component: StepProjects },
-    { title: "Experience", formName: "workExperienceDetails", component: StepExperience },
-    { title: "Education", formName: "educationDetails", component: StepEducation },
-    { title: "Languages", formName: "languageDetails", component: StepLanguages },
+    { title: "Experience", formName: "workExperienceDetails", formNameForDeleted: "deletedWorkExperienceDetails", component: StepExperience },
+    { title: "Education", formName: "educationDetails", formNameForDeleted: "deletedEducationDetails", component: StepEducation },
+    { title: "Languages", formName: "languageDetails", formNameForDeleted: "deletedLanguageDetails", component: StepLanguages },
   ];
 
   const CurrentStep = steps[step].component;
@@ -46,6 +46,10 @@ const ResumeBuilderPage = () => {
             workExperienceDetails: res?.data?.WorkExperienceDetails || [],
             educationDetails: res?.data?.EducationDetails || [],
             languageDetails: res?.data?.LanguageDetails || [],
+
+            deletedWorkExperienceDetails: [],
+            deletedEducationDetails: [],
+            deletedLanguageDetails: [],
           });
         }
       } catch (err) {
@@ -65,9 +69,22 @@ const ResumeBuilderPage = () => {
       ...prev,
       [steps[step].formName]: data
     }));
+    if (step == 0 || step == 1) {
+      // No deleted data for these steps
+    }
+    else{
+      if(steps[step].formNameForDeleted){
+        const deletedData = stepRef?.current?.getDeletedData();
+        setFormData(prev => ({
+          ...prev,
+          [steps[step].formNameForDeleted]: deletedData
+        }));
+      }
+    }
 
     if (step === steps.length - 1) {
       const response = await userService.updateResumeContents(formData);
+      console.log("Resume save response:", response);
       if (response.status !== HttpStatusCode.Ok) {
         showToast("Resume save failed", false);
       } else {
@@ -102,7 +119,7 @@ const ResumeBuilderPage = () => {
     <Container className="py-5">
       <Card className="p-4 shadow-sm rounded-4 border-0">
         <div className="text-center mb-4">
-          <h3 className="fw-bold text-primary">{steps[step].title}</h3>
+          <h3 className="fw-bold text-primary">{steps[step].title == "Projects" ? "Projects (Read Only)" : steps[step].title}</h3>
           <ProgressBar now={progress} label={`${Math.round(progress)}%`} />
         </div>
 
