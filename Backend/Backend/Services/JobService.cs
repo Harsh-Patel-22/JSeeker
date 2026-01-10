@@ -217,24 +217,20 @@ public class JobService (JobRepository jobRepository, InterviewRepository interv
         return applicationDto;
     }
 
-    public async Task UpdateApplicationStateAsync(Guid hirerId, ApplicationStateUpdateDto dto) {
-        if (!await validationService.IsHirerAsync(hirerId)) {
-            throw new Exception("Unauthorized");
-        }
-
+    public async Task UpdateApplicationStateAsync(Guid userId, ApplicationStateUpdateDto dto) {
         if (!await validationService.ApplicationExistsAsync(dto.ApplicationId)) {
             throw new Exception("No such application exists");
         }
         
-        if (!await validationService.IsTheirApplicationAsync(hirerId, dto.ApplicationId)) {
+        if (!await validationService.IsTheirApplicationAsync(userId, dto.ApplicationId)) {
             throw new Exception("Unauthorized");
         }
         
        
         await applicationRepository.UpdateApplicationStateAsync(dto.ApplicationId, dto.State);
         if (dto.State == ApplicationState.Rejected) {
-            Guid userId = await applicationRepository.GetSeekerIdByApplicationIdAsync(dto.ApplicationId);
-            await userRepository.IncrementRejectedCountAsync(userId);
+            Guid seekerId = await applicationRepository.GetSeekerIdByApplicationIdAsync(dto.ApplicationId);
+            await userRepository.IncrementRejectedCountAsync(seekerId);
         }
         
     }
