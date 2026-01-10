@@ -30,16 +30,6 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
     }
 
     public async Task UpdateUserDetailsWithResumeDtoAsync(Guid userId, UpdatedResumeContentsDto dto) {
-        foreach (var projectDetails in dto.ProjectDetails) {
-
-            if (projectDetails.Id == -1) {
-                // Add new project but cant add from here. Need to cater that in the service layer
-                
-            }
-            else {
-                await context.Projects.Where(proj => proj.Id == projectDetails.Id).ExecuteUpdateAsync(setter => setter.SetProperty(p => p.Name, projectDetails.Name).SetProperty(p => p.Description, projectDetails.Description).SetProperty(p => p.GithubRepoLink, projectDetails.GithubRepoLink).SetProperty(p => p.LastUpdatedDate, projectDetails.LastUpdatedDate));
-            }
-        }
         foreach (var experienceDetails in dto.WorkExperienceDetails) {
 
             if (experienceDetails.Id == -1) {
@@ -92,9 +82,6 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
         }
 
 
-        foreach (var deletedProject in dto.DeletedProjectDetails) {
-            await context.Projects.Where(p => p.Id == deletedProject.Id).ExecuteDeleteAsync();
-        }
         foreach (var deletedEducation in dto.DeletedEducationDetails) {
             await context.Educations.Where(e => e.Id == deletedEducation.Id).ExecuteDeleteAsync();
         }
