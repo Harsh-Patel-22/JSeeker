@@ -16,10 +16,10 @@ public class InterviewRepository (ApplicationDbContext context) {
             .ThenInclude(job => job.Address)
             .Where(i => i.HirerId == userId || i.SeekerId == userId);
         if (state == InterviewState.Scheduled) {
-            query = query.Where(i => i.ConfirmedBySeeker == true && i.ConfirmedByHirer == true && i.Date > DateOnly.FromDateTime(DateTime.Now));
+            query = query.Where(i => (i.ConfirmedBySeeker == true && i.ConfirmedByHirer == true) && (i.Date > DateOnly.FromDateTime(DateTime.Now) || (i.Date == DateOnly.FromDateTime(DateTime.Now) && i.Time > TimeOnly.FromDateTime(DateTime.Now))));
         }
         else if (state == InterviewState.Taken) {
-            query = query.Where(i => i.ConfirmedBySeeker == true && i.ConfirmedByHirer == true && i.Date < DateOnly.FromDateTime(DateTime.Now));
+            query = query.Where(i => (i.ConfirmedBySeeker == true && i.ConfirmedByHirer == true) && (i.Date < DateOnly.FromDateTime(DateTime.Now) || (i.Date == DateOnly.FromDateTime(DateTime.Now)  && i.Time < TimeOnly.FromDateTime(DateTime.Now))));
         }
         else {
             // Fetch the ones that are updated (confirmed by the other party and not by him self)
