@@ -235,7 +235,7 @@ const JobForm = ({ mode = "create", jobData = null }) => {
                   className="form-control"
                   name="requiredWorkExperience"
                   placeholder="e.g. 5"
-                  defaultValue={jobData?.requiredWorkExperience || ""}
+                  defaultValue={jobData?.requiredWorkExperience >= 0 ? jobData?.requiredWorkExperience : ""}
                 />
               </div>
 

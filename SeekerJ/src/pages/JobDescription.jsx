@@ -94,6 +94,21 @@ const JobDescription = () => {
         {type == "seeker" && !applied && <button className="btn btn-primary" onClick={() => setShowConfirm(true)}>Apply</button>}
         <ConfirmModal loading={loading} show={showConfirm} onConfirm={() => apply({"seekerId": user.clientId, "jobId": job.id, "hirerId": job.hirerId, "jobType": job.type})} onCancel={() => setShowConfirm(false)}  message={<>Confirm Application Creation</>}/>
       </div>
+      <div className="mt-3 mt-md-0">
+        {type == "hirer" &&
+          <svg xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-pencil"
+              viewBox="0 0 16 16"
+              onClick={() => {navigate('/job/edit', {state: {jobId: job.id}})}}
+          >
+              <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.793 9.793-3.182.795a.25.25 0 0 1-.303-.303l.795-3.182 9.793-9.793z"/>
+              <path d="M11.207 2L3 10.207V13h2.793L14 4.793 11.207 2z"/>
+          </svg>
+      }
+      </div>
     </div>
 
     <hr className="my-4" />
