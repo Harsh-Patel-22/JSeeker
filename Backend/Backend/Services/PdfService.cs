@@ -46,7 +46,7 @@ public class PdfService {
             <p>{{ProjectDescription}}</p>
             <p><strong>Technologies:</strong> {{Technologies}}</p>
             <p><small>{{StartDate}} – {{LastUpdatedDate}}</small></p>
-            <a href='{{GithubRepoLink}}'>GitHub Repo</a>
+            <a href='{{GithubRepoLink}}'>Github Repo: {{ProjectName}}</a>
           </div>";
           foreach (var project in ProjectDetails.EnumerateArray()) {
             var projectHtml = projectTemplate.Replace("{{ProjectName}}", project.GetProperty("Name").GetString())
