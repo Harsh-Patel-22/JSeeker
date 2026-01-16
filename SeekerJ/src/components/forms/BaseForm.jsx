@@ -29,7 +29,7 @@ export const renderField = (field, handleChange, loading, formData, readOnly, di
             {field.options?.map((opt) => (
               <label key={opt.value} className="inline-flex items-center gap-2">
                 <input type="radio" value={opt.value} name={field.name} onChange={handleChange} disabled={readOnly || disable || loading}/>
-                {opt.label}
+                <span style={{marginRight: "10px"}}>{opt.label}</span>
               </label>
             ))}
           </div>
