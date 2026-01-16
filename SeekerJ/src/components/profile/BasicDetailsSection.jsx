@@ -14,7 +14,7 @@ const BasicDetailsSection = ({details}) => {
         <div>
           <h4 className="fw-bold mb-3 mt-3">{details?.firstName} {details?.lastName}</h4>
           <p className="text-muted mb-0">{details?.aboutLine} </p>
-          <p className="text-muted small">{details?.state}, {details?.country}</p>
+          <p className="text-muted small">{details?.companyAddress != undefined ? `${details?.companyAddress?.state}, ${details?.companyAddress?.country}` : `${details?.state}, ${details?.country}`}</p>
           {/* <p className="text-muted small">
             Focused on Full Stack Development | Game Dev | YouTuber (About/Description)
           </p> */}
