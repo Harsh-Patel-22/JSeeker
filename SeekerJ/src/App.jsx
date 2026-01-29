@@ -24,6 +24,8 @@ import MetricsLandingPage from './pages/MetricsLandingPage';
 import UnauthNavbar from './components/UnauthNavbar';
 import ResumeBuilderPage from './pages/ResumeBuilderPage';
 import EditJob from './pages/EditJob';
+import About from './pages/About';
+import Features from './pages/Features';
 
 const App = () => {
   const authVar = useAuth();
@@ -88,6 +90,8 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/testing" element={<Testing />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/features" element={<Features />} />
           <Route path="/*" element={<UnauthorisedPage />} />
 
           {/* Testing */}
