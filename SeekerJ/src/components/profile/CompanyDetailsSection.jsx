@@ -17,7 +17,7 @@ const CompanyDetailsSection = ({ details }) => {
         <li className="mb-2">
           <strong>Website:</strong>{" "}
           <a
-            href={`${details?.websiteLink}`}
+            href={`https://${details?.websiteLink}`}
             className="text-decoration-none"
           >
             {details?.websiteLink}
