@@ -16,11 +16,6 @@ const Map = () => {
     
     useEffect(() => {
         async function searchAndFetchNearbyJobs() {
-            let locationobj = {
-                "latitude": position[0],
-                "longitude": position[1],
-                "searchdistance": searchDistance / 1200
-            }
             try {
                 let response = await jobService.getNearbyJobs(searchDistance, {"type": "Internship", "status": "Open", "mode": "OnSite"});
                 setNearbyJobs(response.data);
@@ -105,13 +100,20 @@ const Map = () => {
       fetchUserCoordinates();
     }, []);
 
+    const getZoomFromDistance = (meters) => {
+      if (meters <= 2000) return 14;
+      if (meters <= 5000) return 13;
+      if (meters <= 10000) return 12;
+      return 11;
+    };
+
     return <>
         <MapContainer 
-      center={position} 
-      zoom={11} // TODO - set the searchDistance level dynamically based on the search distance
-      scrollWheelZoom={false} 
-      style={{ height: "75vh", width: "100%" }}
-    >
+          center={position} 
+          zoom={getZoomFromDistance(searchDistance)} // TODO - set the searchDistance level dynamically based on the search distance
+          scrollWheelZoom={false} 
+          style={{ height: "100vh", width: "100%" }}
+        >
             <TileLayer url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <MapViewUpdater center={position}/>
 
@@ -143,12 +145,12 @@ const Map = () => {
           <input
             type="range"
             min="1"
-            max="20"
-            value={searchDistance / 1200}
-            onChange={(e) => setSearchDistance(e.target.value * 1200)}
+            max="40"
+            value={searchDistance / 1000}
+            onChange={(e) => setSearchDistance(e.target.value * 1000)}
             className="slider"
             />
-          <span className="slider-value">{searchDistance/ 1200}</span>
+          <span className="slider-value">{searchDistance / 1000} km</span>
         </div>
         <center>Set Search Distance</center>
       </div>

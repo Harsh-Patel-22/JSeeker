@@ -143,6 +143,31 @@ public class JobRepository (ApplicationDbContext context, JobsAggregateQueryServ
             return false;
         }
     }
+    
+    private double CalculateDistanceInMeters(
+        double lat1, double lon1,
+        double lat2, double lon2)
+    {
+        const double EarthRadius = 6371000;
+
+        double dLat = DegreesToRadians(lat2 - lat1);
+        double dLon = DegreesToRadians(lon2 - lon1);
+
+        double a =
+            Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+            Math.Cos(DegreesToRadians(lat1)) *
+            Math.Cos(DegreesToRadians(lat2)) *
+            Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        return EarthRadius * c;
+    }
+
+    private double DegreesToRadians(double deg)
+    {
+        return deg * (Math.PI / 180);
+    }
+
 
     public async Task<List<JobForMapMarkerDto>?> GetNearbyJobsAsync(Guid clientId, Roles role, Decimal searchDistance, JobSearchFilterDto searchFilter) {
         LocationDto? targetLocation = await context.Users.Where(u => u.Id == clientId).Include(u => u.Address).Select(u => new LocationDto(u.Address.Latitude, u.Address.Longitude)).FirstOrDefaultAsync();
@@ -160,15 +185,21 @@ public class JobRepository (ApplicationDbContext context, JobsAggregateQueryServ
         
         List<JobForMapMarkerDto>? nearbyJobs = new List<JobForMapMarkerDto>();
         foreach (var job in relevantJobCards) {
-            decimal distance = (decimal)Math.Sqrt(Math.Pow((double)(job.Address.Latitude - targetLocation.Latitude), 2) + Math.Pow((double)(job.Address.Latitude - targetLocation.Latitude), 2));
-            if (distance < searchDistance) {
+            double distanceInMeters = CalculateDistanceInMeters(
+                (double)targetLocation.Latitude,
+                (double)targetLocation.Longitude,
+                (double)job.Address.Latitude,
+                (double)job.Address.Longitude
+            );
+            
+            if (distanceInMeters < (double) searchDistance) {
                 nearbyJobs.Add(new JobForMapMarkerDto() {
                     Id = job.Id,
                     Title = job.Title,
                     Type = job.Type,
                     CompanyName = job.CompanyName,
                     HirerId = job.HirerId,
-                    Distance = (decimal) Math.Sqrt(Math.Pow((double) (job.Address.Latitude - targetLocation.Latitude), 2) + Math.Pow((double) (job.Address.Latitude - targetLocation.Latitude), 2)),
+                    Distance = (decimal) distanceInMeters,
                     Address =  job.Address
                 });
             }
