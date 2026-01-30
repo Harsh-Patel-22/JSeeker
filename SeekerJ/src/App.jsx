@@ -77,6 +77,8 @@ const App = () => {
           <Route path="/interviews" element={<InterviewSchedule />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/resume" element={<ResumeBuilderPage />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/features" element={<Features />} />
 
           {/* Testing */}
           <Route path="/seekerReg" element={<SeekerSecondaryDetails />} />
