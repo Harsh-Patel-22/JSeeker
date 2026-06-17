@@ -16,24 +16,28 @@ public class MetricsQueryService(ApplicationDbContext context) {
     }
 
     private async Task<float> GetAverageNumberOfJobsPostedDailyAsync() {
-        // TODO - Find a way to make it better - SumAsync() and AverageAsync()
-        float monthlyAverages = 0f;
-        int currentYear = DateTime.Now.Year;
         int lastNYears = 5;
+        var cutoffDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-lastNYears));
+        
+        // Fetch only the Year and Month of jobs in the last 5 years in a single DB query
+        var jobDates = await context.Jobs
+            .Where(job => job.PostDate >= cutoffDate)
+            .Select(job => new { job.PostDate.Year, job.PostDate.Month })
+            .ToListAsync();
+            
         float totalAverages = 0f;
+        int currentYear = DateTime.Now.Year;
         
-        for (int year = currentYear; lastNYears >= currentYear - year; year--) {
-            for (int i = 1; i <= 12; i++) {
-                var count = await context.Jobs.Where(job => job.PostDate.Month == i && job.PostDate.Year == year).CountAsync();
-                monthlyAverages += count;
+        for (int year = currentYear; year > currentYear - lastNYears; year--) {
+            float monthlySum = 0f;
+            for (int month = 1; month <= 12; month++) {
+                int count = jobDates.Count(jd => jd.Year == year && jd.Month == month);
+                monthlySum += count;
             }
-            monthlyAverages /= 12;
-            totalAverages += monthlyAverages;
-            monthlyAverages = 0f;
+            totalAverages += (monthlySum / 12f);
         }
-        totalAverages /= lastNYears;
         
-        return totalAverages;
+        return totalAverages / lastNYears;
     }
 
     private async Task<int> GetNumberOfSuccessfulJobLandingsAsync() {
@@ -44,20 +48,24 @@ public class MetricsQueryService(ApplicationDbContext context) {
         return await context.Users.Select(user => user.NumberOfRejections).SumAsync();
     }
 
-    private async Task<float> GetJobLandingSuccessRateAsync() {
-        int successNumber = await GetNumberOfSuccessfulJobLandingsAsync();
-        int failureNumber = await GetNumberOfRejectionsAsync();
-        return (float) successNumber / (successNumber + failureNumber);
-    }
-
     public async Task<MetricsDto> GetAllMetricsAsync() {
+        int totalUsers = await GetTotalNumberOfRegisteredUsersAsync();
+        int totalJobs = await GetTotalNumberOfJobsAsync();
+        float avgJobs = await GetAverageNumberOfJobsPostedDailyAsync();
+        int successLandings = await GetNumberOfSuccessfulJobLandingsAsync();
+        int rejections = await GetNumberOfRejectionsAsync();
+        
+        float successRate = (successLandings + rejections) > 0 
+            ? (float)successLandings / (successLandings + rejections) 
+            : 0f;
+
         return new MetricsDto(
-            await GetTotalNumberOfRegisteredUsersAsync(),
-            await GetTotalNumberOfJobsAsync(),
-            await GetAverageNumberOfJobsPostedDailyAsync(),
-            await GetNumberOfSuccessfulJobLandingsAsync(),
-            await GetJobLandingSuccessRateAsync()
-            );
+            totalUsers,
+            totalJobs,
+            avgJobs,
+            successLandings,
+            successRate
+        );
     }
     
 }

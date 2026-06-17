@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -64,6 +64,30 @@ if (app.Environment.IsDevelopment()) {
 
 using var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+int maxRetries = 30;
+int delaySeconds = 15;
+for (int i = 1; i <= maxRetries; i++)
+{
+    try
+    {
+        Console.WriteLine($"[Startup] Attempting database migration/connection (attempt {i}/{maxRetries})...");
+        await db.Database.MigrateAsync();
+        Console.WriteLine("[Startup] Database is ready and migrations are up to date.");
+        break;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Startup] Database connection/migration failed: {ex.Message}");
+        if (i == maxRetries)
+        {
+            Console.WriteLine("[Startup] Maximum retries reached. Database is still unreachable. Exiting.");
+            throw;
+        }
+        Console.WriteLine($"[Startup] Waiting {delaySeconds} seconds before retrying...");
+        await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+    }
+}
 // await DbSeeder.SeedAsync(db);
 
 

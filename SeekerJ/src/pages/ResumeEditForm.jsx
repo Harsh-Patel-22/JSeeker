@@ -9,6 +9,7 @@ const ResumeEditForm = () => {
       try {
         const response = await api.get("user/get/resume");
         setResumeData(response.data);
+        console.log("Fetched resume data:", response.data['BasicDetails']);
       } catch (error) {
         console.error("Error fetching resume data:", error);
       }
@@ -46,16 +47,16 @@ const ResumeEditForm = () => {
           Basic Details
         </div>
         <div className="card-body row g-3">
-          {["firstName", "lastName", "state", "country", "aboutLine"].map(
+          {["FirstName", "LastName", "State", "Country", "AboutLine"].map(
             (field) => (
               <div key={field} className="col-md-6">
                 <label className="form-label">{field}</label>
                 <input
                   type="text"
                   className="form-control"
-                  value={resumeData.basicDetails?.[field] || ""}
+                  value={resumeData['BasicDetails']?.[field] || ""}
                   onChange={(e) =>
-                    handleChange("basicDetails", field, e.target.value)
+                    handleChange("BasicDetails", field, e.target.value)
                   }
                 />
               </div>

@@ -69,36 +69,6 @@ Content-Type: application/json
 ###
 GET {{Backend_HostAddress}}/api/job/description/3
 
-###
-POST {{Backend_HostAddress}}//api/auth/register
-Content-Type: application/json
-
-{
-  "username": "harsh",
-  "password": "harsh",
-  "email": "harsh@gmail.com",
-  "role": "Seeker"
-}
-
-###
-POST {{Backend_HostAddress}}/api/auth/login
-Content-Type: application/json
-
-{
-  "username": "harsh",
-  "password": "harsh",
-  "role": "Seeker"
-}
-
-###
-POST {{Backend_HostAddress}}/api/auth/login
-Content-Type: application/json
-
-{
-  "username": "h",
-  "password": "h",
-  "role": "Hirer"
-}
 
 ###
 // Testing
@@ -414,3 +384,14 @@ POST {{Backend_HostAddress}}/api/testing/repos
 ###
 GET {{Backend_HostAddress}}/api/testing/get/resume/pdf
 
+###
+POST {{Backend_HostAddress}}/api/job/update/status/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIwZjVkMzhlYi04NmQ4LTQ1YjctYjcxZS03Y2VhOTU3YWJkMWEiLCJuYW1lIjoiaGlyZXJUZXN0aW5nIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiSGlyZXIiLCJleHAiOjE3NTc5MzczMDIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3NSJ9.l3NAdqUSgGPeQvlvNV3X_V-YMM_6On7HayZM7ldhSOs
+
+"Closed"
+
+
+###
+GET {{Backend_HostAddress}}/api/testing/ratings
+Content-Type: application/json

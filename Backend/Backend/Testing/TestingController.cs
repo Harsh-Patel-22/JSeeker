@@ -11,7 +11,7 @@ namespace Backend.Testing;
 
 [ApiController]
 [Route("api/testing")]
-public class TestingController(ResumeBuilderService resumeBuilder, UserRepository userRepository,GithubService githubService, PdfService pdfService, RatingService ratingService, UserService userService) : ControllerBase {
+public class TestingController(ResumeBuilderService resumeBuilder, JobService jobService, UserRepository userRepository,GithubService githubService, PdfService pdfService, RatingService ratingService, UserService userService) : ControllerBase {
     [HttpGet]
     public async Task<IActionResult> Get() {
         // Guid userId = Guid.NewGuid();
@@ -61,5 +61,12 @@ public class TestingController(ResumeBuilderService resumeBuilder, UserRepositor
         }
         var keywords = await resumeBuilder.GetAIGeneratedKeywordsAsync(allInsightsList);
         return Ok(keywords);
+    }
+
+    [HttpGet("ratings")]
+    public async Task<IActionResult> GetRatings() {
+        ApplicationKeyInformationDto dto = await jobService.GetApplicationKeyInformationByIdAsync(1);
+        var rating = await ratingService.GetAIRatingForApplicationAsync(dto);
+        return Ok(rating);
     }
 }

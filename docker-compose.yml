@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  database:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: seekerj-db
+    user: root
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_MEMORY_LIMIT_MB=350
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql/data
+      - ./db-backup:/var/opt/mssql/backup
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\""]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db-init:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: seekerj-db-init
+    environment:
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    volumes:
+      - ./db-backup:/var/opt/mssql/backup
+      - mssql-data:/var/opt/mssql/data
+    entrypoint: /bin/bash
+    command: -c "bash /var/opt/mssql/backup/restore.sh"
+    depends_on:
+      database:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend:
+    image: harshpatel22/jseeker-backend:latest
+    build:
+      context: ./Backend/Backend
+      dockerfile: Dockerfile
+    container_name: seekerj-backend
+    ports:
+      - "5275:5275"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=database,1433;Database=JSeeker;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      - jwt__key=${JWT_KEY}
+      - jwt__audience=${JWT_AUDIENCE}
+      - jwt__issuer=${JWT_ISSUER}
+      - GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPEN_CAGE_API_KEY=${OPEN_CAGE_API_KEY}
+      - ASPNETCORE_URLS=http://0.0.0.0:5275
+      - DOTNET_gcServer=0
+      - DOTNET_GCLatencyMode=0
+    depends_on:
+      database:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend:
+    image: harshpatel22/jseeker-frontend:latest
+    build:
+      context: ./SeekerJ
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+    container_name: seekerj-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mssql-data:

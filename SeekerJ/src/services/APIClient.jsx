@@ -4,14 +4,14 @@ import { useAuth } from '../contexts/AuthContext';
 
 
 export const api = axios.create({
-    baseURL: "http://localhost:5275/api",
+    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5275/api",
     headers: {
         'Content-Type': 'application/json',
     }
 })
 
 export const blobApi = axios.create({
-    baseURL: "http://localhost:5275/api",
+    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5275/api",
     headers: {
         'Content-Type': 'application/json',
     },

@@ -1,4 +1,7 @@
 /Backend/Backend/.env
+.env
+SeekerJ/.env
+*.zip
 
 # Ignore compiled binaries
 *.dll

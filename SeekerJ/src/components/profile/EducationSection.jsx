@@ -7,19 +7,11 @@ const EducationSection = ({details}) => {
 
       {details && details.map((edu, index) => {
         return <div className="mb-3">
-          {/* <h5 className="fw-bold mb-3">{edu.study}</h5> */}
           <p className="mb-1 fw-semibold">{edu.study.toUpperCase()}</p>
           <p className="small mb-1">{edu.instituteName}, {edu.state}</p>
           <p className="small mb-0">{edu.startDate.substring(0, 4)} - {edu.endDate.substring(0, 4)}</p>
         </div>
       })}
-      {/* <div className="mb-3">
-        <p className="mb-1 fw-semibold">YouTube Gaming Creator</p>
-        <p className="text-muted small mb-1">Mobile Legends Channel • Apr 2022 – Present</p>
-        <p className="text-muted small">
-          Edited high-quality gameplays and built a growing audience by storytelling through thumbnails and titles.
-        </p>
-      </div> */}
     </div>
   ) 
 }

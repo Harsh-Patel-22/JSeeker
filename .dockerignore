@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vs
+node_modules
+SeekerJ/node_modules
+Backend/Backend/bin
+Backend/Backend/obj
+Backend/Backend/TestResults
+*.user
+db-backup/*.bak
+db-backup/JSeeker.bak
