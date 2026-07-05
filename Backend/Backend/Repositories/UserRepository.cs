@@ -41,10 +41,14 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
                     StartDate = experienceDetails.StartDate,
                     EndDate = experienceDetails.EndDate,
                 });
-                await context.SaveChangesAsync();
             }
             else {
-                await context.WorkExperiences.Where(we => we.Id == experienceDetails.Id).ExecuteUpdateAsync(setter => setter.SetProperty(we => we.CompanyName, experienceDetails.CompanyName).SetProperty(we => we.Description, experienceDetails.Description).SetProperty(we => we.Role, experienceDetails.Role).SetProperty(we => we.EndDate, experienceDetails.EndDate).SetProperty(we => we.StartDate, experienceDetails.StartDate));
+                var we = new WorkExperience() {
+                    Id = experienceDetails.Id, CompanyName = experienceDetails.CompanyName,
+                    Description = experienceDetails.Description, StartDate = experienceDetails.StartDate,
+                    EndDate = experienceDetails.EndDate, Role = experienceDetails.Role
+                };
+                context.WorkExperiences.Attach(we).State = EntityState.Modified;
             }
         }
         foreach (var educationDetails in dto.EducationDetails) {
@@ -59,10 +63,15 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
                     EndDate = educationDetails.EndDate,
                     StartDate = educationDetails.StartDate
                 });
-                await context.SaveChangesAsync();
             }
             else {
-                await context.Educations.Where(e => e.Id == educationDetails.Id).ExecuteUpdateAsync(setter => setter.SetProperty(e => e.Country, educationDetails.Country).SetProperty(e => e.InstituteName, educationDetails.InstituteName).SetProperty(e => e.Study, educationDetails.Study).SetProperty(e => e.State, educationDetails.State).SetProperty(e => e.EndDate, educationDetails.EndDate).SetProperty(e => e.StartDate, educationDetails.StartDate));
+                var edu = new Education() {
+                    Id = educationDetails.Id, Country = educationDetails.Country,
+                    InstituteName = educationDetails.InstituteName, Study = educationDetails.Study,
+                    State = educationDetails.State, EndDate = educationDetails.EndDate,
+                    StartDate = educationDetails.StartDate
+                };
+                context.Educations.Attach(edu).State = EntityState.Modified;
             }
         }
 
@@ -80,14 +89,15 @@ public class UserRepository (ApplicationDbContext context, AddressRepository add
 
             }
         }
-
-
-        foreach (var deletedEducation in dto.DeletedEducationDetails) {
-            await context.Educations.Where(e => e.Id == deletedEducation.Id).ExecuteDeleteAsync();
+        
+        foreach (var education in dto.DeletedEducationDetails.Select(deletedEducation => new Education() { Id = deletedEducation.Id })) {
+            context.Entry(education).State = EntityState.Deleted;
         }
-        foreach (var deletedWorkExperience in dto.DeletedWorkExperienceDetails) {
-            await context.WorkExperiences.Where(we => we.Id == deletedWorkExperience.Id).ExecuteDeleteAsync();
+        foreach (var workExperience in dto.DeletedWorkExperienceDetails.Select(deletedWorkExperience => new WorkExperience() { Id = deletedWorkExperience.Id })) {
+            context.Entry(workExperience).State = EntityState.Deleted;
         }
+        
+        await context.SaveChangesAsync();
     }
     
     public async Task UpdateUserSecondaryDetailsAsync(Guid userId, UserSecondaryDetailsDto dto) {
