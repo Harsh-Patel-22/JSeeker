@@ -76,28 +76,39 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
     }
 
     public async Task<HirerDashboardMetricsDto> GetHirerDashboardMetricsAsync(Guid hirerId) {
-        var totalHires = await context.Interviews.Where(i => i.HirerId == hirerId && i.Outcome == InterviewOutcome.Hired)
-            .ToListAsync();
+        var totalHires = await context.Interviews.Where(i => i.HirerId == hirerId && i.Outcome == InterviewOutcome.Hired).CountAsync();
         var numActiveJobOpenings = await context.Jobs
-            .Where(job => job.HirerId == hirerId && job.Status != JobStatus.Closed).ToListAsync();
+            .Where(job => job.HirerId == hirerId && job.Status != JobStatus.Closed)
+            .CountAsync();
         var numNewApplicationsToday = await context.Applications
-            .Where(appl => appl.HirerId == hirerId && appl.AppliedOn == DateOnly.FromDateTime(DateTime.Today)).ToListAsync();
+            .Where(appl => appl.HirerId == hirerId && appl.AppliedOn == DateOnly.FromDateTime(DateTime.Today))
+            .CountAsync();
         
         // var numRejectedFromApplication = await context.Applications.Where(appl => appl.HirerId == hirerId && appl.State == ApplicationState.Rejected).ToListAsync();
         // var numRejectedFromInteview = await context.Interviews.Where(appl => appl.HirerId == hirerId && appl.Outcome == InterviewOutcome.Rejected).ToListAsync();
-        var numTotalApplications = await context.Applications.Where(appl => appl.HirerId == hirerId).ToListAsync();
+        var numTotalApplications = await context.Applications
+            .Where(appl => appl.HirerId == hirerId)
+            .CountAsync();
         
         
-        var totalApplications = await context.Applications.Where(appl => appl.HirerId == hirerId).ToListAsync();
-        var shortlistedApplications = await context.Applications.Where(appl => appl.HirerId == hirerId && appl.State != ApplicationState.Pending && appl.State != ApplicationState.Rejected).ToListAsync();
-        var interviewed = await context.Applications.Where(appl => appl.HirerId == hirerId && (appl.State == ApplicationState.InterviewScheduled || appl.State == ApplicationState.InterviewsFinished)).ToListAsync();
-        var hired = await context.Applications.Where(appl => appl.HirerId == hirerId && appl.State == ApplicationState.InterviewsFinished && appl.Interview.Outcome == InterviewOutcome.Hired).ToListAsync();
+        var totalApplications = await context.Applications
+            .Where(appl => appl.HirerId == hirerId)
+            .CountAsync();
+        var shortlistedApplications = await context.Applications
+            .Where(appl => appl.HirerId == hirerId && appl.State != ApplicationState.Pending && appl.State != ApplicationState.Rejected)
+            .CountAsync();
+        var interviewed = await context.Applications
+            .Where(appl => appl.HirerId == hirerId && (appl.State == ApplicationState.InterviewScheduled || appl.State == ApplicationState.InterviewsFinished))
+            .CountAsync();
+        var hired = await context.Applications
+            .Where(appl => appl.HirerId == hirerId && appl.State == ApplicationState.InterviewsFinished && appl.Interview.Outcome == InterviewOutcome.Hired)
+            .CountAsync();
         var dto = new HirerDashboardMetricsDto() {
             Metrics = new MetricsDto() {
-                NumActiveJobOpenings = numActiveJobOpenings.Count,
-                NumNewApplicationsToday = numNewApplicationsToday.Count,
-                TotalHires = totalHires.Count,
-                HiringRate = numTotalApplications.Count == 0 ? 0 : (decimal) totalHires.Count / numTotalApplications.Count,
+                NumActiveJobOpenings = numActiveJobOpenings,
+                NumNewApplicationsToday = numNewApplicationsToday,
+                TotalHires = totalHires,
+                HiringRate = numTotalApplications == 0 ? 0 : (decimal) totalHires / numTotalApplications,
             },
             
             ScheduledInterviews = await context.Interviews.Where(i => i.HirerId == hirerId && i.ConfirmedByHirer && i.ConfirmedBySeeker && i.Date == DateOnly.FromDateTime(DateTime.Today)).Select(i => new InterviewBasicDetailsDto() {
@@ -111,22 +122,22 @@ public class JobsAggregateQueryService (ApplicationDbContext context) {
             funnelData = [
                 new ApplicationFunnelEntryDto() {
                     Stage = Stages.Applied,
-                    Value = totalApplications.Count,
+                    Value = totalApplications,
                     Fill = Color.FromArgb(136, 132, 216)
                 },
                 new ApplicationFunnelEntryDto() {
                     Stage = Stages.Shortlisted,
-                    Value = shortlistedApplications.Count,
+                    Value = shortlistedApplications,
                     Fill = Color.FromArgb(130, 202, 157)
                 },
                 new ApplicationFunnelEntryDto() {
                     Stage = Stages.Interviewed,
-                    Value = interviewed.Count,
+                    Value = interviewed,
                     Fill = Color.FromArgb(255, 198, 88)
                 },
                 new ApplicationFunnelEntryDto() {
                     Stage = Stages.Hired,
-                    Value = hired.Count,
+                    Value = hired,
                     Fill = Color.FromArgb(255, 115, 0)
                 }
             ]
