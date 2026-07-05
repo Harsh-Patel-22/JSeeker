@@ -31,7 +31,7 @@ public class GithubService {
             var downloadUrl = configFile.GetProperty("download_url").GetString();
 
             if (possibleConfigFilesList.Contains(name, StringComparer.OrdinalIgnoreCase)) {
-                var fileContents = _httpClient.GetStringAsync(downloadUrl).Result;
+                var fileContents = await _httpClient.GetStringAsync(downloadUrl);
                 result.Add(name, fileContents);                
             }
         }
@@ -119,7 +119,7 @@ public class GithubService {
         // TODO - Add error catch if no readme file exists in the repo
         var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/readme");
         response.EnsureSuccessStatusCode();
-        var readmeString = response.Content.ReadAsStringAsync().Result;
+        var readmeString = await response.Content.ReadAsStringAsync();
         
         using var doc = JsonDocument.Parse(readmeString);
         var root = doc.RootElement;
@@ -176,13 +176,13 @@ public class GithubService {
     // private async Task<string> GetRepoTopicsAsync(string owner, string repo) {
     //     var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/topics");
     //     response.EnsureSuccessStatusCode();
-    //     return response.Content.ReadAsStringAsync().Result;
+    //     return await response.Content.ReadAsStringAsync();
     // }
     //
     // private async Task<string> GetRepoTagsAsync(string owner, string repo) {
     //     var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}repos/{owner}/{repo}/tags");
     //     response.EnsureSuccessStatusCode();
-    //     return response.Content.ReadAsStringAsync().Result;
+    //     return await response.Content.ReadAsStringAsync();
     // }
 
 }
