@@ -2,9 +2,8 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Backend.Data;
 using Backend.Extensions;
-using Backend.Services;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,6 +18,14 @@ builder.Services.AddControllers().AddJsonOptions(options =>
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
 });
 
+
+builder.Services.AddResponseCompression(options => {
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+builder.Services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
+builder.Services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
 
 builder.Services.AddHttpClients();
 
@@ -90,7 +97,7 @@ for (int i = 1; i <= maxRetries; i++)
 }
 // await DbSeeder.SeedAsync(db);
 
-
+app.UseResponseCompression();
 app.UseHttpsRedirection();
 app.MapControllers();
 
